@@ -1,0 +1,19 @@
+require "sy/version"
+require "sy/parser"
+require 'sy/normalization'
+
+require 'sy/substitution'
+require 'sy/function'
+require 'sy/sum'
+require 'sy/subtraction'
+require 'sy/minus'
+require 'sy/product'
+require 'sy/fraction'
+require 'sy/power'
+require 'sy/variable'
+require 'sy/constantsymbol'
+require 'sy/number'
+require 'sy/value'
+require 'sy/normalization'
+require 'sy/derivative'
+require 'sy/path'
