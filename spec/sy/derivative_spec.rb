@@ -1,7 +1,5 @@
 require 'spec_helper'
 require 'sy'
-require 'sy/derivative'
-require 'sy/normalization'
 
 module Sy
   d = Sy::Derivative.new('x'.to_m)

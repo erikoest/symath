@@ -1,6 +1,5 @@
 require 'spec_helper'
 require 'sy'
-require 'sy/normalization'
 
 module Sy
   n = Sy::Normalization.new
@@ -23,10 +22,12 @@ module Sy
   describe Sy::Normalization, ', normalize product' do
     products = {
       :x.to_m * :x              => 'x^2',
+      :x.to_m * (-:x.to_m)      => '- x^2',
       :x.to_m * :x.to_m ** 2    => 'x^3',
       :x.to_m * 4 * :x * 3 * :y * :y.to_m ** 10 => '12*x^2*y^11',
       :x.to_m / :y.to_m * :a / :b.to_m          => 'a*x/(b*y)',
       14175.to_m / 9000.to_m    => '63/40',
+      fn(:cos, :x)*:y           => 'y*cos(x)',
     }
 
     products.each do |from, to|

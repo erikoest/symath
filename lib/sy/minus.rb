@@ -26,6 +26,10 @@ module Sy
       return argument.div_factors_to_a
     end
 
+    def coefficientless()
+      return argument.coefficientless
+    end
+    
     def coefficient()
       return argument.coefficient
     end

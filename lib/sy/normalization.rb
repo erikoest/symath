@@ -17,39 +17,40 @@ module Sy
 
   # The operation is repeated until no 
   class Normalization < Operation
+    def description
+      return 'Normalize expression'
+    end
+
+    def result_is_normal?
+      return true
+    end
+    
     def act(exp)
-      result = self.deep_clone(exp)
-      changes = false
-
-      while true
-        pass = self.single_pass(result)
-        break if pass.nil?
-        result = pass
-        changes = true
-      end
-
-      return if !changes
-      return result
+      return iterate(exp)
     end
 
     def single_pass(exp)
+      if exp.is_a?(Sy::Constant)
+        return
+      end
+      
       if exp.is_a?(Sy::Variable)
         return
       end
       
       if exp.is_sum_exp?
-        return self.do_sum(exp)
+        return do_sum(exp)
       end
 
       if exp.is_prod_exp?
-        return self.do_product(exp)
+        return do_product(exp)
       end
 
       if exp.is_a?(Sy::Power)
-        return self.do_power(exp)
+        return do_power(exp)
       end
       
-      return self.do_operator(exp)
+      return act_subexpressions(exp)
     end
 
     def do_sum(exp)
@@ -58,16 +59,10 @@ module Sy
       s = exp.subtrahends_to_a
 
       # Normalize each added element
-      a2 = a.map do |e|
-        e2 = self.act(e)
-        e2.nil? ? e : e2
-      end
+      a2 = a.map { |e| act(e) }
 
       # Normalize each subtracted element
-      s2 = s.map do |e|
-        e2 = self.act(e)
-        e2.nil? ? e : e2
-      end
+      s2 = s.map { |e| act(e) }
 
       # Collect equal elements into integer products
       products = {}
@@ -84,6 +79,9 @@ module Sy
 
         ex = e.coefficientless
         n = e.coefficient
+        if (e.sign < 0)
+          n = -n
+        end
 
         if products.key?(ex)
           products[ex] += n
@@ -105,6 +103,9 @@ module Sy
 
         ex = e.coefficientless
         n = e.coefficient
+        if (e.sign < 0)
+          n = -n
+        end
         
         if products.key?(ex)
           products[ex] -= n
@@ -120,7 +121,7 @@ module Sy
         if products[1] > 0
           a3.push(products[1].to_m)
         elsif products[1] < 0
-          s3.push(products[1].to_m)
+          s3.push((-products[1]).to_m)
         end
         products.delete(1)
       end
@@ -136,7 +137,7 @@ module Sy
         elsif products[k] > 0
           a3.push(products[k].to_m * k)
         elsif products[k] < 0
-          s3.push(products[k].to_m * -k)
+          s3.push((-products[k]).to_m * k)
         end
       end
 
@@ -200,15 +201,9 @@ module Sy
       dc = factors.map { |f,pow| pow > 0 ? 1 : f**-pow }.inject(:*)
 
       # Normalize each element.
-      p2 = p.map do |e|
-        e2 = self.act(e)
-        e2.nil? ? e : e2
-      end
+      p2 = p.map { |e| act(e) }
 
-      d2 = d.map do |e|
-        e2 = self.act(e)
-        e2.nil? ? e : e2
-      end
+      d2 = d.map { |e| act(e) }
 
       # Collect equal elements into integer powers
       powers = {}
@@ -300,51 +295,25 @@ module Sy
         end
         ret = ret / div
       end
-      
+
+      if (s < 0)
+        ret = -ret
+      end
+
       return exp == ret ? nil : ret
     end
 
     def do_power(exp)
-      base = self.act(exp.base)
-      expo = self.act(exp.exponent)
-
-      changed_args = (base.nil? and expo.nil?) ? false : true
-      
-      if base.nil?
-        base = exp.base
-      end
-
-      if expo.nil?
-        expo = exp.exponent
-      end
+      base = act(exp.base)
+      expo = act(exp.exponent)
 
       if base.is_a?(Sy::Power)
         return base.base**(base.exponent * expo)
       end
 
-      if changed_args
-        return base ** expo
-      end
-      
-      return
-    end
-    
-    def do_operator(exp)
-      # Normalize each argument
-      changes = false
-      (0...exp.arity).to_a.each do |i|
-        arg = self.act(exp.args[i])
-        if !arg.nil?
-          exp.args[i] = arg
-          changes = true
-        end
-      end
+      ret = base ** expo
 
-      if changes
-        return exp
-      else
-        return
-      end
+      return exp == ret ? nil : ret
     end
   end
 end

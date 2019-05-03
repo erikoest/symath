@@ -4,7 +4,7 @@ require 'set'
 module Sy
   class Operator < Value
     attr_reader :name
-    attr_reader :args
+    attr_accessor :args
 
     def arity
       return @args.length
@@ -30,9 +30,9 @@ module Sy
     
     def ==(other)
       return false if self.class.name != other.class.name
-      return false if self.name.to_s != other.name.to_s
-      return false if self.arity != other.arity
-      return self.args.eql?(other.args)
+      return false if name.to_s != other.name.to_s
+      return false if arity != other.arity
+      return args.eql?(other.args)
     end
 
     def <=>(other)
@@ -40,16 +40,16 @@ module Sy
         return super(other)
       end
 
-      if self.name != other.name
-        return self.name.to_s <=> other.name.to_s
+      if name != other.name
+        return name.to_s <=> other.name.to_s
       end
 
-      if self.arity != other.arity
-        return self.arity <=> other.arity
+      if arity != other.arity
+        return arity <=> other.arity
       end
 
-      (0...self.arity).to_a.each do |i|
-        diff = self.args[i] <=> other.args[i]
+      (0...arity).to_a.each do |i|
+        diff = args[i] <=> other.args[i]
         if diff != 0
           return diff
         end

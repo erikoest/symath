@@ -14,6 +14,10 @@ end
 
 class Integer
   def to_m()
-    return Sy::Number.new(self)
+    if self < 0
+      return -Sy::Number.new(-self)
+    else
+      return Sy::Number.new(self)
+    end
   end
 end

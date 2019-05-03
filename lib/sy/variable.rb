@@ -51,12 +51,20 @@ end
 
 class String
   def to_m()
-    return Sy::Variable.new(self)
+    begin
+      return Sy::ConstantSymbol.new(self)
+    rescue
+      return Sy::Variable.new(self)
+    end
   end
 end
 
 class Symbol
   def to_m()
-    return Sy::Variable.new(self)
+    begin
+      return Sy::ConstantSymbol.new(self)
+    rescue
+      return Sy::Variable.new(self)
+    end
   end
 end

@@ -1,6 +1,5 @@
 require "sy/version"
 require "sy/parser"
-require 'sy/normalization'
 
 require 'sy/substitution'
 require 'sy/function'
@@ -15,5 +14,6 @@ require 'sy/constantsymbol'
 require 'sy/number'
 require 'sy/value'
 require 'sy/normalization'
+require 'sy/summultiplication'
 require 'sy/derivative'
 require 'sy/path'

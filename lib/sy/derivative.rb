@@ -74,7 +74,7 @@ module Sy
           when 'cot' then -(1.to_m + fn(:cot, exp.args[0])**2)
           when 'sec' then fn(:sec, exp.args[0])*fn(:tan, exp.args[0])
           when 'csc' then -fn(:cot, exp.args[0])*fn(:csc, exp.args[0])
-          else raise 'Cannot calculate derivative of expression' + exp.to_s
+          else raise 'Cannot calculate derivative of function' + exp.to_s
         end
       return d*self.act(exp.args[0])
     end

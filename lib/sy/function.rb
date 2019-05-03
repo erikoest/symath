@@ -12,7 +12,7 @@ module Sy
       return false
     end
 
-    def ==(other)
+    def commutative_eq?(other)
       # Check that name matches
       return false if (self.name != other.name)
 

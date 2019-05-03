@@ -191,5 +191,9 @@ module Sy
     end
 
     alias eql? ==
+
+    def to_str
+      return to_s
+    end
   end
 end
