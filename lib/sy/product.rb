@@ -34,16 +34,6 @@ module Sy
       return factor1.div_factors_to_a + factor2.div_factors_to_a
     end
 
-    def coefficientless()
-      if factor1.is_a?(Sy::Number)
-        return factor2.coefficientless
-      elsif factor2.is_a?(Sy::Number)
-        return factor1.coefficientless
-      else
-        return factor1.coefficientless * factor2.coefficientless
-      end
-    end
-    
     def coefficient()
       return factor1.coefficient*factor2.coefficient
     end

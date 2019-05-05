@@ -66,6 +66,7 @@ module Sy
 
       # Collect equal elements into integer products
       products = {}
+      
       a2.each do |e|
         # Sum up all constant numbers
         if e.is_a?(Sy::Number)
@@ -77,40 +78,34 @@ module Sy
           next
         end
 
-        ex = e.coefficientless
-        n = e.coefficient
-        if (e.sign < 0)
-          n = -n
-        end
-
+        ex = e.abs_factors
+        c = e.coefficient*e.sign
+        
         if products.key?(ex)
-          products[ex] += n
+          products[ex] += c
         else
-          products[ex] = n
+          products[ex] = c
         end
       end
 
       s2.each do |e|
-        # Subtract constant numbers
+        # Subtract all constant numbers
         if e.is_a?(Sy::Number)
           if products.key?(1)
             products[1] -= e.value
           else
-            products[1] = e.value
+            products[1] = -e.value
           end
           next
         end
 
-        ex = e.coefficientless
-        n = e.coefficient
-        if (e.sign < 0)
-          n = -n
-        end
+        ex = e.abs_factors
+        c = e.coefficient*e.sign
         
         if products.key?(ex)
-          products[ex] -= n
+          products[ex] -= c
         else
-          products[ex] = -n
+          products[ex] = -c
         end
       end
 
@@ -168,8 +163,6 @@ module Sy
     def do_product(exp)
       # Collect the factors and divisor factors in an array.
       # Get the sign.
-      p  = exp.abs_factors_to_a
-      d  = exp.div_factors_to_a
       c  = exp.coefficient
       dc = exp.div_coefficient
       s  = exp.sign
@@ -178,40 +171,22 @@ module Sy
       if c == 0 and dc > 0
         return 0.to_m
       end
-      
-      factors = { 1 => 1 }
 
-      c.prime_division.flat_map do |f, pow|
-        if factors.key?(f)
-          factors[f] += pow
-        else
-          factors[f] = pow
-        end
+      if c > 0
+        # Reduce coefficients by greatest common divisor
+        gcd = c.gcd(dc)
+        c /= gcd
+        dc /= gcd
       end
 
-      dc.prime_division.flat_map do |f, pow|
-        if factors.key?(f)
-          factors[f] -= pow
-        else
-          factors[f] = -pow
-        end
-      end
-
-      c = factors.map { |f,pow| pow < 0 ? 1 : f**pow }.inject(:*)
-      dc = factors.map { |f,pow| pow > 0 ? 1 : f**-pow }.inject(:*)
-
-      # Normalize each element.
-      p2 = p.map { |e| act(e) }
-
-      d2 = d.map { |e| act(e) }
+      # Get normalized factors
+      p = exp.abs_factors_to_a.map { |e| act(e) }
+      d = exp.div_factors_to_a.map { |e| act(e) }
 
       # Collect equal elements into integer powers
       powers = {}
 
-      p2.each do |e|
-        # Constant numbers are handled by the coefficient
-        next if e.is_a?(Sy::Number)
-
+      p.each do |e|
         ex = e
         n = 1
 
@@ -230,10 +205,7 @@ module Sy
         end
       end
 
-      d2.each do |e|
-        # Constant numbers are handled by the coefficient
-        next if e.is_a?(Sy::Number)
-      
+      d.each do |e|
         ex = e
         n = 1
 
@@ -252,46 +224,46 @@ module Sy
         end
       end
 
-      p3 = []
-      d3 = []
+      p2 = []
+      d2 = []
 
       # Put hashed elements back into a sorted array
       powers.keys.sort.each do |k|
         if powers[k] == 1
-          p3.push(k)
+          p2.push(k)
         elsif powers[k] == -1
-          d3.push(k)
+          d2.push(k)
         elsif powers[k] > 0
-          p3.push(k**(powers[k].to_m))
+          p2.push(k**(powers[k].to_m))
         elsif powers[k] < 0
-          d3.push(k**(powers[k].to_m))
+          d2.push(k**(powers[k].to_m))
         end
       end
 
       # Build expression from p3, d3 and coefficients
       if c != 1
-        p3.unshift(c.to_m)
+        p2.unshift(c.to_m)
       end
 
       if dc != 1
-        d3.unshift(dc.to_m)
+        d2.unshift(dc.to_m)
       end
 
-      if p3.length == 0
+      if p2.length == 0
         ret = 1.to_m
       else
-        ret = p3.shift
+        ret = p2.shift
       end
 
-      while p3.length > 0
-        ret *= p3.shift
+      while p2.length > 0
+        ret *= p2.shift
       end
 
-      if d3.length > 0
-        div = d3.shift
+      if d2.length > 0
+        div = d2.shift
         
-        while d3.length > 0
-          div *= d3.shift
+        while d2.length > 0
+          div *= d2.shift
         end
         ret = ret / div
       end

@@ -167,11 +167,25 @@ module Sy
     def div_factors_to_a()
       return []
     end
+    
+    # Return the factors and division factors of the expression.
+    def abs_factors()
+      fact = abs_factors_to_a
+      divf = div_factors_to_a
+      dc = div_coefficient
 
-    # Return the expression stripped of the coefficient
-    # Defaults to self for all non-products
-    def coefficientless()
-      return self
+      if (fact.length + divf.length == 0)
+        # No factors or division factors
+        return dc == 1 ? 1.to_m : 1.to_m / dc
+      end
+
+      if divf.length == 0
+        # No division factors
+        return dc == 1 ? fact.inject(:*) : fact.inject(:*) / dc
+      end
+      
+      # Only division factors
+      return dc == 1 ? 1.to_m / divf.inject(:*) : 1.to_m / (dc.to_m * divf.inject(:*))
     end
     
     # Return the constant factor of a product

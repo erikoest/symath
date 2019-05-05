@@ -6,6 +6,10 @@ module Sy
       return self.name.to_i
     end
 
+    def abs_factors_to_a()
+      return []
+    end
+    
     def coefficient()
       return self.value
     end
