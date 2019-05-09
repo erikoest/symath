@@ -1,14 +1,15 @@
 require 'sy/operation'
 
 module Sy
-  # Multiplies a sum/subtraction:
+  # FIXME: Rename operaton to DistributiveLaw
+  # Apply distributive law over products of sums:
   #   a*(b + c) -> a*b + a*c
   #   a*(b - c) -> a*b - a*c
   # The transformation iterates until no changes occur. Thus, the expression
   #   (a + b)*(c + d) transforms to a*c + a*d + b*c + b*d
   class SumMultiplication < Operation
     def description
-      return 'Mulitply sums'
+      return 'Apply distributive law'
     end
 
     def act(exp)
@@ -30,8 +31,8 @@ module Sy
     end
 
     def multiply_right(exp)
-      a = exp.factor1.summands_to_a
-      s = exp.factor1.subtrahends_to_a
+      a = exp.factor1.summands.to_a
+      s = exp.factor1.subtrahends.to_a
       p = exp.factor2
 
       if a.length > 0
@@ -52,8 +53,8 @@ module Sy
     end
 
     def multiply_left(exp)
-      a = exp.factor2.summands_to_a
-      s = exp.factor2.subtrahends_to_a
+      a = exp.factor2.summands.to_a
+      s = exp.factor2.subtrahends.to_a
       p = exp.factor1
 
       if a.length > 0

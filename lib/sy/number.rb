@@ -6,7 +6,7 @@ module Sy
       return self.name.to_i
     end
 
-    def abs_factors_to_a()
+    def abs_factors()
       return []
     end
     

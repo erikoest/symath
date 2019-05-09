@@ -26,14 +26,20 @@ module Sy
       return true
     end
 
-    # Return array of positive summands
-    def summands_to_a()
-      return summand1.summands_to_a + summand2.summands_to_a
+    # Return positive summands
+    def summands()
+      return Enumerator.new do |s|
+        summand1.summands.each { |s1| s << s1 }
+        summand2.summands.each { |s2| s << s2 }
+      end
     end
 
-    # Return array of subtrahends 
-    def subtrahends_to_a()
-      return summand1.subtrahends_to_a + summand2.subtrahends_to_a
+    # Return subtrahends 
+    def subtrahends()
+      return Enumerator.new do |s|
+        summand1.subtrahends.each { |s1| s << s1 }
+        summand2.subtrahends.each { |s2| s << s2 }
+      end
     end
     
     def to_s()

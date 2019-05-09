@@ -26,12 +26,18 @@ module Sy
       return true
     end
 
-    def summands_to_a()
-      return minuend.summands_to_a + subtrahend.subtrahends_to_a
+    def summands()
+      return Enumerator.new do |s|
+        minuend.summands.each { |s1| s << s1 }
+        subtrahend.subtrahends.each { |s2| s << s2 }
+      end
     end
 
-    def subtrahends_to_a()
-      return minuend.subtrahends_to_a + subtrahend.summands_to_a
+    def subtrahends()
+      return Enumerator.new do |s|
+        minuend.subtrahends.each { |s1| s << s1 }
+        subtrahend.summands.each { |s2| s << s2 }
+      end
     end
 
     def to_s()

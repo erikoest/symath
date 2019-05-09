@@ -26,12 +26,18 @@ module Sy
       return true
     end
 
-    def abs_factors_to_a()
-      return factor1.abs_factors_to_a + factor2.abs_factors_to_a
+    def abs_factors()
+      return Enumerator.new do |f|
+        factor1.abs_factors.each { |f1| f << f1 }
+        factor2.abs_factors.each { |f2| f << f2 }
+      end
     end
 
-    def div_factors_to_a()
-      return factor1.div_factors_to_a + factor2.div_factors_to_a
+    def div_factors()
+      return Enumerator.new do |d|
+        factor1.div_factors.each { |d1| d << d1 }
+        factor2.div_factors.each { |d2| d << d2 }
+      end
     end
 
     def coefficient()

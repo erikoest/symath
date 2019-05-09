@@ -18,12 +18,18 @@ module Sy
       return true
     end
 
-    def abs_factors_to_a()
-      return dividend.abs_factors_to_a + divisor.div_factors_to_a
+    def abs_factors()
+      return Enumerator.new do |f|
+        dividend.abs_factors.each { |d1| f << d1 }
+        divisor.div_factors.each { |d2| f << d2 }
+      end
     end
 
-    def div_factors_to_a()
-      return dividend.div_factors_to_a + divisor.abs_factors_to_a
+    def div_factors()
+      return Enumerator.new do |d|
+        dividend.div_factors.each { |d1| d << d1 }
+        divisor.abs_factors.each { |d2| d << d2 }
+      end
     end
 
     def coefficient()

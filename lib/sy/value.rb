@@ -146,48 +146,49 @@ module Sy
     
     # Returns the positive elements of a sum in an array.
     # Defaults to self for non-sums.
-    def summands_to_a()
+    def summands()
       return [self]
     end
 
     # Returns the negative elements of a sum in an array.
     # Defaults to nothing for non-sums.
-    def subtrahends_to_a()
+    def subtrahends()
       return []
     end
 
     # Returns the absolute factors of a product in an array.
     # Defaults to self for non-products.
-    def abs_factors_to_a()
-      return [self]
+    def abs_factors()
+      return [self].to_enum
     end
 
     # Returns the absolute factors of a divisor in an array.
     # Defaults to nothing for non-fractions.
-    def div_factors_to_a()
-      return []
+    def div_factors()
+      return [].to_enum
     end
     
     # Return the factors and division factors of the expression.
-    def abs_factors()
-      fact = abs_factors_to_a
-      divf = div_factors_to_a
+    def abs_factors_exp()
+      fact = abs_factors
+      divf = div_factors
       dc = div_coefficient
 
-      if (fact.length + divf.length == 0)
-        # No factors or division factors
-        return dc == 1 ? 1.to_m : 1.to_m / dc
+      begin
+        fact.peek # Check if there are factors
+        f = fact.inject(:*)
+      rescue StopIteration
+        f = 1.to_m
       end
 
-      if divf.length == 0
-        # No division factors
-        return dc == 1 ? fact.inject(:*) : fact.inject(:*) / dc
+      begin
+        divf.peek # Check if there are divisor factors
+        return dc == 1 ? f / divf.inject(:*) : f / (dc * divf.inject(:*))
+      rescue
+        return dc == 1 ? f : f / dc
       end
-      
-      # Only division factors
-      return dc == 1 ? 1.to_m / divf.inject(:*) : 1.to_m / (dc.to_m * divf.inject(:*))
     end
-    
+      
     # Return the constant factor of a product
     def coefficient()
       return 1

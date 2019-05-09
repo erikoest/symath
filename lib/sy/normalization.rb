@@ -54,20 +54,14 @@ module Sy
     end
 
     def do_sum(exp)
-      # Collect all the added and subtracted elements in two arrays
-      a = exp.summands_to_a
-      s = exp.subtrahends_to_a
-
-      # Normalize each added element
-      a2 = a.map { |e| act(e) }
-
-      # Normalize each subtracted element
-      s2 = s.map { |e| act(e) }
+      # Get normalized summands and subtrahends
+      a = exp.summands.map { |e| act(e) }
+      s = exp.subtrahends.map { |e| act(e) }
 
       # Collect equal elements into integer products
       products = {}
       
-      a2.each do |e|
+      a.each do |e|
         # Sum up all constant numbers
         if e.is_a?(Sy::Number)
           if products.key?(1)
@@ -78,7 +72,7 @@ module Sy
           next
         end
 
-        ex = e.abs_factors
+        ex = e.abs_factors_exp
         c = e.coefficient*e.sign
         
         if products.key?(ex)
@@ -88,7 +82,7 @@ module Sy
         end
       end
 
-      s2.each do |e|
+      s.each do |e|
         # Subtract all constant numbers
         if e.is_a?(Sy::Number)
           if products.key?(1)
@@ -99,7 +93,7 @@ module Sy
           next
         end
 
-        ex = e.abs_factors
+        ex = e.abs_factors_exp
         c = e.coefficient*e.sign
         
         if products.key?(ex)
@@ -109,14 +103,14 @@ module Sy
         end
       end
 
-      a3 = []
-      s3 = []
+      a2 = []
+      s2 = []
 
       if products.key?(1)
         if products[1] > 0
-          a3.push(products[1].to_m)
+          a2.push(products[1].to_m)
         elsif products[1] < 0
-          s3.push((-products[1]).to_m)
+          s2.push((-products[1]).to_m)
         end
         products.delete(1)
       end
@@ -126,38 +120,35 @@ module Sy
         next if products[k] == 0
         
         if products[k] == 1
-          a3.push(k)
+          a2.push(k)
         elsif products[k] == -1
-          s3.push(k)
+          s2.push(k)
         elsif products[k] > 0
-          a3.push(products[k].to_m * k)
+          a2.push(products[k].to_m * k)
         elsif products[k] < 0
-          s3.push((-products[k]).to_m * k)
+          s2.push((-products[k]).to_m * k)
         end
       end
 
-      # If there are changes, return a sum chain of the changed or reordered elements
-      return if a == a3 and s == s3
-
-      if a3.length + s3.length == 0
+      if a2.length + s2.length == 0
         return 0.to_m
       end
 
-      if a3.length > 0
-        ret = a3.shift
+      if a2.length > 0
+        ret = a2.shift
       else
-        ret = -s3.shift
+        ret = -s2.shift
       end
 
-      while a3.length > 0
-        ret += a3.shift
+      while a2.length > 0
+        ret += a2.shift
       end
       
-      while s3.length > 0
-        ret -= s3.shift
+      while s2.length > 0
+        ret -= s2.shift
       end
 
-      return ret
+      return exp == ret ? nil : ret
     end
 
     def do_product(exp)
@@ -180,8 +171,8 @@ module Sy
       end
 
       # Get normalized factors
-      p = exp.abs_factors_to_a.map { |e| act(e) }
-      d = exp.div_factors_to_a.map { |e| act(e) }
+      p = exp.abs_factors.map { |e| act(e) }
+      d = exp.div_factors.map { |e| act(e) }
 
       # Collect equal elements into integer powers
       powers = {}
@@ -240,31 +231,28 @@ module Sy
         end
       end
 
-      # Build expression from p3, d3 and coefficients
+      # Build expression from p2, d2, coefficients and sign
       if c != 1
         p2.unshift(c.to_m)
       end
-
+      
       if dc != 1
         d2.unshift(dc.to_m)
       end
 
       if p2.length == 0
         ret = 1.to_m
-      else
+     else
         ret = p2.shift
       end
 
-      while p2.length > 0
-        ret *= p2.shift
-      end
+      p2.each { |p| ret *= p }
 
       if d2.length > 0
         div = d2.shift
-        
-        while d2.length > 0
-          div *= d2.shift
-        end
+
+        d2.each { |d| div *= d }
+
         ret = ret / div
       end
 

@@ -18,12 +18,12 @@ module Sy
       return true
     end
 
-    def abs_factors_to_a()
-      return argument.abs_factors_to_a
+    def abs_factors()
+      return argument.abs_factors
     end
 
-    def div_factors_to_a()
-      return argument.div_factors_to_a
+    def div_factors()
+      return argument.div_factors
     end
 
     def coefficient()
@@ -38,12 +38,12 @@ module Sy
       return -argument.sign
     end
     
-    def summands_to_a()
-      return argument.subtrahends_to_a
+    def summands()
+      return argument.subtrahends
     end
 
-    def subtrahends_to_a()
-      return argument.summands_to_a
+    def subtrahends()
+      return argument.summands
     end
 
     def to_s()
