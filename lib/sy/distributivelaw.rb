@@ -1,13 +1,12 @@
 require 'sy/operation'
 
 module Sy
-  # FIXME: Rename operaton to DistributiveLaw
   # Apply distributive law over products of sums:
   #   a*(b + c) -> a*b + a*c
   #   a*(b - c) -> a*b - a*c
   # The transformation iterates until no changes occur. Thus, the expression
   #   (a + b)*(c + d) transforms to a*c + a*d + b*c + b*d
-  class SumMultiplication < Operation
+  class DistributiveLaw < Operation
     def description
       return 'Apply distributive law'
     end

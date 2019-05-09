@@ -2,10 +2,10 @@ require 'spec_helper'
 require 'sy'
 
 module Sy
-  m = Sy::SumMultiplication.new
+  m = Sy::DistributiveLaw.new
   n = Sy::Normalization.new
 
-  describe Sy::SumMultiplication do
+  describe Sy::DistributiveLaw do
     sums = {
       :x.to_m*(1.to_m + 3.to_m*:y)             => 'x + 3*x*y',
       -:x.to_m*(-:y.to_m - 3.to_m)             => '3*x + x*y',
