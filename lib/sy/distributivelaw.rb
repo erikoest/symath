@@ -18,9 +18,9 @@ module Sy
     def single_pass(exp)
       if exp.is_prod_exp?
         if exp.factor1.is_sum_exp? and exp.factor1.arity > 1
-          return self.multiply_right(exp)
+          return multiply_right(exp)
         elsif exp.factor2.is_sum_exp? and exp.factor2.arity > 1
-          return self.multiply_left(exp)
+          return multiply_left(exp)
         end
       end
 
@@ -30,44 +30,30 @@ module Sy
     end
 
     def multiply_right(exp)
-      a = exp.factor1.summands.to_a
-      s = exp.factor1.subtrahends.to_a
       p = exp.factor2
+      ret = nil
 
-      if a.length > 0
-        ret = a.shift * p
-      else
-        ret = -s.shift * p
+      exp.factor1.summands.each do |s|
+        ret = ret.nil? ? s*p : ret + s*p
       end
-
-      while a.length > 0
-        ret += a.shift * p
-      end
-
-      while s.length > 0
-        ret -= s.shift * p
+        
+      exp.factor1.subtrahends.each do |s|
+        ret = ret.nil? ? -s*p : ret - s*p
       end
 
       return ret      
     end
 
     def multiply_left(exp)
-      a = exp.factor2.summands.to_a
-      s = exp.factor2.subtrahends.to_a
       p = exp.factor1
-
-      if a.length > 0
-        ret = a.shift * p
-      else
-        ret = -s.shift * p
-      end
-
-      while a.length > 0
-        ret += a.shift * p
-      end
+      ret = nil
       
-      while s.length > 0
-        ret -= s.shift * p
+      exp.factor2.summands.each do |s|
+        ret = ret.nil? ? p*s : ret + p*s
+      end
+        
+      exp.factor2.subtrahends.each do |s|
+        ret = ret.nil? ? -p*s : ret - p*s
       end
 
       return ret      
