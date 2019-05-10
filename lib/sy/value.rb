@@ -104,6 +104,8 @@ module Sy
     
     ##
     # Overridden math operators
+    # These operators are only used for composing expression. No reductions are
+    # performed.
     ##    
     def +(other)
       return Sy::Sum.new(self, Sy.value(other))
@@ -129,6 +131,67 @@ module Sy
       return Sy::Power.new(self, Sy.value(other))
     end
 
+    ##
+    # Math operations with simple reductions.
+    ##
+    def add(other)
+      return self if other == 0.to_m
+      return other if self == 0.to_m
+
+      noc = self.abs_factors_exp
+      if noc == other.abs_factors_exp
+        c2 = self.coefficient + other.coefficient
+        return noc == 1.to_m ? c2.to_m : c2*noc
+      end
+      
+      return self + other
+    end
+
+    def sub(other)
+      return self if other == 0.to_m
+      return -other if self == 0.to_m
+
+      noc = self.abs_factors_exp
+      if noc == other.abs_factors_exp
+        c2 = self.coefficient + other.coefficient
+        return 0.to_m if c2 == 0
+        return noc == 1.to_m ? c2.to_m : c2*noc
+      end
+
+      return self + other
+    end
+    
+    def mult(other)
+      return self if other == 1.to_m
+      return other if self == 1.to_m
+
+      if self.base == other.base
+        return self.base ** (self.exponent + other.exponent)
+      end
+
+      if self.is_a?(Sy::Fraction) and self.dividend == 1.to_m
+        return other / self.divisor
+      end
+
+      if other.is_a?(Sy::Fraction) and other.dividend == 1.to_m
+        return self / other.divisor
+      end
+      
+      return self * other
+    end
+
+    def div(other)
+      return self if other == 1.to_m
+
+      if self.is_a?(Sy::Fraction)
+        return self.dividend / (self.divisor * other)
+      end
+      
+      return self / other
+    end
+
+    # FIXME: power function with simplifications
+    
     ##
     # Helper methods for the normalization operation. These are overridden by the subclasses. Default
     # behaviour is defined here.
@@ -156,6 +219,18 @@ module Sy
       return []
     end
 
+    # Returns the base of a power expression.
+    # Defaults to self for non-powers.
+    def base()
+      return self
+    end
+
+    # Returns the exponent of a power expression.
+    # Defaults to self for non-powers.
+    def exponent()
+      return 1.to_m
+    end
+    
     # Returns the absolute factors of a product in an array.
     # Defaults to self for non-products.
     def abs_factors()
@@ -188,7 +263,7 @@ module Sy
         return dc == 1 ? f : f / dc
       end
     end
-      
+
     # Return the constant factor of a product
     def coefficient()
       return 1

@@ -25,6 +25,14 @@ module Sy
     end
 
     def act_subexpressions(exp)
+      if exp.is_a?(Sy::Constant)
+        return
+      end
+      
+      if exp.is_a?(Sy::Variable)
+        return
+      end
+
       # Do operation on each argument
       newargs = exp.args.map { |a| act(a) }
 

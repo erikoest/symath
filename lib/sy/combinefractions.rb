@@ -20,7 +20,8 @@ module Sy
         return do_sum(exp)
       end
       
-      return act_subexpressions(exp)
+      sub = act_subexpressions(exp)
+      return sub.nil? ? exp : sub
     end
 
     def add_summand(sum, fact, divf, c, dc)

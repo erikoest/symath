@@ -7,6 +7,12 @@ module Sy
 
   describe Sy::CombineFractions do
     sums = {
+      1.to_m                               => '1',
+      2.to_m                               => '2',
+      :a.to_m                              => 'a',
+      :a.to_m/2                            => 'a/2',
+      :a.to_m/:b                           => 'a/b',
+      2.to_m/:a                            => '2/a',
       :a.to_m/:c + :b.to_m/:c              => '(a + b)/c',
       2.to_m/3 + 3.to_m/4                  => '17/12',
       :a.to_m/2 + 2.to_m*:a/3              => '7*a/6',
@@ -14,7 +20,7 @@ module Sy
     }
 
     sums.each do |from, to|
-      it "multiplies '#{from.to_s}' to '#{to}'" do
+      it "combines '#{from.to_s}' to '#{to}'" do
         n.act(m.act(from)).to_s.should == to
       end
     end

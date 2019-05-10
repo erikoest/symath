@@ -16,7 +16,7 @@ module Sy
     end
 
     def single_pass(exp)
-      if exp.is_prod_exp?
+      if exp.is_a?(Sy::Product)
         if exp.factor1.is_sum_exp? and exp.factor1.arity > 1
           return multiply_right(exp)
         elsif exp.factor2.is_sum_exp? and exp.factor2.arity > 1

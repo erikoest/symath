@@ -30,14 +30,6 @@ module Sy
     end
 
     def single_pass(exp)
-      if exp.is_a?(Sy::Constant)
-        return
-      end
-      
-      if exp.is_a?(Sy::Variable)
-        return
-      end
-      
       if exp.is_sum_exp?
         return do_sum(exp)
       end
@@ -119,14 +111,10 @@ module Sy
       products.keys.sort.each do |k|
         next if products[k] == 0
         
-        if products[k] == 1
-          a2.push(k)
-        elsif products[k] == -1
-          s2.push(k)
-        elsif products[k] > 0
-          a2.push(products[k].to_m * k)
+        if products[k] > 0
+          a2.push(products[k].to_m.mult(k))
         elsif products[k] < 0
-          s2.push((-products[k]).to_m * k)
+          s2.push((-products[k]).to_m.mult(k))
         end
       end
 
@@ -178,15 +166,13 @@ module Sy
       powers = {}
 
       p.each do |e|
-        ex = e
-        n = 1
-
         # If e is on the form (exp)^n
-        if e.is_a?(Sy::Power)
-          if e.exponent.is_a?(Sy::Number)
-            ex = e.base
-            n = e.exponent.value
-          end
+        if e.exponent.is_a?(Sy::Number)
+          ex = e.base
+          n = e.exponent.value
+        else
+          ex = e
+          n = 1
         end
 
         if powers.key?(ex)
@@ -197,15 +183,13 @@ module Sy
       end
 
       d.each do |e|
-        ex = e
-        n = 1
-
         # If e is on the form (exp)^n
-        if e.is_a?(Sy::Power)
-          if e.exponent.is_a?(Sy::Number)
-            ex = e.base
-            n = e.exponent.value
-          end
+        if e.exponent.is_a?(Sy::Number)
+          ex = e.base
+          n = e.exponent.value
+        else
+          ex = e
+          n = 1
         end
 
         if powers.key?(ex)
@@ -231,29 +215,22 @@ module Sy
         end
       end
 
-      # Build expression from p2, d2, coefficients and sign
-      if c != 1
+      if c > 1
         p2.unshift(c.to_m)
       end
-      
-      if dc != 1
+
+      if p2.length > 0
+        ret = p2.inject(:*)
+      else
+        ret = 1.to_m
+      end
+
+      if dc > 1
         d2.unshift(dc.to_m)
       end
 
-      if p2.length == 0
-        ret = 1.to_m
-     else
-        ret = p2.shift
-      end
-
-      p2.each { |p| ret *= p }
-
       if d2.length > 0
-        div = d2.shift
-
-        d2.each { |d| div *= d }
-
-        ret = ret / div
+        ret = ret / d2.inject(:*)
       end
 
       if (s < 0)

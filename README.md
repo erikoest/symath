@@ -1,7 +1,6 @@
 # Sy
 
-Symbolic math library for Ruby. This gem is only intended as an excercise. You should most
-probably not want to use it in your application.
+Symbolic math library for Ruby. This gem is only intended as a coding excercise.
 
 ## Installation
 

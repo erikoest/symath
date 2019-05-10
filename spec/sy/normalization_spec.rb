@@ -6,9 +6,10 @@ module Sy
 
   describe Sy::Normalization, ', normalize sum' do
     sums = {
-      1.to_m + 3     => '4',
-      :x.to_m + :x   => '2*x',
-      :x.to_m - :x   => '0',
+      1.to_m + 3                  => '4',
+      3.to_m/4 + (5.to_m + 2)/34  => '7/34 + 3/4',
+      :x.to_m + :x                => '2*x',
+      :x.to_m - :x                => '0',
       fn(:sin, :x) + fn(:sin, :x)*2 + 3.to_m*:y - 3.to_m*:y => '3*sin(x)',
     }
 
