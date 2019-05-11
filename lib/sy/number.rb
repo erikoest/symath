@@ -9,6 +9,10 @@ module Sy
     def abs_factors()
       return []
     end
+
+    def abs_factors_exp()
+      return 1.to_m
+    end
     
     def coefficient()
       return self.value

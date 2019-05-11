@@ -29,10 +29,11 @@ module Sy
     end
     
     def ==(other)
-      return false if self.class.name != other.class.name
-      return false if name.to_s != other.name.to_s
-      return false if arity != other.arity
-      return args.eql?(other.args)
+      o = Sy.value(other)
+      return false if self.class.name != o.class.name
+      return false if name.to_s != o.name.to_s
+      return false if arity != o.arity
+      return args.eql?(o.args)
     end
 
     def <=>(other)

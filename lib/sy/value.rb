@@ -49,14 +49,14 @@ module Sy
       return 1
     end
     
-    # Equality operator. Two expressions are considered equal if they are structurally equal and
-    # have the same variable names
+    # Equality operator. Two expressions are considered equal if they are structurally
+    # equal and have the same variable names
     def ==(other)
       return false
     end
 
-    # Sorting/ordering operator. The ordering is used by the normalization to order the parts of a
-    # sum, product etc.
+    # Sorting/ordering operator. The ordering is used by the normalization to order the
+    # parts of a sum, product etc.
     def <=>(other)
       class_order = {
         'Sy::Number' => 1,
@@ -91,8 +91,9 @@ module Sy
       return (self <=> other) >= 0
     end
     
-    # Return true if value is constant relative to changes in any of the given set of variables.
-    # If no variable set is given, returns true if expression is alawys constant.
+    # Return true if value is constant relative to changes in any of the given set of
+    # variables. If no variable set is given, returns true if expression is alawys
+    # constant.
     def is_constant?(vars = nil)
       return true
     end
@@ -106,7 +107,7 @@ module Sy
     # Overridden math operators
     # These operators are only used for composing expression. No reductions are
     # performed.
-    ##    
+    ##
     def +(other)
       return Sy::Sum.new(self, Sy.value(other))
     end
@@ -135,21 +136,23 @@ module Sy
     # Math operations with simple reductions.
     ##
     def add(other)
-      return self if other == 0.to_m
-      return other if self == 0.to_m
+      o = Sy.value(other)
+      return self if o == 0
+      return o if self == 0
 
       noc = self.abs_factors_exp
-      if noc == other.abs_factors_exp
-        c2 = self.coefficient + other.coefficient
+      if noc == o.abs_factors_exp
+        c2 = self.coefficient + o.coefficient
         return noc == 1.to_m ? c2.to_m : c2*noc
       end
-      
-      return self + other
+
+      return self + o
     end
 
     def sub(other)
-      return self if other == 0.to_m
-      return -other if self == 0.to_m
+      o = Sy.value(other)
+      return self if o == 0
+      return -o if self == 0
 
       noc = self.abs_factors_exp
       if noc == other.abs_factors_exp
@@ -158,43 +161,52 @@ module Sy
         return noc == 1.to_m ? c2.to_m : c2*noc
       end
 
-      return self + other
+      return self - o
     end
     
     def mult(other)
-      return self if other == 1.to_m
-      return other if self == 1.to_m
+      o = Sy.value(other)
+      return self if o == 1
+      return o if self == 1
 
-      if self.base == other.base
-        return self.base ** (self.exponent + other.exponent)
+      if base == o.base
+        return base ** (exponent + o.exponent)
       end
 
-      if self.is_a?(Sy::Fraction) and self.dividend == 1.to_m
-        return other / self.divisor
+      if self.is_a?(Sy::Fraction) and dividend == 1.to_m
+        return o / divisor
       end
 
-      if other.is_a?(Sy::Fraction) and other.dividend == 1.to_m
-        return self / other.divisor
+      if o.is_a?(Sy::Fraction) and o.dividend == 1.to_m
+        return self / o.divisor
       end
       
-      return self * other
+      return self * o
     end
 
     def div(other)
-      return self if other == 1.to_m
+      o = Sy.value(other)
+      return self if o == 1
 
       if self.is_a?(Sy::Fraction)
-        return self.dividend / (self.divisor * other)
+        return dividend / (divisor * o)
       end
       
-      return self / other
+      return self / o
     end
 
-    # FIXME: power function with simplifications
+    def power(other)
+      o = Sy.value(other)
+      if self.is_a?(Sy::Power)
+        return self.base.power(self.exponent.mult(o))
+      end
+
+      return self**o
+    end
     
     ##
-    # Helper methods for the normalization operation. These are overridden by the subclasses. Default
-    # behaviour is defined here.
+    # Helper methods for the normalization operation. These are overridden by the
+    # subclasses. Default behaviour is defined here.
     ##
 
     # Value is a sum, subtraction of unitary minus
@@ -245,23 +257,7 @@ module Sy
     
     # Return the factors and division factors of the expression.
     def abs_factors_exp()
-      fact = abs_factors
-      divf = div_factors
-      dc = div_coefficient
-
-      begin
-        fact.peek # Check if there are factors
-        f = fact.inject(:*)
-      rescue StopIteration
-        f = 1.to_m
-      end
-
-      begin
-        divf.peek # Check if there are divisor factors
-        return dc == 1 ? f / divf.inject(:*) : f / (dc * divf.inject(:*))
-      rescue
-        return dc == 1 ? f : f / dc
-      end
+      return self
     end
 
     # Return the constant factor of a product

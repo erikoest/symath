@@ -14,14 +14,6 @@ module Sy
       return @args[1]
     end
     
-    def is_commutative?()
-      return true
-    end
-
-    def is_associative?()
-      return true
-    end
-
     def is_sum_exp?()
       return true
     end

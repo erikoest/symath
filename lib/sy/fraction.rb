@@ -32,6 +32,10 @@ module Sy
       end
     end
 
+    def abs_factors_exp()
+      return dividend.abs_factors_exp / divisor
+    end
+    
     def coefficient()
       return dividend.coefficient
     end

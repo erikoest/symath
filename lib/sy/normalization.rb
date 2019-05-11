@@ -122,19 +122,10 @@ module Sy
         return 0.to_m
       end
 
-      if a2.length > 0
-        ret = a2.shift
-      else
-        ret = -s2.shift
-      end
+      ret = 0.to_m
 
-      while a2.length > 0
-        ret += a2.shift
-      end
-      
-      while s2.length > 0
-        ret -= s2.shift
-      end
+      a2.each { |s| ret = ret.add(s) }
+      s2.each { |s| ret = ret.sub(s) }
 
       return exp == ret ? nil : ret
     end
@@ -245,7 +236,7 @@ module Sy
       expo = act(exp.exponent)
 
       if base.is_a?(Sy::Power)
-        return base.base**(base.exponent * expo)
+        return base.base.power(base.exponent * expo)
       end
 
       ret = base ** expo

@@ -31,14 +31,14 @@ module Sy
 
     def multiply_right(exp)
       p = exp.factor2
-      ret = nil
+      ret = 0.to_m
 
       exp.factor1.summands.each do |s|
-        ret = ret.nil? ? s*p : ret + s*p
+        ret = ret.add(s*p)
       end
         
       exp.factor1.subtrahends.each do |s|
-        ret = ret.nil? ? -s*p : ret - s*p
+        ret = ret.sub(s*p)
       end
 
       return ret      
@@ -46,14 +46,14 @@ module Sy
 
     def multiply_left(exp)
       p = exp.factor1
-      ret = nil
-      
+      ret = 0.to_m
+
       exp.factor2.summands.each do |s|
-        ret = ret.nil? ? p*s : ret + p*s
+        ret = ret.add(p*s)
       end
         
       exp.factor2.subtrahends.each do |s|
-        ret = ret.nil? ? -p*s : ret - p*s
+        ret = ret.sub(p*s)
       end
 
       return ret      

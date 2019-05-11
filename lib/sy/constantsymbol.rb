@@ -13,12 +13,6 @@ module Sy
       @value = value
     end
 
-    def ==(other)
-      return false if other.class != self.class
-
-      return other.value == self.value
-    end
-
     def match(other, varmap)
       if self == other then
         return varmap
