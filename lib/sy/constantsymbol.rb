@@ -7,7 +7,7 @@ module Sy
 
     SYMBOLS = ['pi', 'e', 'i', 'phi', 'sq2'].to_set
 
-    def initialize(name, value)
+    def initialize(name, value = nil)
       raise 'Not a known symbol: ' + name.to_s if !SYMBOLS.member?(name.to_s)
       super(name)
       @value = value
