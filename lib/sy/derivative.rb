@@ -3,66 +3,93 @@ require 'set'
 
 module Sy
   class Derivative < Operation
-    def initialize(var)
-      @var = var
-      @varset = [var].to_set
+    # Calculate/expand differential
+    def description
+      return 'Calculate differential'
     end
-    
+
+    def result_is_normal?
+      return false
+    end
+
     def act(exp)
-      if exp.is_constant?(@varset)
+      if exp.is_a?(Sy::Fraction) and
+        exp.args[0].is_a?(Sy::Diff) and
+        exp.args[1].is_a?(Sy::Variable) and
+        exp.args[1].name =~ /^d/
+        # Derivative notation, d(...)/dx. Expand d with respect to x and replace the
+        # whole expression with the result.
+        var = exp.args[1].name[1,-1]
+        return diff(exp.args[0].args[0], var)
+      end
+
+      if exp.is_a?(Sy::Diff)
+        # Differential notation, d(...). Find first free variable in expression and
+        # expand d.
+        var = exp.args[0].variables[0].to_m
+        dvar = (:d.to_s + var.to_s).to_m
+        return diff(exp.args[0], var)*dvar
+      end
+
+      # Expression did not look like a derivative or differental
+      return
+    end
+
+    def diff(exp, var)
+      if exp.is_constant?([var].to_set)
         return 0.to_m
       end
 
-      if exp == @var
+      if exp == var
         return 1.to_m
       end
       
       if exp.is_a?(Sy::Sum)
-        return self.act(exp.summand1) + self.act(exp.summand2)
+        return diff(exp.summand1, var) + diff(exp.summand2, var)
       end
 
       if exp.is_a?(Sy::Subtraction)
-        return self.act(exp.minuend) - self.act(exp.subtrahend)
+        return diff(exp.minuend, var) - diff(exp.subtrahend, var)
       end
 
       if exp.is_a?(Sy::Minus)
-        return -self.act(exp.argument)
+        return -diff(exp.argument, var)
       end
 
       if exp.is_a?(Sy::Product)
-        return self.do_product(exp)
+        return do_product(exp, var)
       end
 
       if exp.is_a?(Sy::Fraction)
-        return self.do_fraction(exp)
+        return do_fraction(exp, var)
       end
 
       if exp.is_a?(Sy::Power)
-        return self.do_power(exp)
+        return do_power(exp, var)
       end
 
       if exp.is_a?(Sy::Function)
-        return self.do_function(exp)
+        return do_function(exp, var)
       end
       
       raise 'Cannot calculate derivative of expression ' + exp.to_s
     end
 
-    def do_product(exp)
-      return self.act(exp.factor1)*exp.factor2 + exp.factor1*self.act(exp.factor2)
+    def do_product(exp, var)
+      return diff(exp.factor1, var)*exp.factor2 + exp.factor1*diff(exp.factor2, var)
     end
 
-    def do_fraction(exp)
-      return self.act(exp.dividend)*exp.divisor - exp.dividend*self.act(exp.divisor) /
+    def do_fraction(exp, var)
+      return diff(exp.dividend, var)*exp.divisor - exp.dividend*diff(exp.divisor, var) /
                                                   (exp.divisor**2)
     end
 
-    def do_power(exp)
-      return exp*fn(:ln, exp.base)*self.act(exp.exponent) +
-             exp.exponent*exp.base**(exp.exponent - 1)*self.act(exp.base)
+    def do_power(exp, var)
+      return exp*fn(:ln, exp.base)*diff(exp.exponent, var) +
+             exp.exponent*exp.base**(exp.exponent - 1)*diff(exp.base, var)
     end
 
-    def do_function(exp)
+    def do_function(exp, var)
       d = case exp.name.to_s
           # Exponential function
           when 'exp' then exp
@@ -76,7 +103,7 @@ module Sy
           when 'csc' then -fn(:cot, exp.args[0])*fn(:csc, exp.args[0])
           else raise 'Cannot calculate derivative of function' + exp.to_s
         end
-      return d*self.act(exp.args[0])
+      return d*diff(exp.args[0], var)
     end
   end
 end

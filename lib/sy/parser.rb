@@ -12,7 +12,7 @@ require 'sy/node'
 module Sy
 class Parser < Racc::Parser
 
-module_eval(<<'...end parser.y/module_eval...', 'parser.y', 37)
+module_eval(<<'...end parser.y/module_eval...', 'parser.y', 39)
   attr_reader :exp
 
   def named_value(node)
@@ -54,7 +54,11 @@ module_eval(<<'...end parser.y/module_eval...', 'parser.y', 37)
       when /\A\d+(\.\d+)?/
         # number (digits.digits)
         @q.push [:NUMBER, Sy::Node.new($&, [Sy::Path.new([], pos)])]
-      when /\A.|\A\*\*|\n/o
+      when /\A\*\*/
+        # two character operators
+        s = $&
+        @q.push [s, Sy::Node.new(s, [Sy::Path.new([], pos)])]
+      when /\A.|\n/o
         # other signs
         s = $&
         @q.push [s, Sy::Node.new(s, [Sy::Path.new([], pos)])]
@@ -93,82 +97,89 @@ module_eval(<<'...end parser.y/module_eval...', 'parser.y', 37)
 ##### State transition tables begin ###
 
 racc_action_table = [
-    13,    14,    11,    12,     9,    10,     8,    25,    13,    14,
-    11,    12,     9,    10,    13,    14,    11,    12,     9,    10,
-    13,    14,    11,    12,     9,    10,     4,     3,    17,     6,
-     7,     4,     3,    18,     6,     7,     4,     3,   nil,     6,
-     7,     4,     3,   nil,     6,     7,     4,     3,   nil,     6,
-     7,     4,     3,   nil,     6,     7,     4,     3,   nil,     6,
-     7,     4,     3,   nil,     6,     7,     4,     3,   nil,     6,
-     7,     4,     3,    27,     6,     7,     4,     3,   nil,     6,
-     7,    13,    14,    11,    12,    13,    14,    11,    12,    29,
-    13,    14,    30,    13,    14 ]
+    14,    15,    12,    13,    10,    11,     9,     8,    27,    14,
+    15,    12,    13,    10,    11,     9,    14,    15,    12,    13,
+    10,    11,     9,    14,    15,    12,    13,    10,    11,     9,
+     4,    18,     3,    19,     6,     7,     4,   nil,     3,   nil,
+     6,     7,     4,   nil,     3,   nil,     6,     7,     4,   nil,
+     3,   nil,     6,     7,     4,   nil,     3,   nil,     6,     7,
+     4,   nil,     3,   nil,     6,     7,     4,   nil,     3,   nil,
+     6,     7,     4,   nil,     3,   nil,     6,     7,     4,   nil,
+     3,   nil,     6,     7,     4,   nil,     3,   nil,     6,     7,
+     4,   nil,     3,    29,     6,     7,    14,    15,    12,    13,
+    10,    11,     4,   nil,     3,   nil,     6,     7,    14,    15,
+    12,    13,    14,    15,    12,    13,    31,    14,    15,    32,
+    14,    15 ]
 
 racc_action_check = [
-    15,    15,    15,    15,    15,    15,     1,    15,     2,     2,
-     2,     2,     2,     2,    26,    26,    26,    26,    26,    26,
-    31,    31,    31,    31,    31,    31,     0,     0,     6,     0,
-     0,     3,     3,     8,     3,     3,     4,     4,   nil,     4,
-     4,     9,     9,   nil,     9,     9,    10,    10,   nil,    10,
-    10,    11,    11,   nil,    11,    11,    12,    12,   nil,    12,
-    12,    13,    13,   nil,    13,    13,    14,    14,   nil,    14,
-    14,    17,    17,    17,    17,    17,    30,    30,   nil,    30,
-    30,    19,    19,    19,    19,    20,    20,    20,    20,    28,
-    21,    21,    28,    22,    22 ]
+    16,    16,    16,    16,    16,    16,    16,     1,    16,     2,
+     2,     2,     2,     2,     2,     2,    28,    28,    28,    28,
+    28,    28,    28,    33,    33,    33,    33,    33,    33,    33,
+     0,     6,     0,     8,     0,     0,     3,   nil,     3,   nil,
+     3,     3,     4,   nil,     4,   nil,     4,     4,     9,   nil,
+     9,   nil,     9,     9,    10,   nil,    10,   nil,    10,    10,
+    11,   nil,    11,   nil,    11,    11,    12,   nil,    12,   nil,
+    12,    12,    13,   nil,    13,   nil,    13,    13,    14,   nil,
+    14,   nil,    14,    14,    15,   nil,    15,   nil,    15,    15,
+    18,   nil,    18,    18,    18,    18,    20,    20,    20,    20,
+    20,    20,    32,   nil,    32,   nil,    32,    32,    21,    21,
+    21,    21,    22,    22,    22,    22,    30,    23,    23,    30,
+    24,    24 ]
 
 racc_action_pointer = [
-    18,     6,     5,    23,    28,   nil,    19,   nil,    33,    33,
-    38,    43,    48,    53,    58,    -3,   nil,    63,   nil,    78,
-    82,    87,    90,   nil,   nil,   nil,    11,   nil,    79,   nil,
-    68,    17 ]
+    22,     7,     6,    28,    34,   nil,    21,   nil,    33,    40,
+    46,    52,    58,    64,    70,    76,    -3,   nil,    82,   nil,
+    93,   105,   109,   114,   117,   nil,   nil,   nil,    13,   nil,
+   105,   nil,    94,    20 ]
 
 racc_action_default = [
-    -2,   -18,    -1,   -18,   -18,   -11,   -15,   -14,   -18,   -18,
-   -18,   -18,   -18,   -18,   -18,   -18,   -10,   -18,    32,    -3,
-    -4,    -5,    -6,    -7,    -8,    -9,   -17,   -12,   -18,   -13,
-   -18,   -16 ]
+    -2,   -19,    -1,   -19,   -19,   -12,   -16,   -15,   -19,   -19,
+   -19,   -19,   -19,   -19,   -19,   -19,   -19,   -11,   -19,    34,
+    -3,    -4,    -5,    -6,    -7,    -8,    -9,   -10,   -18,   -13,
+   -19,   -14,   -19,   -17 ]
 
 racc_goto_table = [
-     2,     1,    28,    15,    16,   nil,   nil,   nil,   nil,    19,
-    20,    21,    22,    23,    24,   nil,   nil,    26,   nil,   nil,
+     2,     1,    30,    16,    17,   nil,   nil,   nil,   nil,    20,
+    21,    22,    23,    24,    25,    26,   nil,   nil,    28,   nil,
    nil,   nil,   nil,   nil,   nil,   nil,   nil,   nil,   nil,   nil,
-    31 ]
+   nil,   nil,    33 ]
 
 racc_goto_check = [
      2,     1,     4,     2,     2,   nil,   nil,   nil,   nil,     2,
-     2,     2,     2,     2,     2,   nil,   nil,     2,   nil,   nil,
+     2,     2,     2,     2,     2,     2,   nil,   nil,     2,   nil,
    nil,   nil,   nil,   nil,   nil,   nil,   nil,   nil,   nil,   nil,
-     2 ]
+   nil,   nil,     2 ]
 
 racc_goto_pointer = [
-   nil,     1,     0,   nil,   -15 ]
+   nil,     1,     0,   nil,   -16 ]
 
 racc_goto_default = [
    nil,   nil,   nil,     5,   nil ]
 
 racc_reduce_table = [
   0, 0, :racc_error,
-  1, 15, :_reduce_none,
-  0, 15, :_reduce_2,
-  3, 16, :_reduce_3,
-  3, 16, :_reduce_4,
-  3, 16, :_reduce_5,
-  3, 16, :_reduce_6,
-  3, 16, :_reduce_7,
-  3, 16, :_reduce_8,
-  3, 16, :_reduce_9,
-  2, 16, :_reduce_10,
   1, 16, :_reduce_none,
-  3, 17, :_reduce_12,
-  4, 17, :_reduce_13,
-  1, 17, :_reduce_14,
-  1, 17, :_reduce_15,
-  3, 18, :_reduce_16,
-  1, 18, :_reduce_17 ]
+  0, 16, :_reduce_2,
+  3, 17, :_reduce_3,
+  3, 17, :_reduce_4,
+  3, 17, :_reduce_5,
+  3, 17, :_reduce_6,
+  3, 17, :_reduce_7,
+  3, 17, :_reduce_8,
+  3, 17, :_reduce_9,
+  3, 17, :_reduce_10,
+  2, 17, :_reduce_11,
+  1, 17, :_reduce_none,
+  3, 18, :_reduce_13,
+  4, 18, :_reduce_14,
+  1, 18, :_reduce_15,
+  1, 18, :_reduce_16,
+  3, 19, :_reduce_17,
+  1, 19, :_reduce_18 ]
 
-racc_reduce_n = 18
+racc_reduce_n = 19
 
-racc_shift_n = 32
+racc_shift_n = 34
 
 racc_token_table = {
   false => 0,
@@ -180,13 +191,14 @@ racc_token_table = {
   "/" => 6,
   "+" => 7,
   "-" => 8,
-  "(" => 9,
-  ")" => 10,
-  :NAME => 11,
-  :NUMBER => 12,
-  "," => 13 }
+  "=" => 9,
+  "(" => 10,
+  ")" => 11,
+  :NAME => 12,
+  :NUMBER => 13,
+  "," => 14 }
 
-racc_nt_base = 14
+racc_nt_base = 15
 
 racc_use_result_var = true
 
@@ -216,6 +228,7 @@ Racc_token_to_s_table = [
   "\"/\"",
   "\"+\"",
   "\"-\"",
+  "\"=\"",
   "\"(\"",
   "\")\"",
   "NAME",
@@ -235,108 +248,115 @@ Racc_debug_parser = false
 
 # reduce 1 omitted
 
-module_eval(<<'.,.,', 'parser.y', 11)
+module_eval(<<'.,.,', 'parser.y', 12)
   def _reduce_2(val, _values, result)
      result = 0 
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'parser.y', 12)
-  def _reduce_3(val, _values, result)
-     result = operator('Sy::Sum', [val[0], val[2]], val[0]) 
-    result
-  end
-.,.,
-
 module_eval(<<'.,.,', 'parser.y', 13)
-  def _reduce_4(val, _values, result)
-     result = operator('Sy::Subtraction', [val[0], val[2]], val[0]) 
+  def _reduce_3(val, _values, result)
+     result = operator('Sy::Assignment', [val[0], val[2]], val[0]) 
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'parser.y', 14)
-  def _reduce_5(val, _values, result)
-     result = operator('Sy::Product', [val[0], val[2]], val[0]) 
+  def _reduce_4(val, _values, result)
+     result = operator('Sy::Sum', [val[0], val[2]], val[0]) 
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'parser.y', 15)
-  def _reduce_6(val, _values, result)
-     result = operator('Sy::Fraction', [val[0], val[2]], val[0]) 
+  def _reduce_5(val, _values, result)
+     result = operator('Sy::Subtraction', [val[0], val[2]], val[0]) 
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'parser.y', 16)
-  def _reduce_7(val, _values, result)
-     result = operator('Sy::Power', [val[0], val[2]], val[0]) 
+  def _reduce_6(val, _values, result)
+     result = operator('Sy::Product', [val[0], val[2]], val[0]) 
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'parser.y', 17)
+  def _reduce_7(val, _values, result)
+     result = operator('Sy::Fraction', [val[0], val[2]], val[0]) 
+    result
+  end
+.,.,
+
+module_eval(<<'.,.,', 'parser.y', 18)
   def _reduce_8(val, _values, result)
      result = operator('Sy::Power', [val[0], val[2]], val[0]) 
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'parser.y', 18)
+module_eval(<<'.,.,', 'parser.y', 19)
   def _reduce_9(val, _values, result)
+     result = operator('Sy::Power', [val[0], val[2]], val[0]) 
+    result
+  end
+.,.,
+
+module_eval(<<'.,.,', 'parser.y', 20)
+  def _reduce_10(val, _values, result)
      result = val[1] 
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'parser.y', 19)
-  def _reduce_10(val, _values, result)
+module_eval(<<'.,.,', 'parser.y', 21)
+  def _reduce_11(val, _values, result)
      result = operator('Sy::Minus', [val[1]], val[0]) 
     result
   end
 .,.,
 
-# reduce 11 omitted
+# reduce 12 omitted
 
-module_eval(<<'.,.,', 'parser.y', 22)
-  def _reduce_12(val, _values, result)
+module_eval(<<'.,.,', 'parser.y', 24)
+  def _reduce_13(val, _values, result)
      result = function('Sy::Function', val[0], []) 
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'parser.y', 23)
-  def _reduce_13(val, _values, result)
+module_eval(<<'.,.,', 'parser.y', 25)
+  def _reduce_14(val, _values, result)
      result = function('Sy::Function', val[0], val[2]) 
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'parser.y', 24)
-  def _reduce_14(val, _values, result)
-     result = leaf('Sy::Number', val[0]) 
-    result
-  end
-.,.,
-
-module_eval(<<'.,.,', 'parser.y', 25)
+module_eval(<<'.,.,', 'parser.y', 26)
   def _reduce_15(val, _values, result)
-     result = self.named_value(val[0]) 
+     result = leaf('Sy::Number', val[0]) 
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'parser.y', 27)
   def _reduce_16(val, _values, result)
+     result = self.named_value(val[0]) 
+    result
+  end
+.,.,
+
+module_eval(<<'.,.,', 'parser.y', 29)
+  def _reduce_17(val, _values, result)
      result = val[0].push(val[2]) 
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'parser.y', 28)
-  def _reduce_17(val, _values, result)
+module_eval(<<'.,.,', 'parser.y', 30)
+  def _reduce_18(val, _values, result)
      result = [val[0]] 
     result
   end

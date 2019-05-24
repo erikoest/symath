@@ -1,5 +1,4 @@
 require 'sy/value'
-require 'set'
 
 module Sy
   class Operator < Value
@@ -70,16 +69,31 @@ module Sy
     end
 
     def variables()
-      ret = [].to_set
-      @args.each do |a|
-        ret.merge(a.variables)
-      end
-
-      return ret
+      vars = @args.map { |a| a.variables }
+      return vars.length == 0 ? vars : vars.inject(:|)
     end
   end
 end
 
+require 'sy/diff'
+require 'sy/int'
+
 def op(name, *args)
+  if name == :diff
+    if args.length > 1
+      raise "Too many arguments for diff operator"
+    end
+    
+    return Sy::Diff.new(args[0])
+  end
+
+  if name == :int
+    if args.length > 4
+      raise "Too many arguments for int operator"
+    end
+
+    return Sy::Int.new(*args)
+  end
+
   return Sy::Operator.new(name, args)
 end

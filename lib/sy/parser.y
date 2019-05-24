@@ -6,11 +6,13 @@ class Parser
     left '^' '**'
     left '*' '/'
     left '+' '-'
+    left '='
   preclow
 rule
   target: exp
       | /* none */ { result = 0 }
-exp: exp '+' exp { result = operator('Sy::Sum', [val[0], val[2]], val[0]) }
+exp: exp '=' exp { result = operator('Sy::Assignment', [val[0], val[2]], val[0]) }
+     | exp '+' exp { result = operator('Sy::Sum', [val[0], val[2]], val[0]) }
      | exp '-' exp { result = operator('Sy::Subtraction', [val[0], val[2]], val[0]) }
      | exp '*' exp { result = operator('Sy::Product', [val[0], val[2]], val[0]) }
      | exp '/' exp { result = operator('Sy::Fraction', [val[0], val[2]], val[0]) }
@@ -54,6 +56,15 @@ module Sy
     args = subnodes.map { |s| s.val }
     paths = name.paths.clone
     (0...subnodes.length).to_a.each { |i| paths += subnodes[i].paths.map { |p| p.unshift(i) } }
+
+    if name == 'd'
+      return Sy::Node.new(Sy::Diff.new(args), paths)
+    end
+
+    if name == 'int'
+      return Sy::Node.new(Sy::Int.new(args), paths)
+    end
+      
     return Sy::Node.new(Kernel.const_get(clazz).new(name.val, args), paths)
   end
 
@@ -75,7 +86,11 @@ module Sy
       when /\A\d+(\.\d+)?/
         # number (digits.digits)
         @q.push [:NUMBER, Sy::Node.new($&, [Sy::Path.new([], pos)])]
-      when /\A.|\A\*\*|\n/o
+      when /\A\*\*/
+        # two character operators
+        s = $&
+        @q.push [s, Sy::Node.new(s, [Sy::Path.new([], pos)])]
+      when /\A.|\n/o
         # other signs
         s = $&
         @q.push [s, Sy::Node.new(s, [Sy::Path.new([], pos)])]

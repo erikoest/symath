@@ -100,7 +100,7 @@ module Sy
 
     # Return all free variables found in the expression
     def variables()
-      return [].to_set
+      return []
     end
     
     ##

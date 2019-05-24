@@ -1,5 +1,4 @@
 require 'sy/value'
-require 'set'
 
 module Sy
   class Variable < Value
@@ -33,8 +32,20 @@ module Sy
       return !(vars.member?(self))
     end
 
+    # Returns true if variable is a differential
+    # As for now, all variables beginning with d are differentials
+    def is_diff?()
+      return @name[0] == 'd'
+    end
+
+    # Returns variable which differential is based on
+    # Todo: check that return value really is a variable (dpi, de, di, etc.)
+    def undiff()
+      return @name[1..-1].to_m
+    end
+    
     def variables()
-      return [self].to_set
+      return [@name]
     end
     
     def to_s()
