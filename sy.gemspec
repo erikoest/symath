@@ -17,8 +17,8 @@ Gem::Specification.new do |spec|
   if spec.respond_to?(:metadata)
     spec.metadata["allowed_push_host"] = "Set to 'http://mygemserver.com'"
 
-    spec.metadata["source_code_uri"] = "Put your gem's public repo URL here."
-    spec.metadata["changelog_uri"] = "Put your gem's CHANGELOG.md URL here."
+#    spec.metadata["source_code_uri"] = "Put your gem's public repo URL here."
+#    spec.metadata["changelog_uri"] = "Put your gem's CHANGELOG.md URL here."
   else
     raise "RubyGems 2.0 or newer is required to protect against " \
       "public gem pushes."
@@ -34,6 +34,6 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_development_dependency "bundler", "~> 2.0"
-  spec.add_development_dependency "rake", "~> 10.0"
+  spec.add_development_dependency "rake", ">= 10.0"
   spec.add_development_dependency "rspec", "~> 3.0"
 end

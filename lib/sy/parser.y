@@ -39,7 +39,7 @@ module Sy
   attr_reader :exp
 
   def named_value(node)
-    if (node.val.match(/^pi|e|i$/)) then
+if (node.val.match(/^(pi|e|i)$/)) then
       return leaf('Sy::ConstantSymbol', node)
     end
     return leaf('Sy::Variable', node)

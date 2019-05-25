@@ -16,7 +16,7 @@ module_eval(<<'...end parser.y/module_eval...', 'parser.y', 39)
   attr_reader :exp
 
   def named_value(node)
-    if (node.val.match(/^pi|e|i$/)) then
+if (node.val.match(/^(pi|e|i)$/)) then
       return leaf('Sy::ConstantSymbol', node)
     end
     return leaf('Sy::Variable', node)
@@ -33,6 +33,15 @@ module_eval(<<'...end parser.y/module_eval...', 'parser.y', 39)
     args = subnodes.map { |s| s.val }
     paths = name.paths.clone
     (0...subnodes.length).to_a.each { |i| paths += subnodes[i].paths.map { |p| p.unshift(i) } }
+
+    if name == 'd'
+      return Sy::Node.new(Sy::Diff.new(args), paths)
+    end
+
+    if name == 'int'
+      return Sy::Node.new(Sy::Int.new(args), paths)
+    end
+      
     return Sy::Node.new(Kernel.const_get(clazz).new(name.val, args), paths)
   end
 
