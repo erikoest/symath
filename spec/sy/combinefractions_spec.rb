@@ -2,7 +2,6 @@ require 'spec_helper'
 require 'sy'
 
 module Sy
-  m = Sy::CombineFractions.new
   n = Sy::Normalization.new
 
   describe Sy::CombineFractions do
@@ -21,7 +20,7 @@ module Sy
 
     sums.each do |from, to|
       it "combines '#{from.to_s}' to '#{to}'" do
-        n.act(m.act(from)).to_s.should == to
+        n.act(op(:combfrac, from).act).to_s.should == to
       end
     end
   end

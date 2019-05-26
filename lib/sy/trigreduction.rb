@@ -1,4 +1,5 @@
 require 'sy/operation'
+require 'sy/function'
 
 module Sy
   class TrigReduction < Operation

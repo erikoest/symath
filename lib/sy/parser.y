@@ -22,8 +22,8 @@ exp: exp '=' exp { result = operator('Sy::Equation', [val[0], val[2]], val[0]) }
      | '-' exp =UMINUS { result = operator('Sy::Minus', [val[1]], val[0]) }
      | func
 
-  func: NAME '(' ')'      { result = function('Sy::Function', val[0], []) }
-      | NAME '(' args ')' { result = function('Sy::Function', val[0], val[2]) }
+  func: NAME '(' ')'      { result = function(val[0], []) }
+      | NAME '(' args ')' { result = function(val[0], val[2]) }
       | NUMBER            { result = leaf('Sy::Number', val[0]) }
       | NAME              { result = self.named_value(val[0]) }
 
@@ -52,7 +52,7 @@ if (node.val.match(/^(pi|e|i)$/)) then
     return Sy::Node.new(Kernel.const_get(clazz).new(*args), paths)
   end
 
-  def function(clazz, name, subnodes)
+  def function(name, subnodes)
     args = subnodes.map { |s| s.val }
     paths = name.paths.clone
     (0...subnodes.length).to_a.each { |i| paths += subnodes[i].paths.map { |p| p.unshift(i) } }
@@ -64,8 +64,13 @@ if (node.val.match(/^(pi|e|i)$/)) then
     if name == 'int'
       return Sy::Node.new(Sy::Int.new(args), paths)
     end
-      
-    return Sy::Node.new(Kernel.const_get(clazz).new(name.val, args), paths)
+
+    # If name is a built-in operator, create it rather than a 
+    if Sy::Operator.builtin_operators.member?(@name)
+      return Sy::Node.new(Sy::Operator.new(name.val, args), paths)
+    end
+    
+    return Sy::Node.new(Sy::Function.new(name.val, args), paths)
   end
 
   def leaf(clazz, name)

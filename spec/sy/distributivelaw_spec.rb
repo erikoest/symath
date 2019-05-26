@@ -2,7 +2,6 @@ require 'spec_helper'
 require 'sy'
 
 module Sy
-  m = Sy::DistributiveLaw.new
   n = Sy::Normalization.new
 
   describe Sy::DistributiveLaw do
@@ -16,7 +15,7 @@ module Sy
 
     sums.each do |from, to|
       it "multiplies '#{from.to_s}' to '#{to}'" do
-        n.act(m.act(from)).to_s.should == to
+        n.act(op(:dist, from).act).to_s.should == to
       end
     end
   end

@@ -1,10 +1,27 @@
 require 'sy/value'
+require 'set'
 
 module Sy
   class Operator < Value
     attr_reader :name
     attr_accessor :args
 
+    def self.builtin_operators()
+      return @@builtin_operators.map { |o| o.to_s }
+    end
+
+    def has_action?()
+      return @@actions.key?(@name.to_sym)
+    end
+
+    def act()
+      if has_action?
+        return @@actions[@name.to_sym].act(*args)
+      else
+        return self
+      end
+    end
+    
     def arity
       return @args.length
     end
@@ -92,7 +109,7 @@ def op(name, *args)
       raise "Too many arguments for diff operator"
     end
     
-    return Sy::Diff.new(args[0])
+    return Sy::Diff.new(*args)
   end
 
   if name == :int

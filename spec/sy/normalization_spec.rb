@@ -2,8 +2,6 @@ require 'spec_helper'
 require 'sy'
 
 module Sy
-  n = Sy::Normalization.new
-
   describe Sy::Normalization, ', normalize sum' do
     sums = {
       1.to_m + 3                  => '4',
@@ -15,7 +13,7 @@ module Sy
 
     sums.each do |from, to|
       it "normalizes '#{from.to_s}' to '#{to}'" do
-        n.act(from).to_s.should == to
+        op(:norm, from).act.to_s.should == to
       end
     end
   end
@@ -33,7 +31,7 @@ module Sy
 
     products.each do |from, to|
       it "normalizes '#{from.to_s}' to '#{to}'" do
-        n.act(from).to_s.should == to
+        op(:norm, from).act.to_s.should == to
       end
     end
   end
@@ -46,7 +44,7 @@ module Sy
 
     powers.each do |from, to|
       it "normalizes '#{from.to_s}' to '#{to}'" do
-        n.act(from).to_s.should == to
+        op(:norm, from).act.to_s.should == to
       end
     end
   end

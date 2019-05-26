@@ -17,11 +17,9 @@ module Sy
       return false
     end
 
-    def act(exp)
+    def act(exp, var)
       begin
-        if exp.is_a?(Sy::Int)
-          return int(exp.args[0], exp.var) + :C.to_m
-        end
+        return int(exp, var) + :C.to_m
       rescue IntegrationError => e
         puts e.to_s
 #        puts e.backtrace.join("\n")

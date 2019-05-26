@@ -41,3 +41,27 @@ module Sy
     end
   end
 end
+
+require 'sy/normalization'
+require 'sy/trigreduction'
+require 'sy/differential'
+require 'sy/integration'
+require 'sy/distributivelaw'
+require 'sy/combinefractions'
+
+module Sy
+  class Operator < Value
+    @@actions = {
+      # Expression rewriting
+      :trigreduct => Sy::TrigReduction.new,
+      :norm       => Sy::Normalization.new,
+      :dist       => Sy::DistributiveLaw.new,
+      :combfrac   => Sy::CombineFractions.new,
+      # Derivation/integration
+      :diff       => Sy::Differential.new,
+      :int        => Sy::Integration.new,
+    }
+
+    @@builtin_operators = @@actions.keys.to_set
+  end
+end

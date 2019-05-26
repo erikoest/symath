@@ -43,6 +43,10 @@ module Sy
       return @name[1..-1].to_m
     end
     
+    def to_diff()
+      return Sy::Variable.new(:d.to_s + @name.to_s)
+    end
+
     def variables()
       return [@name]
     end

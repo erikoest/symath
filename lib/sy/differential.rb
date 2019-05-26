@@ -12,27 +12,8 @@ module Sy
       return false
     end
 
-    def act(exp)
-      if exp.is_a?(Sy::Fraction) and
-        exp.args[0].is_a?(Sy::Diff) and
-        exp.args[1].is_a?(Sy::Variable) and
-        exp.args[1].name =~ /^d/
-        # Derivative notation, d(...)/dx. Expand d with respect to x and replace the
-        # whole expression with the result.
-        var = exp.args[1].name[1,-1]
-        return diff(exp.args[0].args[0], var)
-      end
-
-      if exp.is_a?(Sy::Diff)
-        # Differential notation, d(...). Find first free variable in expression and
-        # expand d.
-        var = exp.args[0].variables[0].to_m
-        dvar = (:d.to_s + var.to_s).to_m
-        return diff(exp.args[0], var)*dvar
-      end
-
-      # Expression did not look like a derivative or differental
-      return
+    def act(exp, var)
+      return diff(exp, var)*var.to_diff
     end
 
     def diff(exp, var)
@@ -101,7 +82,7 @@ module Sy
           when 'cot' then -(1.to_m + fn(:cot, exp.args[0])**2)
           when 'sec' then fn(:sec, exp.args[0])*fn(:tan, exp.args[0])
           when 'csc' then -fn(:cot, exp.args[0])*fn(:csc, exp.args[0])
-          else raise 'Cannot calculate derivative of function' + exp.to_s
+          else raise 'Cannot calculate differential of function' + exp.to_s
         end
       return d*diff(exp.args[0], var)
     end

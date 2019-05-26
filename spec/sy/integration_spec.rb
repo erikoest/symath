@@ -2,7 +2,6 @@ require 'spec_helper'
 require 'sy'
 
 module Sy
-  d = Sy::Integration.new
   n = Sy::Normalization.new
 
   describe Sy::Integration, ', simple integration' do
@@ -19,7 +18,7 @@ module Sy
 
     poly.each do |from, to|
       it "integrates '#{from.to_s}' into '#{to}'" do
-        n.act(d.act(from)).to_s.should == to
+        n.act(from.act).to_s.should == to
       end
     end
   end

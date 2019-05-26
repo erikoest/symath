@@ -27,16 +27,22 @@ module Sy
       @b = b
     end
 
+    def act()
+      return @@actions[:int].act(*args, var)
+    end
+    
     def to_s()
-      args = @args
+      ret = @name.to_s + '(' + @args.map { |a| a.to_s }.join(',')
       if !@var.nil?
-        args.push @var
+        ret += ',' + @var
       end
+
       if !@a.nil?
-        args.push @a, @b
+        ret += ',' + @a + ',' + @b
       end
-      
-      return @name.to_s + '(' + args.map { |a| a.to_s }.join(',') + ')'
+
+      ret += ')'
+      return ret
     end
   end
 end
