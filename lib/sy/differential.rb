@@ -12,65 +12,65 @@ module Sy
       return false
     end
 
-    def act(exp, var)
-      return diff(exp, var)*var.to_diff
+    def act(exp, vars)
+      return diff(exp, vars)
     end
 
-    def diff(exp, var)
-      if exp.is_constant?([var].to_set)
+    def diff(exp, vars)
+      if exp.is_constant?(vars)
         return 0.to_m
       end
 
-      if exp == var
-        return 1.to_m
+      if vars.member?(exp)
+        return exp.to_diff
       end
       
       if exp.is_a?(Sy::Sum)
-        return diff(exp.summand1, var) + diff(exp.summand2, var)
+        return diff(exp.summand1, vars) + diff(exp.summand2, vars)
       end
 
       if exp.is_a?(Sy::Subtraction)
-        return diff(exp.minuend, var) - diff(exp.subtrahend, var)
+        return diff(exp.minuend, vars) - diff(exp.subtrahend, vars)
       end
 
       if exp.is_a?(Sy::Minus)
-        return -diff(exp.argument, var)
+        return -diff(exp.argument, vars)
       end
 
       if exp.is_a?(Sy::Product)
-        return do_product(exp, var)
+        return do_product(exp, vars)
       end
 
       if exp.is_a?(Sy::Fraction)
-        return do_fraction(exp, var)
+        return do_fraction(exp, vars)
       end
 
       if exp.is_a?(Sy::Power)
-        return do_power(exp, var)
+        return do_power(exp, vars)
       end
 
       if exp.is_a?(Sy::Function)
-        return do_function(exp, var)
+        return do_function(exp, vars)
       end
       
       raise 'Cannot calculate derivative of expression ' + exp.to_s
     end
 
-    def do_product(exp, var)
-      return diff(exp.factor1, var)*exp.factor2 + exp.factor1*diff(exp.factor2, var)
+    def do_product(exp, vars)
+      return diff(exp.factor1, vars)*exp.factor2 + exp.factor1*diff(exp.factor2, vars)
     end
 
-    def do_fraction(exp, var)
-      return diff(exp.dividend, var)*exp.divisor - exp.dividend*diff(exp.divisor, var) /
+    def do_fraction(exp, vars)
+      return diff(exp.dividend, vars)*exp.divisor - exp.dividend*diff(exp.divisor, vars) /
                                                   (exp.divisor**2)
     end
 
-    def do_power(exp, var)
-      return exp*fn(:ln, exp.base)*diff(exp.exponent, var) +
-             exp.exponent*exp.base**(exp.exponent - 1)*diff(exp.base, var)
+    def do_power(exp, vars)
+      return exp*fn(:ln, exp.base)*diff(exp.exponent, vars) +
+             exp.exponent*exp.base**(exp.exponent - 1)*diff(exp.base, vars)
     end
 
-    def do_function(exp, var)
+    def do_function(exp, vars)
       d = case exp.name.to_s
           # Exponential function
           when 'exp' then exp
@@ -84,7 +84,7 @@ module Sy
           when 'csc' then -fn(:cot, exp.args[0])*fn(:csc, exp.args[0])
           else raise 'Cannot calculate differential of function' + exp.to_s
         end
-      return d*diff(exp.args[0], var)
+      return d*diff(exp.args[0], vars)
     end
   end
 end

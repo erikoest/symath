@@ -105,10 +105,6 @@ require 'sy/int'
 
 def op(name, *args)
   if name == :diff
-    if args.length > 2
-      raise "Too many arguments for diff operator"
-    end
-    
     return Sy::Diff.new(*args)
   end
 
