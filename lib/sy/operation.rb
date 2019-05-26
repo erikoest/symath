@@ -1,9 +1,5 @@
 module Sy
   class Operation
-    def deep_clone(exp)
-      return Marshal.load(Marshal.dump(exp))
-    end
-
     def description
       return '(no operation)'
     end
@@ -13,7 +9,7 @@ module Sy
     end
     
     def iterate(exp)
-      result = self.deep_clone(exp)
+      result = exp.deep_clone
 
       while true
         pass = self.single_pass(result)

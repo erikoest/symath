@@ -5,10 +5,14 @@ module Sy
   class ConstantSymbol < Constant
     attr_reader :value
 
-    SYMBOLS = ['pi', 'e', 'i', 'phi', 'sq2'].to_set
+    @@symbols = ['pi', 'e', 'i', 'phi'].to_set
 
+    def self.builtin_constants()
+      return @@symbols
+    end
+    
     def initialize(name, value = nil)
-      raise 'Not a known symbol: ' + name.to_s if !SYMBOLS.member?(name.to_s)
+      raise 'Not a known symbol: ' + name.to_s if !@@symbols.member?(name.to_s)
       super(name)
       @value = value
     end

@@ -46,7 +46,7 @@ module Sy
     end
 
     def act(exp)
-      res = self.deep_clone(exp)
+      res = exp.deep_clone
 
       # Recurse down operator arguments
       res = act_subexpressions(res)

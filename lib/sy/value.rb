@@ -17,6 +17,10 @@ module Sy
   end
 
   class Value
+    def deep_clone()
+      return Marshal.load(Marshal.dump(self))
+    end
+
     def seek(path, start = 0, stop = nil)
       if path.path.length < start
         raise 'Path start out of range'
@@ -101,6 +105,10 @@ module Sy
     # Return all free variables found in the expression
     def variables()
       return []
+    end
+    
+    def replace(var, exp)
+      raise "Don't know how to replace a " + self.class.name
     end
     
     ##

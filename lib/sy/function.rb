@@ -1,25 +1,17 @@
 require 'sy/value'
 require 'sy/operator'
+require 'set'
 
 module Sy
   class Function < Operator
-    def match(other, varmap)
-      return if (self.class != other.class)
-      return if (self.name != other.name)
-      return if (self.args.length != other.args.length)
+    @@builtin_functions = [
+      'exp', 'ln',
+      'sin', 'cos', 'tan',
+      'sec', 'csc', 'cot'
+    ].to_set;
 
-      self.args.each_with_index do |a, i|
-        varmap = a.match(expr.args[i], varmap)
-
-        return if !varmap
-      end
-
-      return varmap
-    end
-
-    def replace(varmap)
-      @args = self.args.map { |a| a.replace(varmap) }
-      return self
+    def self.builtin_functions()
+      return @@builtin_functions
     end
   end
 end

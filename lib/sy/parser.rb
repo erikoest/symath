@@ -57,7 +57,7 @@ if (node.val.match(/^(pi|e|i)$/)) then
       case str
       when /\A\s+/
         # whitespace, do nothing
-      when /\A[A-Za-z]+[A-Za-z0-9]*/
+      when /\A[A-Za-z_]+[A-Za-z_0-9]*/
         # name (char + (char|num))
         @q.push [:NAME, Sy::Node.new($&, [Sy::Path.new([], pos)])]
       when /\A\d+(\.\d+)?/
@@ -266,7 +266,7 @@ module_eval(<<'.,.,', 'parser.y', 12)
 
 module_eval(<<'.,.,', 'parser.y', 13)
   def _reduce_3(val, _values, result)
-     result = operator('Sy::Assignment', [val[0], val[2]], val[0]) 
+     result = operator('Sy::Equation', [val[0], val[2]], val[0]) 
     result
   end
 .,.,

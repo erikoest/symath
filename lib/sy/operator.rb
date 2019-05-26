@@ -72,6 +72,14 @@ module Sy
       vars = @args.map { |a| a.variables }
       return vars.length == 0 ? vars : vars.inject(:|)
     end
+
+    def replace(var, exp)
+      @args= @args.map do |a|
+        a.replace(var, exp)
+      end
+
+      return self
+    end
   end
 end
 

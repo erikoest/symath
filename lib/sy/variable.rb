@@ -7,7 +7,6 @@ module Sy
   
     def initialize(name, value = nil)
       @name = name
-      @value = value
     end
 
     def hash()
@@ -47,13 +46,17 @@ module Sy
     def variables()
       return [@name]
     end
+
+    def replace(var, exp)
+      if var.to_s == @name
+        return exp.deep_clone
+      else
+        return self
+      end
+    end
     
     def to_s()
-      if @value.nil?
-        return @name.to_s
-      else
-        return @name.to_s + ' = ' + @value
-      end
+      return @name.to_s
     end
 
     alias eql? ==
