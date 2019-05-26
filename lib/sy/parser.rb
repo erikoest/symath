@@ -29,20 +29,17 @@ if (node.val.match(/^(pi|e|i)$/)) then
     return Sy::Node.new(Kernel.const_get(clazz).new(*args), paths)
   end
 
-  def function(clazz, name, subnodes)
+  def function(name, subnodes)
     args = subnodes.map { |s| s.val }
     paths = name.paths.clone
     (0...subnodes.length).to_a.each { |i| paths += subnodes[i].paths.map { |p| p.unshift(i) } }
 
-    if name == 'd'
-      return Sy::Node.new(Sy::Diff.new(args), paths)
+    # If name is a built-in operator, create it rather than a 
+    if Sy::Operator.builtin_operators.member?(@name)
+      return Sy::Node.new(op(name.val, args), paths)
     end
-
-    if name == 'int'
-      return Sy::Node.new(Sy::Int.new(args), paths)
-    end
-      
-    return Sy::Node.new(Kernel.const_get(clazz).new(name.val, args), paths)
+    
+    return Sy::Node.new(Sy::Function.new(name.val, args), paths)
   end
 
   def leaf(clazz, name)
@@ -331,14 +328,14 @@ module_eval(<<'.,.,', 'parser.y', 21)
 
 module_eval(<<'.,.,', 'parser.y', 24)
   def _reduce_13(val, _values, result)
-     result = function('Sy::Function', val[0], []) 
+     result = function(val[0], []) 
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'parser.y', 25)
   def _reduce_14(val, _values, result)
-     result = function('Sy::Function', val[0], val[2]) 
+     result = function(val[0], val[2]) 
     result
   end
 .,.,

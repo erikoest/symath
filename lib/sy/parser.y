@@ -57,17 +57,9 @@ if (node.val.match(/^(pi|e|i)$/)) then
     paths = name.paths.clone
     (0...subnodes.length).to_a.each { |i| paths += subnodes[i].paths.map { |p| p.unshift(i) } }
 
-    if name == 'd'
-      return Sy::Node.new(Sy::Diff.new(args), paths)
-    end
-
-    if name == 'int'
-      return Sy::Node.new(Sy::Int.new(args), paths)
-    end
-
     # If name is a built-in operator, create it rather than a 
     if Sy::Operator.builtin_operators.member?(@name)
-      return Sy::Node.new(Sy::Operator.new(name.val, args), paths)
+      return Sy::Node.new(op(name.val, args), paths)
     end
     
     return Sy::Node.new(Sy::Function.new(name.val, args), paths)
