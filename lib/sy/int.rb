@@ -27,7 +27,7 @@ module Sy
       @b = b
     end
 
-    def act()
+    def evaluate()
       return @@actions[:int].act(*args, var)
     end
     

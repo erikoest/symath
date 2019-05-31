@@ -6,7 +6,7 @@ module Sy
   #   2/3 + 3/4   -> 17/12
   #   a/2 + 2*a/3 -> 7*a/6
   #   2*a/b + 2*c/(3*b) -> (6*a + 2*c)/(3*b) ?
-  class CombineFractions < Operation
+  class Operation::CombineFractions < Operation
     def description
       return 'Combine fractions'
     end

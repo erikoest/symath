@@ -2,7 +2,7 @@ require 'spec_helper'
 require 'sy'
 
 module Sy
-  describe Sy::Normalization, ', normalize sum' do
+  describe Sy::Operation::Normalization, ', normalize sum' do
     sums = {
       1.to_m + 3                  => '4',
       3.to_m/4 + (5.to_m + 2)/34  => '7/34 + 3/4',
@@ -13,12 +13,12 @@ module Sy
 
     sums.each do |from, to|
       it "normalizes '#{from.to_s}' to '#{to}'" do
-        op(:norm, from).act.to_s.should == to
+        op(:norm, from).evaluate.to_s.should == to
       end
     end
   end
 
-  describe Sy::Normalization, ', normalize product' do
+  describe Sy::Operation::Normalization, ', normalize product' do
     products = {
       :x.to_m * :x              => 'x^2',
       :x.to_m * (-:x.to_m)      => '- x^2',
@@ -31,12 +31,12 @@ module Sy
 
     products.each do |from, to|
       it "normalizes '#{from.to_s}' to '#{to}'" do
-        op(:norm, from).act.to_s.should == to
+        op(:norm, from).evaluate.to_s.should == to
       end
     end
   end
 
-  describe Sy::Normalization, ', normalize power' do
+  describe Sy::Operation::Normalization, ', normalize power' do
     powers = {
       (:x.to_m**2)**3           => 'x^6',
       (:x.to_m**2)**(:y.to_m)   => 'x^(2*y)',
@@ -44,7 +44,7 @@ module Sy
 
     powers.each do |from, to|
       it "normalizes '#{from.to_s}' to '#{to}'" do
-        op(:norm, from).act.to_s.should == to
+        op(:norm, from).evaluate.to_s.should == to
       end
     end
   end

@@ -2,7 +2,7 @@ require 'spec_helper'
 require 'sy'
 
 module Sy
-  describe Sy::TrigReduction do
+  describe Sy::Operation::TrigReduction do
     exp = {
       fn(:sin, 0)                       => '0',
       fn(:sin, :pi.to_m/6)              => '1/2',
@@ -23,7 +23,7 @@ module Sy
 
     exp.each do |from, to|
       it "multiplies '#{from.to_s}' to '#{to}'" do
-        op(:trigreduct, from).act.to_s.should == to
+        op(:trigreduct, from).evaluate.to_s.should == to
       end
     end
   end

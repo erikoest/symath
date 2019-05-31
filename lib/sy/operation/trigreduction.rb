@@ -2,7 +2,7 @@ require 'sy/operation'
 require 'sy/function'
 
 module Sy
-  class TrigReduction < Operation
+  class Operation::TrigReduction < Operation
 
     def initialize()
       sqrt3 = fn(:sqrt, 3)

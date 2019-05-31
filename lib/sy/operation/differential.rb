@@ -2,7 +2,7 @@ require 'sy/operation'
 require 'set'
 
 module Sy
-  class Differential < Operation
+  class Operation::Differential < Operation
     # Calculate differential
     def description
       return 'Calculate differential'

@@ -25,7 +25,7 @@ module Sy
       @vars = vars
     end
 
-    def act()
+    def evaluate()
       return @@actions[:diff].act(*args, @vars)
     end
   end

@@ -5,7 +5,7 @@ module Sy
   class IntegrationError < StandardError
   end
   
-  class Integration < Operation
+  class Operation::Integration < Operation
     # Calculate some simple indefinite integrals (anti derivatives)
     # NB: This operation is home made and extermely limited. It should be replaced
     # with some of the known integration algorithm

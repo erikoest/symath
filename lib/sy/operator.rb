@@ -14,7 +14,7 @@ module Sy
       return @@actions.key?(@name.to_sym)
     end
 
-    def act()
+    def evaluate()
       if has_action?
         return @@actions[@name.to_sym].act(*args)
       else

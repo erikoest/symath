@@ -2,9 +2,9 @@ require 'spec_helper'
 require 'sy'
 
 module Sy
-  n = Sy::Normalization.new
+  n = Sy::Operation::Normalization.new
 
-  describe Sy::Integration, ', simple integration' do
+  describe Sy::Operation::Integration, ', simple integration' do
     poly = {
       op(:int, :x.to_m + 3.to_m*:x.to_m**2 + 4.to_m*:y + 10.to_m, :dx.to_m) =>
         'C + 10*x + x^3 + x^2/2 + 4*x*y',
@@ -18,7 +18,7 @@ module Sy
 
     poly.each do |from, to|
       it "integrates '#{from.to_s}' into '#{to}'" do
-        n.act(from.act).to_s.should == to
+        n.act(from.evaluate).to_s.should == to
       end
     end
   end

@@ -16,7 +16,7 @@ module Sy
   #   fractions of integers are simplified as far as possible
 
   # The operation is repeated until no 
-  class Normalization < Operation
+  class Operation::Normalization < Operation
     def description
       return 'Normalize expression'
     end

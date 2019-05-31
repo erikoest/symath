@@ -6,7 +6,7 @@ module Sy
   #   a*(b - c) -> a*b - a*c
   # The transformation iterates until no changes occur. Thus, the expression
   #   (a + b)*(c + d) transforms to a*c + a*d + b*c + b*d
-  class DistributiveLaw < Operation
+  class Operation::DistributiveLaw < Operation
     def description
       return 'Apply distributive law'
     end

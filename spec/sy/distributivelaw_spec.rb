@@ -2,9 +2,9 @@ require 'spec_helper'
 require 'sy'
 
 module Sy
-  n = Sy::Normalization.new
+  n = Sy::Operation::Normalization.new
 
-  describe Sy::DistributiveLaw do
+  describe Sy::Operation::DistributiveLaw do
     sums = {
       :x.to_m*(1.to_m + 3.to_m*:y)             => 'x + 3*x*y',
       -:x.to_m*(-:y.to_m - 3.to_m)             => '3*x + x*y',
@@ -15,7 +15,7 @@ module Sy
 
     sums.each do |from, to|
       it "multiplies '#{from.to_s}' to '#{to}'" do
-        n.act(op(:dist, from).act).to_s.should == to
+        n.act(op(:dist, from).evaluate).to_s.should == to
       end
     end
   end
