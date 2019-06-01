@@ -1,21 +1,4 @@
 module Sy
-  def self.value(val)
-    return val if val.is_a?(Sy::Value)
-    if val.is_a?(Integer)
-      if val >= 0
-        return val.to_m
-      else
-        return -val.to_m
-      end
-    end
-
-    if val.is_a?(String) or val.is_a?(Symbol)
-      return val.to_m
-    end
-
-    raise sprintf("Cannot convert %s to a Sy::Value", val.class)
-  end
-
   class Value
     def deep_clone()
       return Marshal.load(Marshal.dump(self))
@@ -117,11 +100,11 @@ module Sy
     # performed.
     ##
     def +(other)
-      return Sy::Sum.new(self, Sy.value(other))
+      return Sy::Sum.new(self, other.to_m)
     end
 
     def -(other)
-      return Sy::Subtraction.new(self, Sy.value(other))
+      return Sy::Subtraction.new(self, other.to_m)
     end
 
     def -@()
@@ -129,22 +112,22 @@ module Sy
     end
 
     def *(other)
-      return Sy::Product.new(self, Sy.value(other))
+      return Sy::Product.new(self, other.to_m)
     end
 
     def /(other)
-      return Sy::Fraction.new(self, Sy.value(other))
+      return Sy::Fraction.new(self, other.to_m)
     end
     
     def **(other)
-      return Sy::Power.new(self, Sy.value(other))
+      return Sy::Power.new(self, other.to_m)
     end
 
     ##
     # Math operations with simple reductions.
     ##
     def add(other)
-      o = Sy.value(other)
+      o = other.to_m
       return self if o == 0
       return o if self == 0
 
@@ -158,7 +141,7 @@ module Sy
     end
 
     def sub(other)
-      o = Sy.value(other)
+      o = other.to_m
       return self if o == 0
       return -o if self == 0
 
@@ -173,7 +156,7 @@ module Sy
     end
     
     def mult(other)
-      o = Sy.value(other)
+      o = other.to_m
       return self if o == 1
       return o if self == 1
 
@@ -193,7 +176,7 @@ module Sy
     end
 
     def div(other)
-      o = Sy.value(other)
+      o = other.to_m
       return self if o == 1
 
       if self.is_a?(Sy::Fraction)
@@ -204,7 +187,7 @@ module Sy
     end
 
     def power(other)
-      o = Sy.value(other)
+      o = other.to_m
       if self.is_a?(Sy::Power)
         return self.base.power(self.exponent.mult(o))
       end
@@ -286,8 +269,12 @@ module Sy
 
     alias eql? ==
 
-    def to_str
+    def to_str()
       return to_s
+    end
+
+    def to_m()
+      return self
     end
   end
 end

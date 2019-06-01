@@ -45,7 +45,7 @@ module Sy
     end
     
     def ==(other)
-      o = Sy.value(other)
+      o = other.to_m
       return false if self.class.name != o.class.name
       return false if name.to_s != o.name.to_s
       return false if arity != o.arity

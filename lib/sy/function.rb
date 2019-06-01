@@ -17,5 +17,5 @@ module Sy
 end
 
 def fn(name, *args)
-  return Sy::Function.new(name, args.map { |a| Sy.value(a) })
+  return Sy::Function.new(name, args.map { |a| a.to_m })
 end
