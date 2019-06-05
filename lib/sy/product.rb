@@ -77,5 +77,15 @@ module Sy
         end
       end.join('*')
     end
+
+    def to_latex()
+      return @args.map do |a|
+        if a.is_sum_exp?
+          '(' + a.to_latex + ')'
+        else
+          a.to_latex
+        end
+      end.join('*')
+    end      
   end
 end

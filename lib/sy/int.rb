@@ -44,5 +44,20 @@ module Sy
       ret += ')'
       return ret
     end
+
+    def to_latex()
+      if @args[0].is_sum_exp?
+        exp = '\left(' + @args[0].to_latex + '\right)'
+      else
+        exp = @args[0].to_latex
+      end
+
+      if @a.nil?
+        return '\int ' + exp + '\,' + @var.to_latex
+      else
+        return '\int_{' + @a.to_latex + '}^{' + @b.to_latex + '} ' +
+               exp + '\, ' + @var.to_latex
+      end
+    end
   end
 end

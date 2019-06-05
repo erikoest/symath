@@ -55,5 +55,9 @@ module Sy
                       divisor.to_s
       return dividend_str + '/' + divisor_str
     end
+
+    def to_latex()
+      return '\frac{' + dividend.to_latex + '}{' + divisor.to_latex + '}'
+    end
   end
 end

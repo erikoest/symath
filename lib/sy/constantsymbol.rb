@@ -28,5 +28,17 @@ module Sy
     def replace(varmap)
       return self
     end
+
+    def to_latex()
+      if @name == 'pi'
+        return '\pi'
+      elsif @name == 'phi'
+        return '\varphi'
+      elsif @name == 'e'
+        return '\mathrm{e}'
+      else
+        return @name
+      end
+    end
   end
 end

@@ -53,5 +53,9 @@ module Sy
     def to_s()
       return '- ' + argument.to_s
     end
+
+    def to_latex()
+      return '- ' + argument.to_latex
+    end
   end
 end

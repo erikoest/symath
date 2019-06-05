@@ -63,6 +63,14 @@ module Sy
       return @name.to_s
     end
 
+    def to_latex()
+      if is_diff?
+        return '\mathrm{d}' + undiff.to_latex
+      else
+        return @name.to_s
+      end
+    end
+    
     alias eql? ==
   end
 end

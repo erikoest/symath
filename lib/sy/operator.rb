@@ -35,6 +35,10 @@ module Sy
       return @name.to_s + '(' + @args.map { |a| a.to_s }.join(',') + ')'
     end
 
+    def to_latex()
+      return @name.to_s + '(' + @args.map { |a| a.to_latex }.join(',') + ')'
+    end
+
     def hash()
       h = @name.hash
       @args.each do |a|

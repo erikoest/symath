@@ -9,5 +9,9 @@ module Sy
     def to_s()
       return @name.to_s
     end
+
+    def to_latex()
+      return @name.to_s
+    end
   end
 end

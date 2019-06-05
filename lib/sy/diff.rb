@@ -28,5 +28,9 @@ module Sy
     def evaluate()
       return @@actions[:diff].act(*args, @vars)
     end
+
+    def to_latex()
+      return '\mathrm{d}(' + @args[0].to_latex + ')'
+    end
   end
 end

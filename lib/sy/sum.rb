@@ -37,5 +37,9 @@ module Sy
     def to_s()
       return @args.map { |a| a.to_s }.join(' + ')
     end
+
+    def to_latex()
+      return @args.map { |a| a.to_latex }.join(' + ')
+    end
   end
 end
