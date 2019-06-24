@@ -78,7 +78,7 @@ module Sy
     def check_factors(exp)
       pi = :pi.to_m
 
-      exp.args[0].abs_factors.each do |f|
+      exp.args[0].scalar_factors.each do |f|
         return false if (pi.nil?)
         return false if f != pi
         pi = nil

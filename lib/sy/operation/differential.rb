@@ -40,7 +40,11 @@ module Sy
       if exp.is_a?(Sy::Product)
         return do_product(exp, vars)
       end
-
+      
+      if exp.is_a?(Sy::Wedge)
+        return do_product(exp, vars)
+      end
+      
       if exp.is_a?(Sy::Fraction)
         return do_fraction(exp, vars)
       end
@@ -56,18 +60,21 @@ module Sy
       raise 'Cannot calculate derivative of expression ' + exp.to_s
     end
 
+    # For simplicity, just use wedge products all the time. They will be normalized
+    # to scalar products afterwards.
     def do_product(exp, vars)
-      return diff(exp.factor1, vars)*exp.factor2 + exp.factor1*diff(exp.factor2, vars)
+      return (diff(exp.factor1, vars)^exp.factor2) + (exp.factor1^diff(exp.factor2, vars))
     end
 
     def do_fraction(exp, vars)
-      return diff(exp.dividend, vars)*exp.divisor - exp.dividend*diff(exp.divisor, vars) /
-                                                  (exp.divisor**2)
+      return ((diff(exp.dividend, vars)^exp.divisor) -
+              (exp.dividend^diff(exp.divisor, vars))) /
+             (exp.divisor**2)
     end
 
     def do_power(exp, vars)
-      return exp*fn(:ln, exp.base)*diff(exp.exponent, vars) +
-             exp.exponent*exp.base**(exp.exponent - 1)*diff(exp.base, vars)
+      return (exp^fn(:ln, exp.base)^diff(exp.exponent, vars)) +
+             (exp.exponent^(exp.base**(exp.exponent - 1))^diff(exp.base, vars))
     end
 
     def do_function(exp, vars)
@@ -84,7 +91,7 @@ module Sy
           when 'csc' then -fn(:cot, exp.args[0])*fn(:csc, exp.args[0])
           else raise 'Cannot calculate differential of function' + exp.to_s
         end
-      return d*diff(exp.args[0], vars)
+      return d^diff(exp.args[0], vars)
     end
   end
 end

@@ -3,7 +3,7 @@ require 'sy/function'
 module Sy
   class Power < Function
     def initialize(base, exponent)
-      super('^', [base, exponent])
+      super('**', [base, exponent])
     end
 
     def base()
@@ -25,7 +25,7 @@ module Sy
                  '(' + exponent.to_s + ')' :
                  exponent.to_s
       
-      return base_str + '^' + expo_str
+      return base_str + '**' + expo_str
     end
 
     def to_latex()

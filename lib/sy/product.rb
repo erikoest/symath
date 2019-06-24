@@ -26,10 +26,10 @@ module Sy
       return true
     end
 
-    def abs_factors()
+    def scalar_factors()
       return Enumerator.new do |f|
-        factor1.abs_factors.each { |f1| f << f1 }
-        factor2.abs_factors.each { |f2| f << f2 }
+        factor1.scalar_factors.each { |f1| f << f1 }
+        factor2.scalar_factors.each { |f2| f << f2 }
       end
     end
 
@@ -54,6 +54,14 @@ module Sy
       end
 
       return factor1.abs_factors_exp.mult(factor2.abs_factors_exp)
+    end
+
+    # TODO: Error if both factors have vector components
+    def vector_factors()
+      return Enumerator.new do |f|
+        factor1.vector_factors.each { |f1| f << f1 }
+        factor2.vector_factors.each { |f2| f << f2 }
+      end
     end
     
     def coefficient()

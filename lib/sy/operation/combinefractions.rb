@@ -68,7 +68,7 @@ module Sy
       exp.summands.each do |s|
         add_summand(
           sum,
-          s.abs_factors.inject(:*),
+          s.scalar_factors.inject(:*),
           s.div_factors.inject(:*),
           s.coefficient,
           s.div_coefficient,
@@ -78,7 +78,7 @@ module Sy
       exp.subtrahends.each do |s|
         add_summand(
           sum,
-          s.abs_factors.inject(:*),
+          s.scalar_factors.inject(:*),
           s.div_factors.inject(:*),
           -s.coefficient,
           s.div_coefficient,

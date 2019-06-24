@@ -1,12 +1,14 @@
 require 'sy/value'
+require 'sy/type'
 
 module Sy
   class Variable < Value
     attr_reader :name
-    attr_reader :value
+    attr_reader :type
   
-    def initialize(name, value = nil)
+    def initialize(name, t)
       @name = name
+      @type = t.to_t
     end
 
     def hash()
@@ -15,6 +17,7 @@ module Sy
     
     def ==(other)
       return false if self.class.name != other.class.name
+      return false if @type != other.type
       return @name.to_s == other.name.to_s
     end
 
@@ -26,25 +29,44 @@ module Sy
       return @name.to_s <=> other.name.to_s
     end
 
+    def scalar_factors()
+      if @type.is_scalar?
+        return [self].to_enum
+      else
+        return [].to_enum
+      end
+    end
+
+    def vector_factors()
+      if @type.is_vector? or @type.is_dform?
+        return [self].to_enum
+      else
+        return [].to_enum
+      end
+    end
+
+    def abs_factors_exp()
+      return self
+    end
+
     def is_constant?(vars = nil)
       return false if vars.nil?
       return !(vars.member?(self))
     end
 
-    # Returns true if variable is a differential
-    # As for now, all variables beginning with d are differentials
+    # Returns true if variable is a differential form
     def is_diff?()
-      return @name[0] == 'd'
+      return @type.is_dform?
     end
 
     # Returns variable which differential is based on
-    # Todo: check that return value really is a variable (dpi, de, di, etc.)
+    # TODO: Check name collision with constant symbols (i, e, pi etc.)
     def undiff()
-      return @name[1..-1].to_m
+      return Sy::Variable.new(@name, 'real')
     end
     
     def to_diff()
-      return Sy::Variable.new(:d.to_s + @name.to_s)
+      return Sy::Variable.new(@name, Sy::Type.new('dform'))
     end
 
     def variables()
@@ -58,9 +80,19 @@ module Sy
         return self
       end
     end
-    
+
     def to_s()
-      return @name.to_s
+      if @type.is_dform?
+        return :d.to_s + @name.to_s
+      elsif @type.is_vector?
+        return @name.to_s + ''''
+      elsif @type.is_covector?
+        return @name.to_s + '.'
+      elsif @type.is_subtype?('tensor')
+        return @name.to_s + '[' + @type.index_str + ']'
+      else
+        return @name.to_s
+      end
     end
 
     def to_latex()
@@ -76,21 +108,21 @@ module Sy
 end
 
 class String
-  def to_m()
+  def to_m(type = 'real')
     begin
       return Sy::ConstantSymbol.new(self)
     rescue
-      return Sy::Variable.new(self)
+      return Sy::Variable.new(self, type)
     end
   end
 end
 
 class Symbol
-  def to_m()
+  def to_m(type = 'real')
     begin
       return Sy::ConstantSymbol.new(self)
     rescue
-      return Sy::Variable.new(self)
+      return Sy::Variable.new(self, type)
     end
   end
 end

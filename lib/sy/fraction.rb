@@ -18,9 +18,9 @@ module Sy
       return true
     end
 
-    def abs_factors()
+    def scalar_factors()
       return Enumerator.new do |f|
-        dividend.abs_factors.each { |d1| f << d1 }
+        dividend.scalar_factors.each { |d1| f << d1 }
         divisor.div_factors.each { |d2| f << d2 }
       end
     end
@@ -28,12 +28,18 @@ module Sy
     def div_factors()
       return Enumerator.new do |d|
         dividend.div_factors.each { |d1| d << d1 }
-        divisor.abs_factors.each { |d2| d << d2 }
+        divisor.scalar_factors.each { |d2| d << d2 }
       end
     end
 
     def abs_factors_exp()
       return dividend.abs_factors_exp / divisor
+    end
+
+    def vector_factors()
+      return Enumerator.new do |f|
+        dividend.vector_factors.each { |d1| f << d1 }
+      end
     end
     
     def coefficient()

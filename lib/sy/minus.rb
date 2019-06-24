@@ -18,8 +18,8 @@ module Sy
       return true
     end
 
-    def abs_factors()
-      return argument.abs_factors
+    def scalar_factors()
+      return argument.scalar_factors
     end
 
     def div_factors()
@@ -28,6 +28,10 @@ module Sy
 
     def abs_factors_exp()
       return argument.abs_factors_exp
+    end
+
+    def vector_factors()
+      return argument.vector_factors
     end
     
     def coefficient()

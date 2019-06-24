@@ -29,6 +29,16 @@ module Sy
       return self
     end
 
+    def type()
+      if @name == 'e' or @name == 'pi' or @name == 'phi'
+        return 'real'.to_t
+      elsif @name == :i
+        return 'imaginary'.to_t
+      else
+        return 'unknown'.to_t
+      end
+    end
+    
     def to_latex()
       if @name == 'pi'
         return '\pi'

@@ -6,8 +6,12 @@ module Sy
 
   describe Sy::Operation::Differential, ', simple polynomials' do
     poly = {
-      op(:diff, :x.to_m + 3.to_m*:x.to_m**2 + 4.to_m*:y + 10.to_m)                   => 'dx + 6*dx*x',
-      op(:diff, 3.to_m*:x + 2.to_m*:y.to_m**3 + 5.to_m*:z.to_m**4, :x.to_m, :y.to_m) => '3*dx + 6*dy*y^2',
+      op(:diff, 3.to_m*:x.to_m**2) =>
+          '6*x*dx',
+      op(:diff, :x.to_m + 3.to_m*:x.to_m**2 + 4.to_m*:y + 10.to_m) =>
+          'dx + 6*x*dx',
+      op(:diff, 3.to_m*:x + 2.to_m*:y.to_m**3 + 5.to_m*:z.to_m**4, :x.to_m, :y.to_m) =>
+          '3*dx + 6*y**2*dy',
     }
 
     poly.each do |from, to|
@@ -19,8 +23,8 @@ module Sy
 
   describe Sy::Operation::Differential, ', exponential functions' do
     exp = {
-      op(:diff, fn('exp', :x.to_m**2)) => '2*dx*x*exp(x^2)',
-      op(:diff, fn('ln', 3.to_m*:x + :x.to_m**2)) => '(3*dx + 2*dx*x)/(3*x + x^2)'
+      op(:diff, fn('exp', :x.to_m**2))            => '2*x*exp(x**2)*dx',
+      op(:diff, fn('ln', 3.to_m*:x + :x.to_m**2)) => '(3*dx + 2*x*dx)/(3*x + x**2)'
     }
 
     exp.each do |from, to|

@@ -74,7 +74,7 @@ module Sy
       prodc = exp.coefficient.to_m
       proda = []
 
-      exp.abs_factors.each do |f|
+      exp.scalar_factors.each do |f|
         if f.is_constant?(vset)
           prodc *= f
         else
@@ -143,9 +143,9 @@ module Sy
       # Check exponential functions
       if b.is_constant?(vset)
         # FIXME: Should consider moving this code out to the value class
-        # We could consider extending the coefficient methods to include an
-        # optional variable set, and return the part of the expression which
-        # is constant with respect to the set.
+        # We could extend the coefficient methods to include an optional
+        # variable set, and return the part of the expression which is
+        # constant with respect to the set.
         divc = xp.div_coefficient.to_m
         
         xp.div_factors.each do |d|
@@ -159,7 +159,7 @@ module Sy
         prodc = xp.coefficient.to_m
         proda = []
       
-        xp.abs_factors.each do |f|
+        xp.scalar_factors.each do |f|
           if f.is_constant?(vset)
             prodc *= f
           elsif f == vu

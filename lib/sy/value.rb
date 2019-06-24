@@ -123,6 +123,10 @@ module Sy
       return Sy::Power.new(self, other.to_m)
     end
 
+    def ^(other)
+      return Sy::Wedge.new(self, other.to_m)
+    end
+
     ##
     # Math operations with simple reductions.
     ##
@@ -195,6 +199,26 @@ module Sy
       return self**o
     end
     
+    def wedge(other)
+      o = other.to_m
+      return self if o == 1
+      return o if self == 1
+
+      if base == o.base
+        return base ** (exponent + o.exponent)
+      end
+
+      if self.is_a?(Sy::Fraction) and dividend == 1.to_m
+        return o / divisor
+      end
+
+      if o.is_a?(Sy::Fraction) and o.dividend == 1.to_m
+        return self / o.divisor
+      end
+      
+      return self ^ o
+    end
+
     ##
     # Helper methods for the normalization operation. These are overridden by the
     # subclasses. Default behaviour is defined here.
@@ -234,19 +258,20 @@ module Sy
       return 1.to_m
     end
     
-    # Returns the absolute factors of a product in an array.
+    # Returns the absolute scalar factors of a product in an array.
     # Defaults to self for non-products.
-    def abs_factors()
+    def scalar_factors()
       return [self].to_enum
     end
 
-    # Returns the absolute factors of a divisor in an array.
+    # Returns the absolute factors of a divisor in an array (including vector
+    # components.
     # Defaults to nothing for non-fractions.
     def div_factors()
       return [].to_enum
     end
     
-    # Return the factors and division factors of the expression.
+    # Return the non-constant factors and division factors of the expression.
     def abs_factors_exp()
       return self
     end
@@ -260,11 +285,21 @@ module Sy
     def div_coefficient()
       return 1
     end
+
+    # Return vector factors in an array
+    # Defaults to nothing for non-vectors and non-wedge products
+    def vector_factors()
+      return [].to_enum
+    end
     
     # Returns the accumulated sign of a product.
     # Defaults to 1 for positive non-sum expressions.
     def sign()
       return 1
+    end
+
+    def type()
+      return type('unknown')
     end
 
     alias eql? ==

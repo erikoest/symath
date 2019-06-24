@@ -6,7 +6,9 @@ module Sy
       return self.name.to_i
     end
 
-    def abs_factors()
+    # Scalar factor is empty because the numeric value is counted as
+    # coefficient
+    def scalar_factors()
       return []
     end
 
@@ -16,6 +18,10 @@ module Sy
     
     def coefficient()
       return self.value
+    end
+
+    def type()
+      return type('natural')
     end
   end
 end
