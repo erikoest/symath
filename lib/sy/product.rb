@@ -40,22 +40,6 @@ module Sy
       end
     end
 
-    def abs_factors_exp()
-      if factor1.is_a?(Sy::Number) and factor2.is_a?(Sy::Number)
-        return 1.to_m
-      end
-
-      if factor1.is_a?(Sy::Number)
-        return factor2
-      end
-
-      if factor2.is_a?(Sy::Number)
-        return factor1
-      end
-
-      return factor1.abs_factors_exp.mult(factor2.abs_factors_exp)
-    end
-
     # TODO: Error if both factors have vector components
     def vector_factors()
       return Enumerator.new do |f|

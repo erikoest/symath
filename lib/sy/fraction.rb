@@ -32,10 +32,6 @@ module Sy
       end
     end
 
-    def abs_factors_exp()
-      return dividend.abs_factors_exp / divisor
-    end
-
     def vector_factors()
       return Enumerator.new do |f|
         dividend.vector_factors.each { |d1| f << d1 }

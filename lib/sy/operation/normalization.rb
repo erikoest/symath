@@ -10,12 +10,14 @@ module Sy
   #   arguments in a sum are sorted
   #   subtractive elements are put after the additive elements
 
+  #   vector parts are factorized out of sums
+
   #   integer sums are calculated
   #   integer products are calculated
 
   #   fractions of integers are simplified as far as possible
 
-  # The operation is repeated until no 
+  # The operation is repeated until the expression is no longer changed
   class Operation::Normalization < Operation
     def description
       return 'Normalize expression'
@@ -46,75 +48,81 @@ module Sy
     end
 
     def do_sum(exp)
+      one = 1.to_m
       # Get normalized summands and subtrahends
-      a = exp.summands.map { |e| act(e) }
-      s = exp.subtrahends.map { |e| act(e) }
+      add = exp.summands.map { |e| act(e) }
+      sub = exp.subtrahends.map { |e| act(e) }
 
       # Collect equal elements into integer products
+      # Vector parts are factorized out
+
+      # Hash: product[vector part][scalar part]
       products = {}
-      
-      a.each do |e|
-        # Sum up all constant numbers
-        if e.is_a?(Sy::Number)
-          if products.key?(1)
-            products[1] += e.value
-          else
-            products[1] = e.value
-          end
-          next
+
+      add.each do |e|
+        w = e.vector_factors_exp
+        if !products.key?(w)
+          products[w] = {}
         end
 
-        ex = e.abs_factors_exp
+        s = e.scalar_factors_exp
         c = e.coefficient*e.sign
 
-        if products.key?(ex)
-          products[ex] += c
+        if products[w].key?(s)
+          products[w][s] += c
         else
-          products[ex] = c
+          products[w][s] = c
         end
       end
 
-      s.each do |e|
-        # Subtract all constant numbers
-        if e.is_a?(Sy::Number)
-          if products.key?(1)
-            products[1] -= e.value
-          else
-            products[1] = -e.value
-          end
-          next
+      sub.each do |e|
+        w = e.vector_factors_exp
+        if !products.key?(one)
+          products[w] = {}
         end
 
-        ex = e.abs_factors_exp
+        s = e.scalar_factors_exp
         c = e.coefficient*e.sign
         
-        if products.key?(ex)
-          products[ex] -= c
+        if products[w].key?(s)
+          products[w][s] -= c
         else
-          products[ex] = -c
+          products[w][s] = -c
         end
       end
 
       a2 = []
       s2 = []
 
-      if products.key?(1)
-        if products[1] > 0
-          a2.push(products[1].to_m)
-        elsif products[1] < 0
-          s2.push((-products[1]).to_m)
-        end
-        products.delete(1)
-      end
-
-      # Put hashed elements back into a sorted array
-      products.keys.sort.each do |k|
-        next if products[k] == 0
+      products.keys.sort.each do |w|
+        # For each vector product, put scalar parts back into a sorted array
+        a3 = []
+        s3 = []
         
-        if products[k] > 0
-          a2.push(products[k].to_m.mult(k))
-        elsif products[k] < 0
-          s2.push((-products[k]).to_m.mult(k))
+        products[w].keys.sort.each do |k|
+          next if products[w][k] == 0
+        
+          if products[w][k] > 0
+            a3.push(products[w][k].to_m.mult(k))
+          elsif products[w][k] < 0
+            s3.push((-products[w][k]).to_m.mult(k))
+          end
+        end
+
+        next if a3.length + s3.length == 0
+        
+        if w == one
+          a2 += a3
+          s2 += s3
+        else
+          if a3.length == 0
+            s2.push(s3.inject(:add).mult(w))
+          else
+            p = 0.to_m
+            a3.each { |s| p = p.add(s) }
+            s3.each { |s| p = p.sub(s) }
+            a2.push(p.mult(w))
+          end
         end
       end
 

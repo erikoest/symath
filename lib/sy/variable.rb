@@ -45,10 +45,6 @@ module Sy
       end
     end
 
-    def abs_factors_exp()
-      return self
-    end
-
     def is_constant?(vars = nil)
       return false if vars.nil?
       return !(vars.member?(self))

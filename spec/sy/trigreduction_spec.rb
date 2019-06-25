@@ -22,7 +22,7 @@ module Sy
     }
 
     exp.each do |from, to|
-      it "multiplies '#{from.to_s}' to '#{to}'" do
+      it "reduces '#{from.to_s}' to '#{to}'" do
         op(:trigreduct, from).evaluate.to_s.should == to
       end
     end

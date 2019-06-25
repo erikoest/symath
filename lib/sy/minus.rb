@@ -26,10 +26,6 @@ module Sy
       return argument.div_factors
     end
 
-    def abs_factors_exp()
-      return argument.abs_factors_exp
-    end
-
     def vector_factors()
       return argument.vector_factors
     end

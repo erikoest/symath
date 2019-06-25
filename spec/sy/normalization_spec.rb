@@ -59,7 +59,7 @@ module Sy
       dy^dx^dz                        => '- dx^dy^dz',
       fn(:sin, :x.to_m)*dy^dx         => '- sin(x)*dx^dy',
       :x.to_m**3^dy*:e.to_m**4^dz^dx  => 'e**4*x**3*dx^dy^dz',
-      dx + (:x.to_m**1.to_m^dx)       => 'dx + x*dx',
+      dx + (:x.to_m**1.to_m^dx)       => '(1 + x)*dx',
     }
 
     wedges.each do |from, to|

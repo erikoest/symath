@@ -51,12 +51,13 @@ module Sy
         'Sy::Variable' => 3,
         'Sy::Minus' => 4,
         'Sy::Power' => 5,
-        'Sy::Fraction' => 6,
-        'Sy::Product' => 7,
-        'Sy::Subtraction' => 8,
-        'Sy::Sum' => 9,
-        'Sy::Function' => 10,
-        'Sy::Operator' => 11,
+        'Sy::Wedge' => 6,
+        'Sy::Fraction' => 7,
+        'Sy::Product' => 8,
+        'Sy::Subtraction' => 9,
+        'Sy::Sum' => 10,
+        'Sy::Function' => 11,
+        'Sy::Operator' => 12,
       }
 
       return class_order[self.class.name] <=> class_order[other.class.name]
@@ -135,10 +136,20 @@ module Sy
       return self if o == 0
       return o if self == 0
 
-      noc = self.abs_factors_exp
-      if noc == o.abs_factors_exp
-        c2 = self.coefficient + o.coefficient
-        return noc == 1.to_m ? c2.to_m : c2*noc
+      s = scalar_factors_exp
+      w = vector_factors_exp
+      if s == o.scalar_factors_exp and
+        w == o.vector_factors_exp
+        ret = coefficient + o.coefficient
+        if s != 1.to_m
+          ret *= s
+        end
+
+        if w != 1.to_m
+          ret *= w
+        end
+        
+        return ret
       end
 
       return self + o
@@ -149,11 +160,22 @@ module Sy
       return self if o == 0
       return -o if self == 0
 
-      noc = self.abs_factors_exp
-      if noc == other.abs_factors_exp
-        c2 = self.coefficient + other.coefficient
-        return 0.to_m if c2 == 0
-        return noc == 1.to_m ? c2.to_m : c2*noc
+      s = scalar_factors_exp
+      w = vector_factors_exp
+
+      if s == other.scalar_factors_exp and
+        w == other.vector_factors_exp        
+        ret = coefficient - other.coefficient
+        return 0.to_m if ret == 0
+        if s != 1.to_m
+          ret *= s
+        end
+
+        if w != 1.to_m
+          ret *= w
+        end
+
+        return ret
       end
 
       return self - o
@@ -271,9 +293,33 @@ module Sy
       return [].to_enum
     end
     
-    # Return the non-constant factors and division factors of the expression.
-    def abs_factors_exp()
-      return self
+    # Return the scalar factors and division factors as an expression.
+    def scalar_factors_exp()
+      ret = 1.to_m
+      scalar_factors.each do |f|
+        ret = ret.mult(f)
+      end
+
+      d = div_coefficient.to_m
+      div_factors.each do |f|
+        d = d.mult(f)
+      end
+      
+      if d != 1.to_m
+        ret /= d
+      end
+      
+      return ret
+    end
+
+    # Return vector factors as an expression
+    def vector_factors_exp()
+      w = vector_factors.inject(:^)
+      if (w.nil?)
+        return 1.to_m
+      else
+        return w
+      end
     end
 
     # Return the constant factor of a product
