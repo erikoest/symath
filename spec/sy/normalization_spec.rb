@@ -53,13 +53,17 @@ module Sy
     dx = :x.to_m('dform')
     dy = :y.to_m('dform')
     dz = :z.to_m('dform')
+
+    x = :x.to_m
+    a = :a.to_m
     
     wedges = {
       dx^dx                           => '0',
       dy^dx^dz                        => '- dx^dy^dz',
-      fn(:sin, :x.to_m)*dy^dx         => '- sin(x)*dx^dy',
+      fn(:sin, x)*dy^dx               => '- sin(x)*dx^dy',
       :x.to_m**3^dy*:e.to_m**4^dz^dx  => 'e**4*x**3*dx^dy^dz',
-      dx + (:x.to_m**1.to_m^dx)       => '(1 + x)*dx',
+      dx + (x**1.to_m^dx)             => '(1 + x)*dx',
+      (dx^fn(:ln, a*x)) + ((x^1.to_m)/(a*x)^((0.to_m^x) + (a^dx))) - dx => 'ln(a*x)*dx'
     }
 
     wedges.each do |from, to|
