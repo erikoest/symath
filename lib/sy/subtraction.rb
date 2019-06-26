@@ -33,11 +33,19 @@ module Sy
     end
 
     def to_s()
-      return @args.map { |a| a.to_s }.join(' - ')
+      if subtrahend.is_a?(Sy::Sum)
+        return minuend.to_s + ' - (' + subtrahend.to_s + ')'
+      else
+        return minuend.to_s + ' - ' + subtrahend.to_s
+      end
     end
 
     def to_latex()
-      return @args.map { |a| a.to_latex }.join(' - ')
+      if subtrahend.is_a?(Sy::Sum)
+        return minuend.to_latex + ' - (' + subtrahend.to_latex + ')'
+      else
+        return minuend.to_latex + ' - ' + subtrahend.to_latex
+      end
     end
   end
 end
