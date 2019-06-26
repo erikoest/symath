@@ -70,7 +70,7 @@ module Sy
     end
 
     def replace(var, exp)
-      if var.to_s == @name
+      if var == self
         return exp.deep_clone
       else
         return self

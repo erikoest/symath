@@ -6,6 +6,10 @@ module Sy
       return self.name.to_i
     end
 
+    def has_action?()
+      return false
+    end
+    
     # Scalar factor is empty because the numeric value is counted as
     # coefficient
     def scalar_factors()

@@ -7,8 +7,8 @@ module Sy
   
   class Operation::Integration < Operation
     # Calculate some simple indefinite integrals (anti derivatives)
-    # NB: This operation is home made and extermely limited. It should be replaced
-    # with some of the known integration algorithm
+    # NB: This operation is home made and extermely limited. It should be
+    # replaced with some of the known integration algorithm
     def description
       return 'Calculate indefinite integral'
     end
@@ -115,7 +115,7 @@ module Sy
           # 1/x => ln|x|
           return fn(:ln, fn(:abs, vu))
         else
-          # 1/x^n => x^(1 - n)/(1 - n)
+          # 1/x**n => x**(1 - n)/(1 - n)
           return vu**(1.to_m - xp)/(1.to_m - xp)
         end
       end
@@ -132,11 +132,11 @@ module Sy
 
       if b == vu
         if !xp.is_constant?(vset)
-          # Cannot integrate x^f(x)
+          # Cannot integrate x**f(x)
           failure(exp)
         end
 
-        # x^n => x^(n + 1)/(n + 1)
+        # x**n => x**(n + 1)/(n + 1)
         return vu**(xp + 1)/(xp + 1)
       end
 
@@ -179,7 +179,7 @@ module Sy
 
         prodc /= divc
         
-        # a^(b*x) => a^(b*x)/(b*ln(a))
+        # a**(b*x) => a**(b*x)/(b*ln(a))
         return b**(prodc*vu)/(prodc*fn(:ln, b))
       end
       

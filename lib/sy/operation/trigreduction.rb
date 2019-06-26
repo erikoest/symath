@@ -52,7 +52,7 @@ module Sy
       # Recurse down operator arguments
       res = act_subexpressions(res)
       res = exp if res.nil?
-
+      
       if res.is_a?(Sy::Function)
         res = case res.name.to_s
               when 'sin'

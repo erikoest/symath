@@ -25,10 +25,6 @@ module Sy
       return
     end
 
-    def replace(varmap)
-      return self
-    end
-
     def type()
       if @name == 'e' or @name == 'pi' or @name == 'phi'
         return 'real'.to_t

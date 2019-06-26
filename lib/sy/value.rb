@@ -36,14 +36,14 @@ module Sy
       return 1
     end
     
-    # Equality operator. Two expressions are considered equal if they are structurally
-    # equal and have the same variable names
+    # Equality operator. Two expressions are considered equal if they are
+    # structurally equal and have the same variable names
     def ==(other)
       return false
     end
 
-    # Sorting/ordering operator. The ordering is used by the normalization to order the
-    # parts of a sum, product etc.
+    # Sorting/ordering operator. The ordering is used by the normalization to
+    # order the parts of a sum, product etc.
     def <=>(other)
       class_order = {
         'Sy::Number' => 1,
@@ -79,9 +79,9 @@ module Sy
       return (self <=> other) >= 0
     end
     
-    # Return true if value is constant relative to changes in any of the given set of
-    # variables. If no variable set is given, returns true if expression is alawys
-    # constant.
+    # Return true if value is constant relative to changes in any of the given
+    # set of variables. If no variable set is given, returns true if
+    # expression is alawys constant.
     def is_constant?(vars = nil)
       return true
     end
@@ -90,9 +90,10 @@ module Sy
     def variables()
       return []
     end
-    
+
+    # Replaces variable with expression. Overridden by subclasses
     def replace(var, exp)
-      raise "Don't know how to replace a " + self.class.name
+      return self
     end
     
     ##
@@ -242,8 +243,8 @@ module Sy
     end
 
     ##
-    # Helper methods for the normalization operation. These are overridden by the
-    # subclasses. Default behaviour is defined here.
+    # Helper methods for the normalization operation. These are overridden by
+    # the subclasses. Default behaviour is defined here.
     ##
 
     # Value is a sum, subtraction of unitary minus

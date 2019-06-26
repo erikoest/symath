@@ -95,7 +95,7 @@ module Sy
     end
 
     def replace(var, exp)
-      @args= @args.map do |a|
+      @args = @args.map do |a|
         a.replace(var, exp)
       end
 
@@ -106,6 +106,7 @@ end
 
 require 'sy/diff'
 require 'sy/int'
+require 'sy/bounds'
 
 def op(name, *args)
   if name == :diff
@@ -113,12 +114,12 @@ def op(name, *args)
   end
 
   if name == :int
-    if args.length > 4
-      raise "Too many arguments for int operator"
-    end
-
     return Sy::Int.new(*args)
   end
 
+  if name == :bounds
+    return Sy::Bounds.new(*args)
+  end
+  
   return Sy::Operator.new(name, args)
 end

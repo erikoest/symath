@@ -3,7 +3,6 @@ require "sy/version"
 require "sy/parser"
 
 require 'sy/type'
-require 'sy/substitution'
 require 'sy/function'
 require 'sy/sum'
 require 'sy/subtraction'
@@ -27,6 +26,7 @@ require 'sy/path'
 #   symbol for differentiation (d, ð, etc.)
 #   symbol for vector (', ', ~, etc.)
 #   normalization policy (how much normalzation?)
+#   auto evaluate operators
 # Working environment:
 #   vector room
 #   basis vectors (variable names)

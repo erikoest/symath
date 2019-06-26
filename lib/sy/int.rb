@@ -28,7 +28,12 @@ module Sy
     end
 
     def evaluate()
-      return @@actions[:int].act(*args, var)
+      if a.nil?
+        return @@actions[:int].act(*args, var)
+      else
+        int = @@actions[:int].act(*args, var)
+        return op(:bounds, int, var.undiff, a, b)
+      end
     end
     
     def to_s()
@@ -38,7 +43,7 @@ module Sy
       end
 
       if !@a.nil?
-        ret += ',' + @a + ',' + @b
+        ret += ',' + @a.to_s + ',' + @b.to_s
       end
 
       ret += ')'

@@ -48,6 +48,8 @@ require 'sy/operation/differential'
 require 'sy/operation/integration'
 require 'sy/operation/distributivelaw'
 require 'sy/operation/combinefractions'
+require 'sy/operation/bounds'
+require 'sy/operation/evaluation'
 
 module Sy
   class Operator < Value
@@ -60,6 +62,7 @@ module Sy
       # Derivation/integration
       :diff       => Sy::Operation::Differential.new,
       :int        => Sy::Operation::Integration.new,
+      :bounds     => Sy::Operation::Bounds.new,
     }
 
     @@builtin_operators = @@actions.keys.to_set
