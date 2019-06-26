@@ -77,7 +77,7 @@ module Sy
 
       sub.each do |e|
         w = e.vector_factors_exp
-        if !products.key?(one)
+        if !products.key?(w)
           products[w] = {}
         end
 
