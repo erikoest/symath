@@ -3,8 +3,8 @@
 class Parser
   prechigh
     nonassoc UMINUS
-    left '^' '**'
-    left '*' '/'
+    left '**'
+    left '*' '/' '^'
     left '+' '-'
     left '='
   preclow
@@ -16,7 +16,7 @@ exp: exp '=' exp { result = operator('Sy::Equation', [val[0], val[2]], val[0]) }
      | exp '-' exp { result = operator('Sy::Subtraction', [val[0], val[2]], val[0]) }
      | exp '*' exp { result = operator('Sy::Product', [val[0], val[2]], val[0]) }
      | exp '/' exp { result = operator('Sy::Fraction', [val[0], val[2]], val[0]) }
-     | exp '^' exp { result = operator('Sy::Power', [val[0], val[2]], val[0]) }
+     | exp '^' exp { result = operator('Sy::Wedge', [val[0], val[2]], val[0]) }
      | exp '**' exp { result = operator('Sy::Power', [val[0], val[2]], val[0]) }
      | '(' exp ')' { result = val[1] }
      | '-' exp =UMINUS { result = operator('Sy::Minus', [val[1]], val[0]) }
@@ -57,15 +57,25 @@ if (node.val.match(/^(pi|e|i)$/)) then
     paths = name.paths.clone
     (0...subnodes.length).to_a.each { |i| paths += subnodes[i].paths.map { |p| p.unshift(i) } }
 
-    # If name is a built-in operator, create it rather than a 
-    if Sy::Operator.builtin_operators.member?(@name)
-      return Sy::Node.new(op(name.val, args), paths)
+    # If name is a built-in operator, create it rather than a function
+    if Sy::Operator.builtin_operators.member?(name.val)
+      return Sy::Node.new(op(name.val, *args), paths)
     end
     
     return Sy::Node.new(Sy::Function.new(name.val, args), paths)
   end
 
   def leaf(clazz, name)
+    if clazz.eql?('Sy::Variable')
+      n = name.val
+      t = 'real'
+     if n =~ /^d/
+       n = n[1..-1]
+       t = 'dform'
+     end
+     return Sy::Node.new(Sy::Variable.new(n,t), name.paths)
+    end
+    
     return Sy::Node.new(Kernel.const_get(clazz).new(name.val), name.paths)
   end
 

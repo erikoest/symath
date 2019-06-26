@@ -34,15 +34,25 @@ if (node.val.match(/^(pi|e|i)$/)) then
     paths = name.paths.clone
     (0...subnodes.length).to_a.each { |i| paths += subnodes[i].paths.map { |p| p.unshift(i) } }
 
-    # If name is a built-in operator, create it rather than a 
-    if Sy::Operator.builtin_operators.member?(@name)
-      return Sy::Node.new(op(name.val, args), paths)
+    # If name is a built-in operator, create it rather than a function
+    if Sy::Operator.builtin_operators.member?(name.val)
+      return Sy::Node.new(op(name.val, *args), paths)
     end
     
     return Sy::Node.new(Sy::Function.new(name.val, args), paths)
   end
 
   def leaf(clazz, name)
+    if clazz.eql?('Sy::Variable')
+      n = name.val
+      t = 'real'
+     if n =~ /^d/
+       n = n[1..-1]
+       t = 'dform'
+     end
+     return Sy::Node.new(Sy::Variable.new(n,t), name.paths)
+    end
+    
     return Sy::Node.new(Kernel.const_get(clazz).new(name.val), name.paths)
   end
 
@@ -103,39 +113,37 @@ if (node.val.match(/^(pi|e|i)$/)) then
 ##### State transition tables begin ###
 
 racc_action_table = [
-    14,    15,    12,    13,    10,    11,     9,     8,    27,    14,
-    15,    12,    13,    10,    11,     9,    14,    15,    12,    13,
-    10,    11,     9,    14,    15,    12,    13,    10,    11,     9,
-     4,    18,     3,    19,     6,     7,     4,   nil,     3,   nil,
-     6,     7,     4,   nil,     3,   nil,     6,     7,     4,   nil,
+    15,    12,    13,    14,    10,    11,     9,     8,    27,    15,
+    12,    13,    14,    10,    11,     9,    15,    12,    13,    14,
+    10,    11,     9,    15,    12,    13,    14,    10,    11,     9,
+     4,    18,     3,    19,     6,     7,     4,    15,     3,    15,
+     6,     7,     4,    15,     3,   nil,     6,     7,     4,   nil,
      3,   nil,     6,     7,     4,   nil,     3,   nil,     6,     7,
      4,   nil,     3,   nil,     6,     7,     4,   nil,     3,   nil,
      6,     7,     4,   nil,     3,   nil,     6,     7,     4,   nil,
      3,   nil,     6,     7,     4,   nil,     3,   nil,     6,     7,
-     4,   nil,     3,    29,     6,     7,    14,    15,    12,    13,
-    10,    11,     4,   nil,     3,   nil,     6,     7,    14,    15,
-    12,    13,    14,    15,    12,    13,    31,    14,    15,    32,
-    14,    15 ]
+     4,   nil,     3,    29,     6,     7,    15,    12,    13,    14,
+    10,    11,     4,   nil,     3,   nil,     6,     7,    15,    12,
+    13,    14,    15,    12,    13,    14,    31,   nil,   nil,    32 ]
 
 racc_action_check = [
     16,    16,    16,    16,    16,    16,    16,     1,    16,     2,
      2,     2,     2,     2,     2,     2,    28,    28,    28,    28,
     28,    28,    28,    33,    33,    33,    33,    33,    33,    33,
-     0,     6,     0,     8,     0,     0,     3,   nil,     3,   nil,
-     3,     3,     4,   nil,     4,   nil,     4,     4,     9,   nil,
+     0,     6,     0,     8,     0,     0,     3,    23,     3,    24,
+     3,     3,     4,    25,     4,   nil,     4,     4,     9,   nil,
      9,   nil,     9,     9,    10,   nil,    10,   nil,    10,    10,
     11,   nil,    11,   nil,    11,    11,    12,   nil,    12,   nil,
     12,    12,    13,   nil,    13,   nil,    13,    13,    14,   nil,
     14,   nil,    14,    14,    15,   nil,    15,   nil,    15,    15,
     18,   nil,    18,    18,    18,    18,    20,    20,    20,    20,
     20,    20,    32,   nil,    32,   nil,    32,    32,    21,    21,
-    21,    21,    22,    22,    22,    22,    30,    23,    23,    30,
-    24,    24 ]
+    21,    21,    22,    22,    22,    22,    30,   nil,   nil,    30 ]
 
 racc_action_pointer = [
     22,     7,     6,    28,    34,   nil,    21,   nil,    33,    40,
     46,    52,    58,    64,    70,    76,    -3,   nil,    82,   nil,
-    93,   105,   109,   114,   117,   nil,   nil,   nil,    13,   nil,
+    93,   105,   109,    34,    36,    40,   nil,   nil,    13,   nil,
    105,   nil,    94,    20 ]
 
 racc_action_default = [
@@ -191,10 +199,10 @@ racc_token_table = {
   false => 0,
   :error => 1,
   :UMINUS => 2,
-  "^" => 3,
-  "**" => 4,
-  "*" => 5,
-  "/" => 6,
+  "**" => 3,
+  "*" => 4,
+  "/" => 5,
+  "^" => 6,
   "+" => 7,
   "-" => 8,
   "=" => 9,
@@ -228,10 +236,10 @@ Racc_token_to_s_table = [
   "$end",
   "error",
   "UMINUS",
-  "\"^\"",
   "\"**\"",
   "\"*\"",
   "\"/\"",
+  "\"^\"",
   "\"+\"",
   "\"-\"",
   "\"=\"",
@@ -298,7 +306,7 @@ module_eval(<<'.,.,', 'parser.y', 17)
 
 module_eval(<<'.,.,', 'parser.y', 18)
   def _reduce_8(val, _values, result)
-     result = operator('Sy::Power', [val[0], val[2]], val[0]) 
+     result = operator('Sy::Wedge', [val[0], val[2]], val[0]) 
     result
   end
 .,.,
