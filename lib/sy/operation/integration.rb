@@ -58,10 +58,11 @@ module Sy
     end
     
     def do_product(exp, var)
-      divc = exp.div_coefficient.to_m
-      diva = []
       vu = var.undiff
       vset = [vu].to_set
+
+      divc = exp.div_coefficient.to_m
+      diva = []
 
       exp.div_factors.each do |d|
         if d.is_constant?(vset)
@@ -80,6 +81,11 @@ module Sy
         else
           proda.push(f)
         end
+      end
+
+      # We don't know how to integrate vectors
+      exp.vector_factors.each do |v|
+        failure(exp)
       end
 
       if exp.sign < 0
@@ -123,10 +129,86 @@ module Sy
       failure(1.to_m/exp)
     end
 
+    # Anti-derivatives of simple functions with one variable
+    @@functions = {
+      :ln  => :a.to_m*fn(:ln, :a.to_m) - :a.to_m,
+      :sin => - fn(:cos, :a.to_m),
+      :cos => fn(:sin, :a.to_m),
+      :tan => - fn(:ln, fn(:abs, fn(:cos, :a.to_m))),
+      :cot => fn(:ln, fn(:abs, fn(:sin, :a.to_m))),
+      :sec => fn(:ln, fn(:abs, fn(:sec, :a.to_m) + fn(:tan, :a.to_m))),
+      :csc => - fn(:ln, fn(:abs, fn(:csc, :a.to_m) + fn(:cot, :a.to_m))),
+    }
+
+    def do_function(exp, var)
+      vu = var.undiff
+      vset = [vu].to_set
+      arg = exp.args[0]
+
+      # Split exp into a constant part and (hopefully) a single factor
+      # which equals to var
+      divc = arg.div_coefficient.to_m
+
+      # We expect all divisor factors to be constant with respect to var
+      arg.div_factors.each do |d|
+        if !d.is_constant?(vset)
+          failure(exp)
+        end
+        divc *= d
+      end
+
+      prodc = arg.coefficient.to_m
+      has_var = false
+
+      arg.scalar_factors.each do |f|
+        # Constant factor with respect to var
+        if f.is_constant?(vset)
+          prodc *= f
+          next
+        end
+
+        # Found more than one var
+        if has_var
+          failure(exp)
+        end
+
+        # Factor is var. Remember it, but continue to examine the other factors.
+        if f == vu
+          has_var = true
+          next
+        end
+
+        # Factor is a function of var. Too difficult for us to integrate
+        failure(exp)
+      end
+
+      # We don't know how to integrate vectors
+      arg.vector_factors.each do |v|
+        failure(exp)
+      end
+
+      if arg.sign < 0
+        prodc -= prodc
+      end
+
+      # Calculate divc as the inverse of the constant part of the function arg
+      divc /= prodc
+
+      # int(func(n*x)) -> Func(n*x)/n
+      fexp = @@functions[exp.name.to_sym].deep_clone
+      fexp.replace(:a.to_m, arg)
+      return divc*fexp
+    end
+
     def do_other(exp, var)
       # At this point, exp should not be a constant, a sum or a product.
       vu = var.undiff
       vset = [vu].to_set
+
+      if exp.is_a?(Sy::Function) and @@functions.key?(exp.name.to_sym)
+        return do_function(exp, var)
+      end
+
       b = exp.base
       xp = exp.exponent
 
