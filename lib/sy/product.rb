@@ -77,7 +77,7 @@ module Sy
         else
           a.to_latex
         end
-      end.join('*')
+      end.join(' \cdot ')
     end      
   end
 end
