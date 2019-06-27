@@ -29,7 +29,7 @@ module Sy
 
     def evaluate()
       if a.nil?
-        return @@actions[:int].act(*args, var)
+        return @@actions[:int].act(*args, var) + :C.to_m
       else
         int = @@actions[:int].act(*args, var)
         return op(:bounds, int, var.undiff, a, b)

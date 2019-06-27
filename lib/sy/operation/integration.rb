@@ -19,7 +19,7 @@ module Sy
 
     def act(exp, var)
       begin
-        return int(exp, var) + :C.to_m
+        return int(exp, var)
       rescue IntegrationError => e
         puts e.to_s
 #        puts e.backtrace.join("\n")
