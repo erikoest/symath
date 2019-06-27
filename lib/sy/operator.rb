@@ -109,15 +109,15 @@ require 'sy/int'
 require 'sy/bounds'
 
 def op(name, *args)
-  if name.eql?(:diff.to_s)
+  if name.to_sym == :diff
     return Sy::Diff.new(*args)
   end
 
-  if name.eql?(:int.to_s)
+  if name.to_sym == :int
     return Sy::Int.new(*args)
   end
 
-  if name.eql?(:bounds.to_s)
+  if name.to_sym == :bounds
     return Sy::Bounds.new(*args)
   end
   

@@ -27,6 +27,7 @@ require 'sy/path'
 #   symbol for vector (', ', ~, etc.)
 #   normalization policy (how much normalzation?)
 #   auto evaluate operators
+#   display square root as x^(1/2) or sqrt(x)
 # Working environment:
 #   vector room
 #   basis vectors (variable names)

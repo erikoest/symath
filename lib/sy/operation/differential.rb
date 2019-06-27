@@ -77,21 +77,48 @@ module Sy
              (exp.exponent^(exp.base**(exp.exponent - 1))^diff(exp.base, vars))
     end
 
+    @@functions = {
+      # Exponential and trigonometric functions
+      :exp => fn(:exp, :a.to_m),
+      :ln  => 1.to_m/:a.to_m,
+      # Trigonometric functions
+      :sin => fn(:cos, :a.to_m),
+      :cos => - fn(:sin, :a.to_m),
+      :tan => 1.to_m + fn(:tan, :a.to_m)**2,
+      :cot => - (1.to_m + fn(:cot, :a.to_m)**2),
+      :sec => fn(:sec, :a.to_m)*fn(:tan, :a.to_m),
+      :csc => - fn(:cot, :a.to_m)*fn(:csc, :a.to_m),
+      # Inverse trigonometric functions
+      :arcsin => 1.to_m/fn(:sqrt, 1.to_m - :a.to_m**2),
+      :arccos => - 1.to_m/fn(:sqrt, 1.to_m - :a.to_m**2),
+      :arctan => 1.to_m/fn(:sqrt, 1.to_m + :a.to_m**2),
+      :arcsec => 1.to_m/(fn(:abs, :a.to_m)*fn(:sqrt, :a.to_m**2 - 1)),
+      :arccsc => - 1.to_m/(fn(:abs, :a.to_m)*fn(:sqrt, :a.to_m**2 - 1)),
+      :arccot => - 1.to_m/(1.to_m + :a.to_m**2),
+      # Hyperbolic functions
+      :sinh => fn(:cosh, :a.to_m),
+      :cosh => fn(:sinh, :a.to_m),
+      :tanh => fn(:sech, :a.to_m)**2,
+      :sech => - fn(:tanh, :a.to_m)*fn(:sech, :a.to_m),
+      :csch => - fn(:coth, :a.to_m)*fn(:csch, :a.to_m),
+      :coth => - fn(:csch, :a.to_m)**2,
+      # Inverse hyperbolic functions
+      :arsinh => 1.to_m/fn(:sqrt, :a.to_m**2 + 1),
+      :arcosh => 1.to_m/fn(:sqrt, :a.to_m**2 - 1),
+      :artanh => 1.to_m/(1.to_m - :a.to_m**2),
+      :arsech => - 1.to_m/(:a.to_m*fn(:sqrt, 1.to_m - :a.to_m**2)),
+      :arcsch => - 1.to_m/(fn(:abs, :a.to_m)*fn(:sqrt, :a.to_m**2 + 1)),
+      :arcoth => 1.to_m/(1.to_m - :a.to_m**2),
+    }
+    
     def do_function(exp, vars)
-      d = case exp.name.to_s
-          # Exponential function
-          when 'exp' then exp
-          when 'ln' then 1.to_m/exp.args[0]
-          # Trigonometric functions
-          when 'sin' then fn(:cos, exp.args[0])
-          when 'cos' then -fn(:sin, exp.args[0])
-          when 'tan' then 1.to_m + fn(:tan, exp.args[0])**2
-          when 'cot' then -(1.to_m + fn(:cot, exp.args[0])**2)
-          when 'sec' then fn(:sec, exp.args[0])*fn(:tan, exp.args[0])
-          when 'csc' then -fn(:cot, exp.args[0])*fn(:csc, exp.args[0])
-          else raise 'Cannot calculate differential of function' + exp.to_s
-        end
-      return d^diff(exp.args[0], vars)
+      if @@functions.key?(exp.name.to_sym)
+        d = @@functions[exp.name.to_sym].deep_clone
+        d.replace(:a.to_m, exp.args[0])
+        return d^diff(exp.args[0], vars)
+      else
+        raise 'Cannot calculate differential of expression ' + exp.to_s
+      end
     end
   end
 end

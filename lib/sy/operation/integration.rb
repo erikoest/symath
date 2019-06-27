@@ -131,13 +131,36 @@ module Sy
 
     # Anti-derivatives of simple functions with one variable
     @@functions = {
+      # Logarithm
       :ln  => :a.to_m*fn(:ln, :a.to_m) - :a.to_m,
+      # Trigonometric functions
       :sin => - fn(:cos, :a.to_m),
       :cos => fn(:sin, :a.to_m),
       :tan => - fn(:ln, fn(:abs, fn(:cos, :a.to_m))),
       :cot => fn(:ln, fn(:abs, fn(:sin, :a.to_m))),
       :sec => fn(:ln, fn(:abs, fn(:sec, :a.to_m) + fn(:tan, :a.to_m))),
       :csc => - fn(:ln, fn(:abs, fn(:csc, :a.to_m) + fn(:cot, :a.to_m))),
+      # Inverse trigonometric functions
+      :arcsin => :a.to_m*fn(:arcsin, :a.to_m) + fn(:sqrt, 1.to_m - :a.to_m**2),
+      :arccos => :a.to_m*fn(:arccos, :a.to_m) - fn(:sqrt, 1.to_m - :a.to_m**2),
+      :arctan => :a.to_m*fn(:arctan, :a.to_m) - fn(:ln, fn(:abs, 1.to_m + :a.to_m**2))/2,
+      :arccot => :a.to_m*fn(:arccot, :a.to_m) + fn(:ln, fn(:abs, 1.to_m + :a.to_m**2))/2,
+      :arcsec => :a.to_m*fn(:arcsec, :a.to_m) - fn(:ln, fn(:abs, 1.to_m + fn(:sqrt, 1.to_m - :a.to_m**-2))),
+      :arccsc => :a.to_m*fn(:arccsc, :a.to_m) + fn(:ln, fn(:abs, 1.to_m + fn(:sqrt, 1.to_m - :a.to_m**-2))),
+      # Hyperbolic functions
+      :sinh => fn(:cosh, :a.to_m),
+      :cosh => fn(:sinh, :a.to_m),
+      :tanh => fn(:ln, fn(:cosh, :a.to_m)),
+      :coth => fn(:ln, fn(:abs, fn(:sinh, :a.to_m))),
+      :sech => fn(:arctan, fn(:sinh, :a.to_m)),
+      :csch => fn(:ln, fn(:abs, fn(:tanh, :a.to_m/2))),
+      # Inverse hyperbolic functions
+      :arsinh => :a.to_m*fn(:arsinh, :a.to_m) - fn(:sqrt, :a.to_m**2 + 1),
+      :arcosh => :a.to_m*fn(:arcosh, :a.to_m) - fn(:sqrt, :a.to_m**2 - 1),
+      :artanh => :a.to_m*fn(:artanh, :a.to_m) + fn(:ln, 1.to_m - :a.to_m**2)/2,
+      :arcoth => :a.to_m*fn(:arcoth, :a.to_m) + fn(:ln, :a.to_m**2 - 1)/2,
+      :arsech => :a.to_m*fn(:arsech, :a.to_m) + fn(:arcsin, :a.to_m),
+      :arcsch => :a.to_m*fn(:arcsch, :a.to_m) + fn(:abs, fn(:arsinh, :a.to_m)),
     }
 
     def do_function(exp, var)
