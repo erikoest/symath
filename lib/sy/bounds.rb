@@ -30,7 +30,7 @@ module Sy
     end
 
     def to_latex()
-      return '\left[' + @args[0].to_latex + '\right]^{' + @b + '}_{' + @a + '}'
+      return '\left[' + @args[0].to_latex + '\right]^{' + @b.to_latex + '}_{' + @a.to_latex + '}'
     end
   end
 end
