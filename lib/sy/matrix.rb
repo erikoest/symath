@@ -28,6 +28,7 @@ module Sy
       end
     end
 
+    # FIXME:
     def hash()
     end
     

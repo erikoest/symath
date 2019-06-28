@@ -14,7 +14,7 @@ module Sy
     def hash()
       return @name.to_s.hash
     end
-    
+
     def ==(other)
       return false if self.class.name != other.class.name
       return false if @type != other.type

@@ -31,7 +31,9 @@ module Sy
 
       return self
     end
-    
+
+    # Needed for value objects to be hashable. Subclasses should override this to return a
+    # value which tends to be different for unequal objects.
     def hash()
       return 1
     end
@@ -78,7 +80,34 @@ module Sy
     def >=(other)
       return (self <=> other) >= 0
     end
-    
+
+    # Returns true if this is a function declaration, a operator declaration or
+    # a variable assignment
+    def is_definition?()
+      # The expression must be an equation on top
+      return false if !is_a?(Sy::Equation)
+
+      # Is this a variable assigment?
+      return true if args[0].is_a?(Sy::Variable)
+
+      # Or an operator or function?
+      return false if !args[0].is_a?(Sy::Operator)
+
+      vars = {}
+
+      args[0].args.each do |a|
+        # All arguments must be variables
+        return false if !a.is_a?(Sy::Variable)
+        
+        # All argument variables must be unique
+        return false if vars.key?(a.name.to_sym)
+
+        vars[a.name.to_sym] = true
+      end
+
+      return true
+    end
+
     # Return true if value is constant relative to changes in any of the given
     # set of variables. If no variable set is given, returns true if
     # expression is alawys constant.

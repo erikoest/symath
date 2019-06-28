@@ -5,9 +5,9 @@ module Sy
   class Operator < Value
     attr_reader :name
     attr_accessor :args
-
+    
     def self.builtin_operators()
-      return @@builtin_operators.map { |o| o.to_s }
+      return @@builtin_operators
     end
 
     def has_action?()
@@ -47,7 +47,7 @@ module Sy
 
       return h
     end
-    
+
     def ==(other)
       o = other.to_m
       return false if self.class.name != o.class.name
@@ -119,6 +119,11 @@ def op(name, *args)
 
   if name.to_sym == :bounds
     return Sy::Bounds.new(*args)
+  end
+
+  puts "ERIK WAS HERE"
+  if name.to_s.eql?('=')
+    return Sy::Equation.new(*args)
   end
   
   return Sy::Operator.new(name, args)

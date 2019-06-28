@@ -10,20 +10,22 @@ class Parser
   preclow
 rule
   target: exp
-      | /* none */ { result = 0 }
-exp: exp '=' exp { result = operator('Sy::Equation', [val[0], val[2]], val[0]) }
-     | exp '+' exp { result = operator('Sy::Sum', [val[0], val[2]], val[0]) }
-     | exp '-' exp { result = operator('Sy::Subtraction', [val[0], val[2]], val[0]) }
-     | exp '*' exp { result = operator('Sy::Product', [val[0], val[2]], val[0]) }
-     | exp '/' exp { result = operator('Sy::Fraction', [val[0], val[2]], val[0]) }
-     | exp '^' exp { result = operator('Sy::Wedge', [val[0], val[2]], val[0]) }
-     | exp '**' exp { result = operator('Sy::Power', [val[0], val[2]], val[0]) }
-     | '(' exp ')' { result = val[1] }
+      | /* none */     { result = 0 }
+  exp: exp '=' exp     { result = operator('Sy::Equation', [val[0], val[2]], val[0]) }
+     | exp '+' exp     { result = operator('Sy::Sum', [val[0], val[2]], val[0]) }
+     | exp '-' exp     { result = operator('Sy::Subtraction', [val[0], val[2]], val[0]) }
+     | exp '*' exp     { result = operator('Sy::Product', [val[0], val[2]], val[0]) }
+     | exp '/' exp     { result = operator('Sy::Fraction', [val[0], val[2]], val[0]) }
+     | exp '^' exp     { result = operator('Sy::Wedge', [val[0], val[2]], val[0]) }
+     | exp '**' exp    { result = operator('Sy::Power', [val[0], val[2]], val[0]) }
+     | '(' exp ')'     { result = val[1] }
      | '-' exp =UMINUS { result = operator('Sy::Minus', [val[1]], val[0]) }
      | func
 
   func: NAME '(' ')'      { result = function(val[0], []) }
       | NAME '(' args ')' { result = function(val[0], val[2]) }
+      | '#' '(' exp ')'   { result = function('sharp', [val[2]]) }
+      | '|' exp '|'       { result = function('abs', [val[1]]) }
       | NUMBER            { result = leaf('Sy::Number', val[0]) }
       | NAME              { result = self.named_value(val[0]) }
 
@@ -58,7 +60,7 @@ if (node.val.match(/^(pi|e|i)$/)) then
     (0...subnodes.length).to_a.each { |i| paths += subnodes[i].paths.map { |p| p.unshift(i) } }
 
     # If name is a built-in operator, create it rather than a function
-    if Sy::Operator.builtin_operators.member?(name.val)
+    if Sy::Operator.builtin_operators.member?(name.val.to_sym)
       return Sy::Node.new(op(name.val, *args), paths)
     end
     
