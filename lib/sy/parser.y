@@ -63,7 +63,7 @@ if (node.val.match(/^(pi|e|i)$/)) then
     if Sy::Operator.builtin_operators.member?(name.val.to_sym)
       return Sy::Node.new(op(name.val, *args), paths)
     end
-    
+
     return Sy::Node.new(Sy::Function.new(name.val, args), paths)
   end
 

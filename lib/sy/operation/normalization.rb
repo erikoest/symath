@@ -284,6 +284,15 @@ module Sy
       base = act(exp.base)
       expo = act(exp.exponent)
 
+      if base.is_a?(Sy::Number)
+        if expo.is_a?(Sy::Minus) and expo.args[0].is_a?(Sy::Number)
+          return (1.to_m/(base.value ** expo.args[0].value)).to_m
+        end
+        if expo.is_a?(Sy::Number)
+          return (base.value ** expo.value).to_m
+        end
+      end
+
       if base.is_a?(Sy::Power)
         return base.base.power(base.exponent * expo)
       end

@@ -69,14 +69,14 @@ module Sy
       return [@name]
     end
 
-    def replace(var, exp)
-      if var == self
-        return exp.deep_clone
+    def replace(map)
+      if map.key?(self)
+        return map[self].deep_clone
       else
         return self
       end
     end
-
+    
     def to_s()
       if @type.is_dform?
         return :d.to_s + @name.to_s

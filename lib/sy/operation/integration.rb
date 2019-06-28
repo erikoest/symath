@@ -219,7 +219,7 @@ module Sy
 
       # int(func(n*x)) -> Func(n*x)/n
       fexp = @@functions[exp.name.to_sym].deep_clone
-      fexp.replace(:a.to_m, arg)
+      fexp.replace({ :a.to_m =>  arg })
       return divc*fexp
     end
 

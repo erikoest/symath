@@ -20,6 +20,28 @@ module Sy
     def self.builtin_functions()
       return @@builtin_functions
     end
+
+    def has_action?()
+      return !Sy.get_function(self.name.to_sym).nil?
+    end
+    
+    def evaluate()
+      f = Sy.get_function(self.name.to_sym)
+      if !f.nil?
+        d = f[:definition]
+        res = f[:expression].deep_clone
+        if res.args.length == self.args.length
+          map = {}
+          d.args.each_with_index do |a, i|
+            map[a] = self.args[i]
+          end
+          res.replace(map)
+          return res
+        end
+      end
+
+      return self
+    end
   end
 end
 

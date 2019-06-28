@@ -104,7 +104,7 @@ module Sy
     return @@operator_definitions
   end
 
-  def self.get_operator()
+  def self.get_operator(o)
     return @@operator_definitions[o]
   end
 

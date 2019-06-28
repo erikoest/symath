@@ -12,8 +12,8 @@ module Sy
     end
 
     def act(exp, var, a, b)
-      bexp = exp.deep_clone.replace(var, b)
-      aexp = exp.deep_clone.replace(var, a)
+      bexp = exp.deep_clone.replace({ var =>  b })
+      aexp = exp.deep_clone.replace({ var =>  a })
       return bexp - aexp
     end
   end

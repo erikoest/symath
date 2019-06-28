@@ -114,7 +114,7 @@ module Sy
     def do_function(exp, vars)
       if @@functions.key?(exp.name.to_sym)
         d = @@functions[exp.name.to_sym].deep_clone
-        d.replace(:a.to_m, exp.args[0])
+        d.replace({ :a.to_m => exp.args[0] })
         return d^diff(exp.args[0], vars)
       else
         raise 'Cannot calculate differential of expression ' + exp.to_s

@@ -110,7 +110,7 @@ module Sy
 
     # Return true if value is constant relative to changes in any of the given
     # set of variables. If no variable set is given, returns true if
-    # expression is alawys constant.
+    # expression is always constant.
     def is_constant?(vars = nil)
       return true
     end
@@ -120,8 +120,8 @@ module Sy
       return []
     end
 
-    # Replaces variable with expression. Overridden by subclasses
-    def replace(var, exp)
+    # Replaces map of variables with expressions. Overridden by subclasses
+    def replace(map)
       return self
     end
     

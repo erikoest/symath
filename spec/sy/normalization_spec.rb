@@ -4,11 +4,13 @@ require 'sy'
 module Sy
   describe Sy::Operation::Normalization, ', normalize sum' do
     sums = {
-      1.to_m + 3                  => '4',
-      3.to_m/4 + (5.to_m + 2)/34  => '7/34 + 3/4',
-      :x.to_m + :x                => '2*x',
-      :x.to_m - :x                => '0',
+      1.to_m + 3                   => '4',
+      3.to_m/4 + (5.to_m + 2)/34   => '7/34 + 3/4',
+      :x.to_m + :x                 => '2*x',
+      :x.to_m - :x                 => '0',
       fn(:sin, :x) + fn(:sin, :x)*2 + 3.to_m*:y - 3.to_m*:y => '3*sin(x)',
+      2.to_m**3 + 3.to_m**2        => '17',
+      3.to_m**-4.to_m + 2.to_m**-5 => '1/32 + 1/81',
     }
 
     sums.each do |from, to|

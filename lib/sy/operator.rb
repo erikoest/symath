@@ -20,6 +20,22 @@ module Sy
       else
         return self
       end
+
+      o = Sy.get_operator(self.name.to_sym)
+      if !o.nil?
+        d = o[:definition]
+        res = o[:expression].deep_clone
+        if res.args.length == self.args.length
+          map = {}
+          d.args.each_with_index do |a, i|
+            map[a] = self.args[i]
+          end
+          res.replace(map)
+          return res
+        end
+      end
+
+      return self
     end
     
     def arity
@@ -94,9 +110,9 @@ module Sy
       return vars.length == 0 ? vars : vars.inject(:|)
     end
 
-    def replace(var, exp)
+    def replace(map)
       @args = @args.map do |a|
-        a.replace(var, exp)
+        a.replace(map)
       end
 
       return self
@@ -121,7 +137,6 @@ def op(name, *args)
     return Sy::Bounds.new(*args)
   end
 
-  puts "ERIK WAS HERE"
   if name.to_s.eql?('=')
     return Sy::Equation.new(*args)
   end
