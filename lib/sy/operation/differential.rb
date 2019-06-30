@@ -8,10 +8,6 @@ module Sy
       return 'Calculate differential'
     end
 
-    def result_is_normal?
-      return false
-    end
-
     def act(exp, vars)
       return diff(exp, vars)
     end

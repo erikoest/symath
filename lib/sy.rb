@@ -51,7 +51,7 @@ module Sy
     # of the basis vectors and co-vectors of the tangent space.
     :basis.to_m => [:x1.to_m, :x2.to_m, :x3.to_m].to_m,
 
-    # Metric tensor, relative to the chosen basis.
+    # Metric tensor, relative to the chosen basis (subscript indexes)
     :g.to_m => [[1.to_m, 0.to_m, 0.to_m],
                 [0.to_m, 1.to_m, 0.to_m],
                 [0.to_m, 0.to_m, 1.to_m]].to_m,

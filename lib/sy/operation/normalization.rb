@@ -44,6 +44,10 @@ module Sy
         return do_power(exp)
       end
       
+      if exp.is_a?(Sy::Matrix)
+        return do_matrix(exp)
+      end
+      
       return act_subexpressions(exp)
     end
 
@@ -144,7 +148,7 @@ module Sy
       c  = exp.coefficient
       dc = exp.div_coefficient
       s  = exp.sign
-
+      
       # First examine the coefficients
       if c == 0 and dc > 0
         return 0.to_m
@@ -210,7 +214,7 @@ module Sy
         elsif powers[k] > 0
           p2.push(k**(powers[k].to_m))
         elsif powers[k] < 0
-          d2.push(k**(powers[k].to_m))
+          d2.push(k**((-powers[k]).to_m))
         end
       end
 
@@ -299,6 +303,15 @@ module Sy
 
       ret = base ** expo
 
+      return exp == ret ? nil : ret
+    end
+
+    def do_matrix(exp)
+      data = (0..exp.nrows - 1).map do |r|
+        exp.row(r).map { |e| act(e) }
+      end
+
+      ret = Sy::Matrix.new(data)
       return exp == ret ? nil : ret
     end
   end

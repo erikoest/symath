@@ -13,10 +13,6 @@ module Sy
       return 'Calculate indefinite integral'
     end
 
-    def result_is_normal?
-      return false
-    end
-
     def act(exp, var)
       begin
         return int(exp, var)

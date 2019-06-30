@@ -60,10 +60,12 @@ if (node.val.match(/^(pi|e|i)$/)) then
     (0...subnodes.length).to_a.each { |i| paths += subnodes[i].paths.map { |p| p.unshift(i) } }
 
     # If name is a built-in operator, create it rather than a function
+      name = 'lower' if name.eql?('b')
+      
     if Sy::Operator.builtin_operators.member?(name.val.to_sym)
       return Sy::Node.new(op(name.val, *args), paths)
     end
-
+    
     return Sy::Node.new(Sy::Function.new(name.val, args), paths)
   end
 

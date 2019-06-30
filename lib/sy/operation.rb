@@ -50,6 +50,9 @@ require 'sy/operation/distributivelaw'
 require 'sy/operation/combinefractions'
 require 'sy/operation/bounds'
 require 'sy/operation/evaluation'
+require 'sy/operation/raise'
+require 'sy/operation/lower'
+require 'sy/operation/hodge'
 
 module Sy
   class Operator < Value
@@ -63,6 +66,10 @@ module Sy
       :diff       => Sy::Operation::Differential.new,
       :int        => Sy::Operation::Integration.new,
       :bounds     => Sy::Operation::Bounds.new,
+      # Exterior algebra
+      :raise      => Sy::Operation::Raise.new,
+      :lower      => Sy::Operation::Lower.new,
+      :hodge      => Sy::Operation::Hodge.new,
     }
 
     @@builtin_operators = @@actions.keys.to_set

@@ -170,9 +170,9 @@ module Sy
       w = vector_factors_exp
       if s == o.scalar_factors_exp and
         w == o.vector_factors_exp
-        ret = coefficient + o.coefficient
+        ret = (coefficient + o.coefficient).to_m
         if s != 1.to_m
-          ret *= s
+          ret.mult(s)
         end
 
         if w != 1.to_m
@@ -195,10 +195,10 @@ module Sy
 
       if s == other.scalar_factors_exp and
         w == other.vector_factors_exp        
-        ret = coefficient - other.coefficient
+        ret = (coefficient - other.coefficient).to_m
         return 0.to_m if ret == 0
         if s != 1.to_m
-          ret *= s
+          ret.mult(s)
         end
 
         if w != 1.to_m
@@ -216,8 +216,12 @@ module Sy
       return self if o == 1
       return o if self == 1
 
+      if o.is_a?(Sy::Matrix)
+        return o.mult(self)
+      end
+      
       if base == o.base
-        return base ** (exponent + o.exponent)
+        return base ** (exponent.add(o.exponent))
       end
 
       if self.is_a?(Sy::Fraction) and dividend == 1.to_m
