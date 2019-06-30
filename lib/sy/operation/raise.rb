@@ -4,30 +4,41 @@ module Sy
   class Operation::Raise < Operation
 
     def description
-      return 'Calculate ''sharp'' contra-variant vector from covariant dual'
+      return 'Calculate \'sharp\' contra-variant vector from covariant dual'
     end
 
-    def act(exp)
+    def calc_basic_vectors
       # Calculate vector components for each of the dform bases
-      # FIXME: This should be done before the recursive call to act()
+      n = Sy::Operation::Normalization.new
+      
       # A row matrix of bases. These are scalar variables. We will need
       # to convert them to vectors and dforms
-      b = Sy.get_variable('basis')
+      b = Sy.get_variable(:basis.to_m)
+
       # Get the inverse metric tensor
-      g = Sy.get_variable('g').inverse
+      g = Sy.get_variable(:g.to_m).inverse
+
       # Create column matrices of the basis vectors and dforms
-      # v = b.each ...
-      # d = b.each ...
-      # Hash d => g.mult(v)
-      # Replace all occurences in exp of d with d => 
-      
-      act_subexpression(exp)
+      v = b.row(0).map { |r| r.name.to_m('vector') }
+      d = b.row(0).map { |r| r.name.to_m('dform') }
+
+      # Calculate raised vectors from metric tensor
+      raised = n.act(g.mult(Sy::Matrix.new(v).transpose)).col(0)
+
+      # Map dforms to raised vectors
+      @vectormap = (0..b.ncols-1).map { |r| [d[r], raised[r]] }.to_h
+    end
+    
+    def act(exp)
+      act_subexpressions(exp)
 
       if exp.is_a?(Sy::Variable)
-        if exp.type.is_subtype?('dform')
-
+        if exp.type.is_subtype?('dform') and @vectormap.key?(exp)
+          return @vectormap[exp]
         end
       end
+
+      return exp
     end
   end
 end

@@ -62,7 +62,7 @@ module Sy
       data = (0..@nrows-1).map do |r|
         (0..other.ncols-1).map do |c|
           (0..@ncols-1).map do |c2|
-            self[r, c].mult(other[c2, c])
+            self[r, c2].mult(other[c2, c])
           end.inject(:add) 
         end
       end

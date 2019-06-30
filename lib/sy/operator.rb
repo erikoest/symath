@@ -17,8 +17,6 @@ module Sy
     def evaluate()
       if has_action?
         return @@actions[@name.to_sym].act(*args)
-      else
-        return self
       end
 
       o = Sy.get_operator(self.name.to_sym)
@@ -123,23 +121,27 @@ end
 require 'sy/diff'
 require 'sy/int'
 require 'sy/bounds'
+require 'sy/raise'
+require 'sy/lower'
+require 'sy/hodge'
 
 def op(name, *args)
-  if name.to_sym == :diff
+  case name.to_s
+  when 'diff'
     return Sy::Diff.new(*args)
-  end
-
-  if name.to_sym == :int
+  when 'int'
     return Sy::Int.new(*args)
-  end
-
-  if name.to_sym == :bounds
+  when 'bounds'
     return Sy::Bounds.new(*args)
+  when '='
+    return Sy::Equation.new(*args)
+  when 'raise'
+    return Sy::Raise.new(*args)
+  when 'lower'
+    return Sy::Lower.new(*args)
+  when 'hodge'
+    return Sy::Hodge.new(*args)
   end
 
-  if name.to_s.eql?('=')
-    return Sy::Equation.new(*args)
-  end
-  
   return Sy::Operator.new(name, args)
 end

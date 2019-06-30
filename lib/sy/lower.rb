@@ -8,7 +8,8 @@ module Sy
     end
 
     def evaluate()
-      return self
+      @@actions[:lower].calc_basic_vectors
+      return @@actions[:lower].act(*args)
     end
 
     def to_string()

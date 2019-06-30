@@ -81,7 +81,7 @@ module Sy
       if @type.is_dform?
         return :d.to_s + @name.to_s
       elsif @type.is_vector?
-        return @name.to_s + ''''
+        return @name.to_s + '\''
       elsif @type.is_covector?
         return @name.to_s + '.'
       elsif @type.is_subtype?('tensor')

@@ -42,19 +42,18 @@ module Sy
     :basis.to_m => 1,
     :g.to_m => 1,
   }
-  
   @@variable_assignments = {
     # Some variables with special meanings
 
     # Row matrix of variable names used as the coordinates in differential geometry
     # analyses. These define the dimension of the manifold, and also as the default names
     # of the basis vectors and co-vectors of the tangent space.
-    :basis.to_m => [:x1.to_m, :x2.to_m, :x3.to_m].to_m,
+    :basis.to_m => [:x1, :x2, :x3].to_m,
 
     # Metric tensor, relative to the chosen basis (subscript indexes)
-    :g.to_m => [[1.to_m, 0.to_m, 0.to_m],
-                [0.to_m, 1.to_m, 0.to_m],
-                [0.to_m, 0.to_m, 1.to_m]].to_m,
+    :g.to_m => [[1, 0, 0],
+                [0, 1, 0],
+                [0, 0, 1]].to_m,
   }
 
   def self.get_functions()

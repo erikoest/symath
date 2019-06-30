@@ -7,6 +7,11 @@ module Sy
       super('raise', [arg])
     end
 
+    def evaluate()
+      @@actions[:raise].calc_basic_vectors
+      return @@actions[:raise].act(*args)
+    end
+    
     def to_string()
       return '#(' + @args[0] + ')'
     end
