@@ -127,6 +127,7 @@ require 'sy/hodge'
 require 'sy/grad'
 require 'sy/curl'
 require 'sy/div'
+require 'sy/laplacian'
 
 def op(name, *args)
   case name.to_s
@@ -150,6 +151,8 @@ def op(name, *args)
     return Sy::Curl.new(*args)
   when 'div'
     return Sy::Div.new(*args)
+  when 'laplacian'
+    return Sy::Laplacian.new(*args)
   end
 
   return Sy::Operator.new(name, args)

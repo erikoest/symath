@@ -39,4 +39,16 @@ module Sy
       end
     end
   end
+
+  describe Sy::Laplacian do
+    div = {
+      op(:laplacian, :x1.to_m**2 + :x2.to_m**2 + :x3.to_m**2) => '6'
+    }
+
+    div.each do |from, to|
+      it "evaluates '#{from.to_s}' into '#{to}'" do
+        n.act(from.evaluate).to_s.should == to
+      end
+    end
+  end
 end
