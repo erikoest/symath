@@ -50,7 +50,7 @@ module Sy
     end
 
     def to_latex()
-      return @name.to_s + '(' + @args.map { |a| a.to_latex }.join(',') + ')'
+      return '\operatorname{' + @name.to_s + '}(' + @args.map { |a| a.to_latex }.join(',') + ')'
     end
 
     def hash()

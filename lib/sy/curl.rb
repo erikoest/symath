@@ -18,5 +18,9 @@ module Sy
       # Curl is defined as (*(d(Fb)))#
       return @@actions[:eval].act(op(:raise, op(:hodge, op(:diff, op(:lower, args[0]), *vars))))
     end
+
+    def to_latex()
+      return '\nabla\times ' + @args[0].to_latex
+    end
   end
 end

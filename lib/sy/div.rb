@@ -18,5 +18,9 @@ module Sy
       # Div is defined as *d*(Fb)
       return @@actions[:eval].act(op(:hodge, op(:diff, op(:hodge, op(:lower, args[0])), *vars)))
     end
+
+    def to_latex()
+      return '\nabla\cdot ' + @args[0].to_latex
+    end
   end
 end

@@ -173,7 +173,7 @@ module Sy
 
     def to_latex()
       if is_diff?
-        return '\mathrm{d}' + undiff.to_latex
+        return 'd' + undiff.to_latex
       else
         return @name.to_s
       end

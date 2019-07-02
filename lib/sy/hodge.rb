@@ -14,7 +14,7 @@ module Sy
     end
     
     def to_latex()
-      return '\star' + @args[0].to_latex
+      return '\star ' + @args[0].to_latex
     end
   end
 end

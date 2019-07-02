@@ -18,7 +18,7 @@ module Sy
     end
     
     def to_latex()
-      return @args[0].to_latex + '\flat'
+      return @args[0].to_latex + '^\flat'
     end
   end
 end

@@ -14,5 +14,9 @@ module Sy
       # The laplacian is defined as *d*dF
       return @@actions[:eval].act(op(:hodge, op(:diff, op(:hodge, op(:diff, args[0], *vars)), *vars)))
     end
+
+    def to_latex()
+      return '\nabla^2 ' + @args[0].to_latex
+    end
   end
 end

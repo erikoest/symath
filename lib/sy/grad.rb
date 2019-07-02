@@ -14,5 +14,9 @@ module Sy
       # Grad is defined as (dF)#
       return @@actions[:eval].act(op(:raise, op(:diff, args[0], *vars)))
     end
+
+    def to_latex()
+      return '\nabla ' + @args[0].to_latex
+    end
   end
 end

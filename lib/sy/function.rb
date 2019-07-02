@@ -42,6 +42,10 @@ module Sy
 
       return self
     end
+
+    def to_latex()
+      return @name.to_s + '(' + @args.map { |a| a.to_latex }.join(',') + ')'
+    end
   end
 end
 
