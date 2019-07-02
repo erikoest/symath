@@ -48,18 +48,18 @@ module Sy
     # order the parts of a sum, product etc.
     def <=>(other)
       class_order = {
-        'Sy::Number' => 1,
-        'Sy::ConstantSymbol' => 2,
-        'Sy::Variable' => 3,
-        'Sy::Minus' => 4,
-        'Sy::Power' => 5,
-        'Sy::Wedge' => 6,
-        'Sy::Fraction' => 7,
-        'Sy::Product' => 8,
-        'Sy::Subtraction' => 9,
-        'Sy::Sum' => 10,
-        'Sy::Function' => 11,
-        'Sy::Operator' => 12,
+        'Sy::Operator' => 1,
+        'Sy::Function' => 2,
+        'Sy::Sum' => 3,
+        'Sy::Subtraction' => 4,
+        'Sy::Product' => 5,
+        'Sy::Fraction' => 6,
+        'Sy::Wedge' => 7,
+        'Sy::Power' => 8,
+        'Sy::Minus' => 9,
+        'Sy::Variable' => 10,
+        'Sy::ConstantSymbol' => 11,
+        'Sy::Number' => 12,
       }
 
       return class_order[self.class.name] <=> class_order[other.class.name]

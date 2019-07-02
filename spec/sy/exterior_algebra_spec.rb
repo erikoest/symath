@@ -18,7 +18,7 @@ module Sy
 
   describe Sy::Curl do
     curl = {
-      op(:curl, -:x2.to_m*:x1.to_m('vector') + :x1.to_m*:x2*:x2.to_m('vector') + :x3.to_m*:x3.to_m('vector')) => '(1 + x2)*x3\''
+      op(:curl, -:x2.to_m*:x1.to_m('vector') + :x1.to_m*:x2*:x2.to_m('vector') + :x3.to_m*:x3.to_m('vector')) => '(x2 + 1)*x3\''
     }
 
     curl.each do |from, to|
@@ -30,7 +30,7 @@ module Sy
 
   describe Sy::Div do
     div = {
-      op(:div, -:x2.to_m*:x1.to_m('vector') + :x1.to_m*:x2*:x2.to_m('vector') + :x3.to_m*:x3.to_m('vector')) => '1 + x1'
+      op(:div, -:x2.to_m*:x1.to_m('vector') + :x1.to_m*:x2*:x2.to_m('vector') + :x3.to_m*:x3.to_m('vector')) => 'x1 + 1'
     }
 
     div.each do |from, to|

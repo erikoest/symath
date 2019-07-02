@@ -28,7 +28,7 @@ module Sy
       :x.to_m * 4 * :x * 3 * :y * :y.to_m ** 10 => '12*x**2*y**11',
       :x.to_m / :y.to_m * :a / :b.to_m          => 'a*x/(b*y)',
       14175.to_m / 9000.to_m    => '63/40',
-      fn(:cos, :x)*:y           => 'y*cos(x)',
+      fn(:cos, :x)*:y           => 'cos(x)*y',
     }
 
     products.each do |from, to|
@@ -63,8 +63,8 @@ module Sy
       dx^dx                           => '0',
       dy^dx^dz                        => '- dx^dy^dz',
       fn(:sin, x)*dy^dx               => '- sin(x)*dx^dy',
-      :x.to_m**3^dy*:e.to_m**4^dz^dx  => 'e**4*x**3*dx^dy^dz',
-      dx + (x**1.to_m^dx)             => '(1 + x)*dx',
+      :x.to_m**3^dy*:e.to_m**4^dz^dx  => 'x**3*e**4*dx^dy^dz',
+      dx + (x**1.to_m^dx)             => '(x + 1)*dx',
       (dx^fn(:ln, a*x)) + ((x^1.to_m)/(a*x)^((0.to_m^x) + (a^dx))) - dx => 'ln(a*x)*dx'
     }
 

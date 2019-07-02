@@ -9,13 +9,13 @@ module Sy
 
     poly = {
       op(:int, :x.to_m + 3.to_m*:x.to_m**2 + 4.to_m*:y + 10.to_m, dx) =>
-        'C + 10*x + x**3 + x**2/2 + 4*x*y',
+        '4*x*y + x**2/2 + x**3 + C + 10*x',
       op(:int, :y.to_m/:x, dx) =>
-        'C + y*ln(abs(x))',
+        'ln(abs(x))*y + C',
       op(:int, :pi.to_m/:x.to_m**:e, dx) =>
-        'C + pi*x**(1 - e)/(1 - e)',
+        'x**(1 - e)*pi/(1 - e) + C',
       op(:int, 30.to_m*:y*:a.to_m**(2.to_m*:b*:x), dx) =>
-        'C + 15*y*a**(2*b*x)/(b*ln(a))',
+        '15*a**(2*b*x)*y/(ln(a)*b) + C',
     }
 
     poly.each do |from, to|

@@ -14,15 +14,15 @@ module Sy
   end
 
   describe Sy::Value, ', comparison' do
-    it 'compares 900 < :x' do
-      900.to_m.should < :x.to_m
+    it 'compares 900 > :x' do
+      900.to_m.should > :x.to_m
     end
 
-    it 'compares sin(:x) > :x' do
-      fn(:sin, :x).should > :x.to_m
+    it 'compares sin(:x) < :x' do
+      fn(:sin, :x).should < :x.to_m
     end
 
-    it 'compares cos(:x) <= sin(:x)' do
+    it 'compares cos(:x) < sin(:x)' do
       fn(:cos, :x).should < fn(:sin, :x)
     end
 
@@ -44,9 +44,9 @@ module Sy
   end
 
   describe Sy::Value, ', sorting' do
-    it 'sorts [sin(:x), 100, :x, :y*:z] into [100, :x, :y*:z, sin(:x)]' do
+    it 'sorts [sin(:x), 100, :x, :y*:z] into [sin(:x), :y*:z, :x, 100]' do
       [fn(:sin, :x), 100.to_m, :x.to_m, :y.to_m*:z].sort.should ==
-        [100.to_m, :x.to_m, :y.to_m*:z, fn(:sin, :x)]
+        [fn(:sin, :x), :y.to_m*:z, :x.to_m, 100.to_m]
     end
   end
 
