@@ -55,7 +55,7 @@ require 'sy/operation/lower'
 require 'sy/operation/hodge'
 
 module Sy
-  class Operator < Value
+  class Value
     @@actions = {
       # Evaluation operation
       :eval       => Sy::Operation::Evaluation.new,

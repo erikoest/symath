@@ -8,7 +8,6 @@ module Sy
     end
 
     def evaluate()
-      @@actions[:hodge].calculate_vector_pairs
       # Must normalize input, operation depends on factorized vectors
       return @@actions[:hodge].act(@@actions[:norm].act(*args))
     end

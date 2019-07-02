@@ -43,17 +43,6 @@ module Sy
     :g.to_m => 1,
   }
 
-  # Order of basis vectors, used by the variable sort function
-  @@basis_order = {
-    :x1 => 0,
-    :x2 => 1,
-    :x3 => 2,
-  }
-
-  define_singleton_method(:basis_order) do
-    @@basis_order
-  end
-
   @@variable_assignments = {
     # Some variables with special meanings
 
@@ -67,7 +56,7 @@ module Sy
                 [0, 1, 0],
                 [0, 0, 1]].to_m,
   }
-
+  
   def self.get_functions()
     return @@function_definitions
   end
@@ -173,6 +162,12 @@ module Sy
     end
     
     @@variable_assignments[var] = value
+
+    # Re-calculate basis vectors if the basis or the metric tensor
+    # changes
+    if var.name.to_sym == :g or var.name.to_sym == :basis
+      Sy::Variable.recalc_basis_vectors
+    end
   end
 
   def self.clear_variable(var)
@@ -186,4 +181,7 @@ module Sy
       @@variable_assignments.delete(v)
     end
   end
+
+  # Calculate basis vectors on startup
+  Sy::Variable.recalc_basis_vectors
 end

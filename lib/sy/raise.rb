@@ -8,7 +8,6 @@ module Sy
     end
 
     def evaluate()
-      @@actions[:raise].calc_basic_vectors
       # Must normalize input, operation depends on factorized vectors
       return @@actions[:raise].act(@@actions[:norm].act(*args))
     end

@@ -3,6 +3,7 @@ require 'sy/type'
 
 module Sy
   class Variable < Value
+
     # Return parity of permutation. Even number of permutations give
     # 1 and odd number gives -1
     def self.permutation_parity(perm)
@@ -36,7 +37,92 @@ module Sy
       sign = (1 - (sign % 2)*2).to_m
     end
 
-    # Normalize a list of vectors, and combine them into a wedge product
+    # Re-calculate various auxiliary data structured based on the given basis
+    # This does not scale for higher dimensions, but that will most probably
+    # be out of scope for this library anyway.
+    def self.recalc_basis_vectors()
+      b = Sy.get_variable(:basis.to_m)
+      g = Sy.get_variable(:g.to_m)
+
+      # If the basis and the metric tensor do not 
+      # basis is not a matrix
+      # g (metric tensor) is not a square matrix
+      # basis and metric tensor g have different dimensions
+      if !b.is_a?(Sy::Matrix) or
+        !g.is_a?(Sy::Matrix) or
+        !g.is_square?        
+        b.nrows != g.nrows
+        @@basis_order = nil
+        @@norm_map = nil
+        @@hodge_map = nil
+        @@sharp_map = nil
+        @@flat_map = nil
+        return
+      end
+
+      brow = b.row(0)
+      dim = brow.length
+      
+      # Hash up the order of the basis vectors
+      @@basis_order = (0..dim-1).map do |i|
+        [brow[i].name.to_sym, i]
+      end.to_h
+
+      # Calculate all possible permutations of all possible combinations of the
+      # basis vectors (including no vectors).
+      @@norm_map = {}
+      @@hodge_map = {}
+      (0..dim).each do |d|
+        (0..dim-1).to_a.permutation(d).each do |p|
+          if p.length == 0
+            @@norm_map[1.to_m] = 1.to_m
+            @@hodge_map[1.to_m] = brow.map { |bb| bb.name.to_m('dform') }.inject(:^)
+            next
+          end
+          
+          # Hash them to the normalized expression (including the sign).
+          # Do this both for vectors and dforms.      
+          norm = p.sort
+          sign = permutation_parity(p)
+
+          dform = p.map { |i| brow[i].name.to_m('dform') }.inject(:^)
+          vect = p.map { |i| brow[i].name.to_m('vector') }.inject(:^)
+
+          dnorm = sign.mult(norm.map { |i| brow[i].name.to_m('dform') }.inject(:^))
+          vnorm = sign.mult(norm.map { |i| brow[i].name.to_m('vector') }.inject(:^))
+
+          @@norm_map[dform] = dnorm
+          @@norm_map[vect] = vnorm
+
+          # Hash them to their hodge dual
+          dual = (0..dim-1).to_a - norm
+          dsign = permutation_parity(p + dual)
+          
+          if dual.length == 0
+            hdd = sign.mult(1.to_m)
+            hdv = sign.mult(1.to_m)
+          else
+            hdd = sign.mult(dsign.mult(dual.map { |i| brow[i].name.to_m('dform') }.inject(:^)))
+            hdv = sign.mult(dsign.mult(dual.map { |i| brow[i].name.to_m('vector') }.inject(:^)))
+          end
+
+          @@hodge_map[dform] = hdd
+          @@hodge_map[vect] = hdv
+        end
+      end
+
+      # Calculate the musical isomorphisms. Hash up the mappings both ways.
+      v = brow.map { |bb| bb.name.to_m('vector') }
+      d = brow.map { |bb| bb.name.to_m('dform') }
+
+      flat = g.mult(Sy::Matrix.new(d).transpose).normalize.col(0)
+      sharp = g.inverse.mult(Sy::Matrix.new(v).transpose).normalize.col(0)
+
+      @@flat_map = (0..dim-1).map { |i| [v[i], flat[i]] }.to_h
+      @@sharp_map = (0..dim-1).map { |i| [d[i], sharp[i]] }.to_h
+    end
+
+    # Normalize a list of basis vectors, and combine them into a wedge product
     def self.normalize_vectors(vectors)
       # Empty list of vectors. Return 1
       if vectors.length == 0
@@ -62,6 +148,16 @@ module Sy
       return  sign.to_m.mult(sorted.inject(:^))
     end
 
+    # Return the hodge dual of an expression consisting only of basis vectors or basis
+    # dforms
+    def self.hodge_dual(exp)
+      if !@@hodge_map.key?(exp)
+        raise 'No hodge dual for ' + exp.to_s
+      end
+
+      return @@hodge_map[exp]
+    end
+    
     attr_reader :name
     attr_reader :type
   
@@ -91,14 +187,14 @@ module Sy
 
       # Order basis vectors and basis dforms by basis order
       if type.is_subtype?('vector') or type.is_subtype?('dform')
-        bv1 = Sy::basis_order.key?(@name)
-        bv2 = Sy::basis_order.key?(other.name)
+        bv1 = @@basis_order.key?(@name)
+        bv2 = @@basis_order.key?(other.name)
         if !bv1 and bv2
           return 1
         elsif bv1 and !bv2
           return -1
         elsif bv1 and bv2
-          return Sy::basis_order[@name] <=> Sy::basis_order[other.name]
+          return @@basis_order[@name] <=> @@basis_order[other.name]
         end
       end
       
@@ -145,6 +241,24 @@ module Sy
       return Sy::Variable.new(@name, Sy::Type.new('dform'))
     end
 
+    # Return the vector dual of the dform
+    def raise_dform()
+      if !@@sharp_map.key?(self)
+        raise 'No vector dual for ' + to_s
+      end
+
+      return @@sharp_map[self]
+    end
+
+    # Return the dform dual of the vector
+    def lower_vector()
+      if !@@flat_map.key?(self)
+        raise 'No dform dual for ' + to_s
+      end
+
+      return @@flat_map[self]
+    end
+    
     def variables()
       return [@name]
     end

@@ -389,6 +389,10 @@ module Sy
       return 'scalar'.to_t
     end
 
+    def normalize()
+      return @@actions[:norm].act(self)
+    end
+    
     alias eql? ==
 
     def to_str()
