@@ -26,6 +26,10 @@ module Sy
       return true
     end
 
+    def is_scalar?()
+      return (factor1.is_scalar? and factor2.is_scalar?)
+    end
+
     def scalar_factors()
       return Enumerator.new do |f|
         factor1.scalar_factors.each { |f1| f << f1 }
@@ -60,6 +64,10 @@ module Sy
       return factor1.sign*factor2.sign
     end
     
+    def type()
+      return factor1.type.product(factor2.type)
+    end
+
     def to_s()
       return @args.map do |a|
         if a.is_sum_exp?

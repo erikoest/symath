@@ -33,8 +33,12 @@ module Sy
       act_subexpressions(exp)
 
       if exp.is_a?(Sy::Variable)
-        if exp.type.is_subtype?('dform') and @vectormap.key?(exp)
-          return @vectormap[exp]
+        if exp.type.is_subtype?('dform')
+          if @vectormap.key?(exp)
+            return @vectormap[exp]
+          else
+            raise 'Cannot raise unknown dform ' + exo.to_s
+          end
         end
       end
 

@@ -18,6 +18,10 @@ module Sy
       return true
     end
 
+    def is_scalar?()
+      return (summand1.is_scalar? and summand2.is_scalar?)
+    end
+    
     # Return positive summands
     def summands()
       return Enumerator.new do |s|
@@ -32,6 +36,10 @@ module Sy
         summand1.subtrahends.each { |s1| s << s1 }
         summand2.subtrahends.each { |s2| s << s2 }
       end
+    end
+
+    def type()
+      return summand1.type.sum(summand2.type)
     end
     
     def to_s()

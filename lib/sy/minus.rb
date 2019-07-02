@@ -18,6 +18,10 @@ module Sy
       return true
     end
 
+    def is_scalar?()
+      return argument.is_scalar?()
+    end
+
     def scalar_factors()
       return argument.scalar_factors
     end
@@ -50,6 +54,14 @@ module Sy
       return argument.summands
     end
 
+    def type()
+      if argument.type.is_subtype?('integer')
+        return 'integer'.to_t
+      else
+        return argument.type
+      end
+    end
+    
     def to_s()
       return '- ' + argument.to_s
     end

@@ -7,6 +7,15 @@ module Sy
       @name = '^'
     end
 
+    def type()
+      if factor1.type.is_subtype?('tensor') and
+        factor2.type.is_subtype?('tensor')
+        return 'tensor'.to_t(indexes: factor1.type.indexes + factor2.type.indexes)
+      else
+        return factor1.type.sum(factor2.type)
+      end
+    end
+    
     def to_s()
       return @args.map do |a|
         if a.is_sum_exp?

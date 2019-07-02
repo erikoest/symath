@@ -102,6 +102,38 @@ module Sy
       end
     end
 
+    # Determine the type of a sum
+    def sum(other)
+      if is_subtype?('scalar') and
+        other.is_subtype?('scalar')
+        return common_parent(other)
+      elsif self == other
+        return self
+      else
+        raise 'Types ' + to_s + ' and ' + other.to_s + ' cannot be summed.'
+      end
+    end
+
+    # Determine the type of a product
+    def product(other)
+      scalar = is_scalar?
+      oscalar = other.is_scalar
+      
+      if scalar and oscalar
+        return common_parent(other)
+      elsif scalar
+        return other.type
+      elsif oscalar
+        return type
+      elsif is_subtype?('matrix') and
+           other.is_subtype?('matrix') and
+           dimn == other.dimm
+        return 'matrix'.to_t(dimm: dimm, dimn: other.dimn)
+      else
+        raise 'Types ' + to_s + ' and ' + other.to_s + ' cannot be multiplied'
+      end
+    end
+    
     # Return tensor degree (rank)
     def degree()
       return @indexes.length

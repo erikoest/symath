@@ -57,6 +57,8 @@ require 'sy/operation/hodge'
 module Sy
   class Operator < Value
     @@actions = {
+      # Evaluation operation
+      :eval       => Sy::Operation::Evaluation.new,
       # Expression rewriting
       :trigreduct => Sy::Operation::TrigReduction.new,
       :norm       => Sy::Operation::Normalization.new,

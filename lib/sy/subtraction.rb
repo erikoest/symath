@@ -18,6 +18,10 @@ module Sy
       return true
     end
 
+    def is_scalar?()
+      return (minuend.is_scalar? and subtrahend.is_scalar?)
+    end
+
     def summands()
       return Enumerator.new do |s|
         minuend.summands.each { |s1| s << s1 }
@@ -32,6 +36,14 @@ module Sy
       end
     end
 
+    def type()
+      if summand1.type == summand2.type
+        return summand1.type
+      else
+        return 'invalid'.to_t
+      end
+    end
+    
     def to_s()
       if subtrahend.is_a?(Sy::Sum)
         return minuend.to_s + ' - (' + subtrahend.to_s + ')'

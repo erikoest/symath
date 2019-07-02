@@ -84,7 +84,7 @@ module Sy
     # Returns true if this is a function declaration, a operator declaration or
     # a variable assignment
     def is_definition?()
-      # The expression must be an equation on top
+      # The expression must have an equation at the top node
       return false if !is_a?(Sy::Equation)
 
       # Is this a variable assigment?
@@ -289,6 +289,12 @@ module Sy
     def is_prod_exp?()
       return false
     end
+
+    # Value is a scalar, i.e. has no vector parts, down to non-sum and non-product
+    # functions and operators.
+    def is_scalar?()
+      return true
+    end
     
     # Returns the positive elements of a sum in an array.
     # Defaults to self for non-sums.
@@ -378,8 +384,9 @@ module Sy
       return 1
     end
 
+    # By default, assume an unknown expression to be scalar
     def type()
-      return type('unknown')
+      return 'scalar'.to_t
     end
 
     alias eql? ==

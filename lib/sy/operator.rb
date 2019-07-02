@@ -124,6 +124,9 @@ require 'sy/bounds'
 require 'sy/raise'
 require 'sy/lower'
 require 'sy/hodge'
+require 'sy/grad'
+require 'sy/curl'
+require 'sy/div'
 
 def op(name, *args)
   case name.to_s
@@ -141,6 +144,12 @@ def op(name, *args)
     return Sy::Lower.new(*args)
   when 'hodge'
     return Sy::Hodge.new(*args)
+  when 'grad'
+    return Sy::Grad.new(*args)
+  when 'curl'
+    return Sy::Curl.new(*args)
+  when 'div'
+    return Sy::Div.new(*args)
   end
 
   return Sy::Operator.new(name, args)

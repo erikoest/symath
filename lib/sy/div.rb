@@ -1,0 +1,22 @@
+require 'sy/value'
+require 'sy/operator'
+
+module Sy
+  class Div < Operator
+    def initialize(arg)
+      super('div', [arg])
+    end
+
+    def evaluate()
+      if Sy.get_variable(:basis.to_m).row(0).length != 3
+        raise 'Div is only defined for 3 dimensions'
+      end
+      
+      # Get list of variables to differentiate with respect to
+      vars = Sy.get_variable(:basis.to_m).row(0)
+
+      # Div is defined as *d*(Fb)
+      return @@actions[:eval].act(op(:hodge, op(:diff, op(:hodge, op(:lower, args[0])), *vars)))
+    end
+  end
+end

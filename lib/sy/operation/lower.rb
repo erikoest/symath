@@ -30,13 +30,15 @@ module Sy
     end
     
     def act(exp)
-      # Replace all occurences in exp of d with d => 
-
       act_subexpressions(exp)
 
       if exp.is_a?(Sy::Variable)
-        if exp.type.is_subtype?('vector') and @vectormap.key?(exp)
-          return @vectormap[exp]
+        if exp.type.is_subtype?('vector')
+          if @vectormap.key?(exp)
+            return @vectormap[exp]
+          else
+            raise 'Cannot lower unknown vector ' + exp.to_s
+          end
         end
       end
 

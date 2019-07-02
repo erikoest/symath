@@ -42,6 +42,18 @@ module Sy
     :basis.to_m => 1,
     :g.to_m => 1,
   }
+
+  # Order of basis vectors, used by the variable sort function
+  @@basis_order = {
+    :x1 => 0,
+    :x2 => 1,
+    :x3 => 2,
+  }
+
+  define_singleton_method(:basis_order) do
+    @@basis_order
+  end
+
   @@variable_assignments = {
     # Some variables with special meanings
 

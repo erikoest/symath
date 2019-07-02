@@ -59,18 +59,19 @@ module Sy
     # For simplicity, just use wedge products all the time. They will be normalized
     # to scalar products afterwards.
     def do_product(exp, vars)
-      return (diff(exp.factor1, vars)^exp.factor2) + (exp.factor1^diff(exp.factor2, vars))
+      return (wedge(diff(exp.factor1, vars), exp.factor2) +
+              wedge(exp.factor1, diff(exp.factor2, vars)))
     end
 
     def do_fraction(exp, vars)
-      return ((diff(exp.dividend, vars)^exp.divisor) -
-              (exp.dividend^diff(exp.divisor, vars))) /
+      return (wedge(diff(exp.dividend, vars), exp.divisor) -
+              wedge(exp.dividend, diff(exp.divisor, vars))) /
              (exp.divisor**2)
     end
 
     def do_power(exp, vars)
-      return (exp^fn(:ln, exp.base)^diff(exp.exponent, vars)) +
-             (exp.exponent^(exp.base**(exp.exponent - 1))^diff(exp.base, vars))
+      return wedge(wedge(exp, fn(:ln, exp.base)), diff(exp.exponent, vars)) +
+             wedge(wedge(exp.exponent, exp.base**(exp.exponent - 1)), diff(exp.base, vars))
     end
 
     @@functions = {
@@ -111,10 +112,73 @@ module Sy
       if @@functions.key?(exp.name.to_sym)
         d = @@functions[exp.name.to_sym].deep_clone
         d.replace({ :a.to_m => exp.args[0] })
-        return d^diff(exp.args[0], vars)
+        return wedge(d, diff(exp.args[0], vars))
       else
         raise 'Cannot calculate differential of expression ' + exp.to_s
       end
+    end
+
+    # FIXME: Use the DistributiveLaw class for this.
+    # Multiply exp1 into each summand in exp2
+    def expand(exp1, exp2)
+      if exp2.is_sum_exp?
+        # exp2 is a sum and must be expanded.
+        ret = 0.to_m
+        exp2.summands.each do |s|
+          ret = ret.add(wedge(exp1, s))
+        end
+
+        exp2.subtrahends.each do |s|
+          ret = ret.sub(wedge(exp1, s))
+        end
+
+        return ret
+      else
+        # Not a sum. Just multiply. If any of the expressions are scalar,
+        # we can do with a scalar multiplication.
+        if exp1.is_scalar?
+          return exp1.mult(exp2)
+        end
+
+        if exp2.is_scalar?
+          return exp2.mult(exp1)
+        end
+
+        # Both expressions are vectors and must be joined with a wedge operator
+        return exp1^exp2
+      end
+    end
+
+    # Apply wedge product or ordinary product between two expressions, depending
+    # on whether or not they have vector parts.
+    def wedge(exp1, exp2)
+      if exp1.is_scalar? and exp2.is_scalar?
+        # Both parts are scalar. Just multiply.
+        return exp1.mult(exp2)
+      end
+
+      if exp1.is_scalar?
+        # exp2 has vector parts. If it is a sum, we must expand the product
+        return expand(exp1, exp2)
+      end
+
+      if exp2.is_scalar?
+        # exp1 has vector parts. If it is a sum, we must expand the product
+        return expand(exp2, exp1)
+      end
+      
+      # Both parts have vector parts. Wedge the two expressions.
+      ret = 0.to_m
+
+      exp1.summands.each do |s|
+        ret = ret.add(expand(s, exp2))
+      end
+
+      exp1.subtrahends.each do |s|
+        ret = ret.sub(expand(s, exp2))
+      end
+
+      return ret
     end
   end
 end

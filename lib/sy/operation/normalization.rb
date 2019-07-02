@@ -161,7 +161,8 @@ module Sy
         dc /= gcd
       end
 
-      # Get normalized factors
+      # Get normalized factors. Expand all factors that contain vectors in their
+      # subexpression sums.
       p = exp.scalar_factors.map { |e| act(e) }
       d = exp.div_factors.map { |e| act(e) }
 
@@ -236,46 +237,7 @@ module Sy
         ret = ret / d2.inject(:*)
       end
 
-      # Order vector factors and add them to the result
-      vhash = {}
-      vinv = {}
-      vectors = exp.vector_factors.each_with_index do |v, i|
-        # Double occurence of a vector gives zero result
-        if vhash.key?(v)
-          vhash = nil
-          break
-        end
-        vhash[v] = i
-        vinv[i] = v
-      end
-
-      if vhash.nil?
-        # Double vector occurence
-        ret *= 0.to_m
-      elsif vhash.length != 0
-        # Positive number of vectors. Order them into a wedge product structure and
-        # flip the sign for each permutation.
-        vlist = vhash.keys.sort
-        vlist.each_with_index do |v, i|
-          # Skip if the vector is already in place
-          next if vhash[v] == i
-          
-          # Swap vectors
-          vinv[vhash[v]] = vinv[i]
-          vhash[vinv[i]] = vhash[v]
-          vhash[v] = i
-          vinv[i] = v
-          
-          # Flip sign
-          s *= -1
-        end
-
-        if ret == 1.to_m
-          ret = vlist.inject(:^)
-        else
-          ret *= vlist.inject(:^)
-        end
-      end
+      ret = ret.mult(Sy::Variable.normalize_vectors(exp.vector_factors.to_a))
 
       if (s < 0)
         ret = -ret

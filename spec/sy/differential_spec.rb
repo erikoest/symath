@@ -24,7 +24,7 @@ module Sy
   describe Sy::Operation::Differential, ', exponential functions' do
     exp = {
       op(:diff, fn('exp', :x.to_m**2))            => '2*x*exp(x**2)*dx',
-      op(:diff, fn('ln', 3.to_m*:x + :x.to_m**2)) => '(3 + 2*x)/(3*x + x**2)*dx'
+      op(:diff, fn('ln', 3.to_m*:x + :x.to_m**2)) => '(3/(3*x + x**2) + 2*x/(3*x + x**2))*dx'
     }
 
     exp.each do |from, to|

@@ -9,7 +9,8 @@ module Sy
 
     def evaluate()
       @@actions[:raise].calc_basic_vectors
-      return @@actions[:raise].act(*args)
+      # Must normalize input, operation depends on factorized vectors
+      return @@actions[:raise].act(@@actions[:norm].act(*args))
     end
     
     def to_string()

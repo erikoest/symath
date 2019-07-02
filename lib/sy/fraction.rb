@@ -18,6 +18,10 @@ module Sy
       return true
     end
 
+    def is_scalar?()
+      return dividend.is_scalar?()
+    end
+
     def scalar_factors()
       return Enumerator.new do |f|
         dividend.scalar_factors.each { |d1| f << d1 }
@@ -50,6 +54,14 @@ module Sy
       return dividend.sign*divisor.sign
     end
 
+    def type()
+      if dividend.type.is_subtype?('rational')
+        return 'rational'.to_t
+      else
+        return dividend.type
+      end
+    end
+    
     def to_s()
       dividend_str = dividend.is_sum_exp? ? '(' + dividend.to_s + ')' : dividend.to_s
       divisor_str = (divisor.is_sum_exp? or divisor.is_prod_exp?) ?
