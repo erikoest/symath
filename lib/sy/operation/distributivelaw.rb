@@ -34,11 +34,11 @@ module Sy
       ret = 0.to_m
 
       exp.factor1.summands.each do |s|
-        ret = ret.add(s*p)
+        ret = ret.add(s.mult(p))
       end
         
       exp.factor1.subtrahends.each do |s|
-        ret = ret.sub(s*p)
+        ret = ret.sub(s.mult(p))
       end
 
       return ret      
@@ -49,11 +49,11 @@ module Sy
       ret = 0.to_m
 
       exp.factor2.summands.each do |s|
-        ret = ret.add(p*s)
+        ret = ret.add(p.mult(s))
       end
         
       exp.factor2.subtrahends.each do |s|
-        ret = ret.sub(p*s)
+        ret = ret.sub(p.mult(s))
       end
 
       return ret      

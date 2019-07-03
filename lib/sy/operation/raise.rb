@@ -8,15 +8,16 @@ module Sy
     end
 
     def act(exp)
-      act_subexpressions(exp)
+      res = act_subexpressions(exp)
+      res = exp if res.nil?
 
-      if exp.is_a?(Sy::Variable)
-        if exp.type.is_subtype?('dform')
-          return exp.raise_dform
+      if res.is_a?(Sy::Variable)
+        if res.type.is_subtype?('dform')
+          return res.raise_dform
         end
       end
 
-      return exp
+      return res
     end
   end
 end

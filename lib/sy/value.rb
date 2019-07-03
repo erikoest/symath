@@ -127,8 +127,7 @@ module Sy
     
     ##
     # Overridden math operators
-    # These operators are only used for composing expression. No reductions are
-    # performed.
+    # These operators are purely compositional. No reductions are performed.
     ##
     def +(other)
       return Sy::Sum.new(self, other.to_m)
@@ -166,6 +165,15 @@ module Sy
       return self if o == 0
       return o if self == 0
 
+      # Is this really a subtraction
+      if o.is_a?(Sy::Minus)
+        return sub(o.args[0])
+      end
+
+      if self.is_a?(Sy::Minus)
+        return o.sub(self.args[0])
+      end
+      
       s = scalar_factors_exp
       w = vector_factors_exp
       if s == o.scalar_factors_exp and
@@ -188,8 +196,13 @@ module Sy
     def sub(other)
       o = other.to_m
       return self if o == 0
-      return -o if self == 0
+      return o.minus if self == 0
 
+      # Is this really an addition?
+      if o.is_a?(Sy::Minus)
+        return self.add(o.args[0])
+      end
+      
       s = scalar_factors_exp
       w = vector_factors_exp
 
@@ -211,11 +224,33 @@ module Sy
       return self - o
     end
     
+    def minus()
+      if self.is_a?(Sy::Minus)
+        # - - a => a
+        return self.args[0]
+      else
+        return - self
+      end
+    end
+
     def mult(other)
       o = other.to_m
+
+      # First try some simple reductions
+      # a*1 => a
       return self if o == 1
       return o if self == 1
 
+      # -a*-b => a*b
+      if o.is_a?(Sy::Minus) and self.is_a?(Sy::Minus)
+        return args[0].mult(o.args[0])
+      end
+
+      # (-a)*b => -(a*b)
+      # a*(-b) => -(a*b)
+      return self.mult(o.args[0]).minus if o.is_a?(Sy::Minus)
+      return self.args[0].mult(o).minus if self.is_a?(Sy::Minus)
+      
       if o.is_a?(Sy::Matrix)
         return o.mult(self)
       end

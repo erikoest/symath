@@ -29,13 +29,17 @@ module Sy
         return
       end
 
+      if exp.is_a?(Sy::Minus)
+        return act(exp.args[0]).minus
+      end
+      
       # Do operation on each argument
       newargs = exp.args.map { |a| act(a) }
 
       if newargs == exp.args
         return
       end
-
+      
       exp.args = newargs
       return exp
     end

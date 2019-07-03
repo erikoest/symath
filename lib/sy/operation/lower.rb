@@ -8,15 +8,16 @@ module Sy
     end
     
     def act(exp)
-      act_subexpressions(exp)
+      res = act_subexpressions(exp)
+      res = exp if res.nil?
 
-      if exp.is_a?(Sy::Variable)
-        if exp.type.is_subtype?('vector')
-          return exp.lower_vector
+      if res.is_a?(Sy::Variable)
+        if res.type.is_subtype?('vector')
+          return res.lower_vector
         end
       end
 
-      return exp
+      return res
     end
   end
 end

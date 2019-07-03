@@ -10,8 +10,7 @@ module Sy
     def act(exp)
       # Recurse down sums and subtractions
       if exp.is_sum_exp?
-        act_subexpressions(exp)
-        return exp
+        return act_subexpressions(exp)
       else
         # Replace nvectors and nforms with their hodge dual
         s = exp.scalar_factors_exp
