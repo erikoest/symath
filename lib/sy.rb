@@ -30,6 +30,8 @@ module Sy
     # Boolean setting for whether to represent square roots with the root symbol
     # or as a fraction exponent
     :sq_exponent_form => false,
+    # Show the multiplication sign in LaTeX output
+    :ltx_mult_sign => false,
   }
   
   @@function_definitions = {
