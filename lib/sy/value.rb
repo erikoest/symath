@@ -295,6 +295,8 @@ module Sy
       return self if o == 1
       return o if self == 1
 
+      # FIXME: Reduce to 0 if the expressions have a common vector
+
       if base == o.base
         return base ** (exponent + o.exponent)
       end
