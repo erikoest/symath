@@ -132,28 +132,28 @@ require 'sy/laplacian'
 def op(name, *args)
   case name.to_s
   when 'diff'
-    return Sy::Diff.new(*args)
+    return Sy::Diff.new(*args.map { |a| a.to_m })
   when 'int'
-    return Sy::Int.new(*args)
+    return Sy::Int.new(*args.map { |a| a.to_m })
   when 'bounds'
-    return Sy::Bounds.new(*args)
+    return Sy::Bounds.new(*args.map { |a| a.to_m })
   when '='
-    return Sy::Equation.new(*args)
+    return Sy::Equation.new(*args.map { |a| a.to_m })
   when 'raise'
-    return Sy::Raise.new(*args)
+    return Sy::Raise.new(*args.map { |a| a.to_m })
   when 'lower'
-    return Sy::Lower.new(*args)
+    return Sy::Lower.new(*args.map { |a| a.to_m })
   when 'hodge'
-    return Sy::Hodge.new(*args)
+    return Sy::Hodge.new(*args.map { |a| a.to_m })
   when 'grad'
-    return Sy::Grad.new(*args)
+    return Sy::Grad.new(*args.map { |a| a.to_m })
   when 'curl'
-    return Sy::Curl.new(*args)
+    return Sy::Curl.new(*args.map { |a| a.to_m })
   when 'div'
-    return Sy::Div.new(*args)
+    return Sy::Div.new(*args.map { |a| a.to_m })
   when 'laplacian'
-    return Sy::Laplacian.new(*args)
+    return Sy::Laplacian.new(*args.map { |a| a.to_m })
   end
 
-  return Sy::Operator.new(name, args)
+  return Sy::Operator.new(name, args.map { |a| a.to_m })
 end

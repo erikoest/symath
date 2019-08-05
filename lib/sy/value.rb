@@ -441,3 +441,115 @@ module Sy
     end
   end
 end
+
+class Integer
+  alias_method :super_add, :+
+  alias_method :super_sub, :-
+  alias_method :super_min, :-@
+  alias_method :super_mul, :*
+  alias_method :super_div, :/
+  alias_method :super_pow, :**
+  alias_method :super_wedge, :^
+  
+  def +(other)
+    if other.class.method_defined?(:to_m) and !other.is_a?(Integer)
+      return self.to_m + other.to_m
+    else
+      return self.super_add(other)
+    end
+  end
+
+  def -(other)
+    if other.class.method_defined?(:to_m) and !other.is_a?(Integer)
+      return self.to_m - other.to_m
+    else
+      return self.super_sub(other)
+    end
+  end
+
+  def *(other)
+    if other.class.method_defined?(:to_m) and !other.is_a?(Integer)
+      return self.to_m * other.to_m
+    else
+      return self.super_mul(other)
+    end
+  end
+
+  def /(other)
+    if other.class.method_defined?(:to_m) and !other.is_a?(Integer)
+      return self.to_m / other.to_m
+    else
+      return self.super_div(other)
+    end
+  end
+
+  def **(other)
+    if other.class.method_defined?(:to_m)  and !other.is_a?(Integer)
+      return self.to_m ** other.to_m
+    else
+      return self.super_pow(other)
+    end
+  end
+
+  def ^(other)
+    if other.class.method_defined?(:to_m)  and !other.is_a?(Integer)
+      return self.to_m ^ other.to_m
+    else
+      return self.super_wedge(other)
+    end
+  end
+end
+
+class Symbol
+  def +(other)
+    if other.class.method_defined?(:to_m)
+      return self.to_m + other.to_m
+    else
+      return super(other)
+    end
+  end
+
+  def -(other)
+    if other.class.method_defined?(:to_m)
+      return self.to_m - other.to_m
+    else
+      return super(other)
+    end
+  end
+
+  def -@()
+    return - self.to_m
+  end
+
+  def *(other)
+    if other.class.method_defined?(:to_m)
+      return self.to_m * other.to_m
+    else
+      return super(other)
+    end
+  end
+
+  def /(other)
+    if other.class.method_defined?(:to_m)
+      return self.to_m / other.to_m
+    else
+      return super(other)
+    end
+  end
+
+  def **(other)
+    if other.class.method_defined?(:to_m)
+      return self.to_m ** other.to_m
+    else
+      return super(other)
+    end
+  end
+
+  def ^(other)
+    if other.class.method_defined?(:to_m)
+      return self.to_m ^ other.to_m
+    else
+      return super(other)
+    end
+  end
+end
