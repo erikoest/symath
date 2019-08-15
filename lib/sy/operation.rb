@@ -57,6 +57,7 @@ require 'sy/operation/evaluation'
 require 'sy/operation/raise'
 require 'sy/operation/lower'
 require 'sy/operation/hodge'
+require 'sy/operation/factorization'
 
 module Sy
   class Value
