@@ -17,6 +17,9 @@ require 'sy/value'
 require 'sy/matrix'
 require 'sy/equation'
 require 'sy/diff'
+require 'sy/poly'
+require 'sy/poly/dup'
+require 'sy/poly/galois'
 require 'sy/operation'
 require 'sy/path'
 
@@ -58,7 +61,7 @@ module Sy
                 [0, 1, 0],
                 [0, 0, 1]].to_m,
   }
-  
+
   def self.get_functions()
     return @@function_definitions
   end

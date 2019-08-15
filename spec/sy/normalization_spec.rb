@@ -15,7 +15,7 @@ module Sy
 
     sums.each do |from, to|
       it "normalizes '#{from.to_s}' to '#{to}'" do
-        op(:norm, from).evaluate.to_s.should == to
+        expect(op(:norm, from).evaluate.to_s).to be == to
       end
     end
   end
@@ -33,7 +33,7 @@ module Sy
 
     products.each do |from, to|
       it "normalizes '#{from.to_s}' to '#{to}'" do
-        op(:norm, from).evaluate.to_s.should == to
+        expect(op(:norm, from).evaluate.to_s).to be == to
       end
     end
   end
@@ -46,7 +46,7 @@ module Sy
 
     powers.each do |from, to|
       it "normalizes '#{from.to_s}' to '#{to}'" do
-        op(:norm, from).evaluate.to_s.should == to
+        expect(op(:norm, from).evaluate.to_s).to be == to
       end
     end
   end
@@ -67,7 +67,7 @@ module Sy
 
     wedges.each do |from, to|
       it "normalizes '#{from.to_s}' to '#{to}'" do
-        op(:norm, from).evaluate.to_s.should == to
+        expect(op(:norm, from).evaluate.to_s).to be == to
       end
     end
   end
