@@ -22,11 +22,7 @@ module Sy
       end
       
       if exp.is_a?(Sy::Sum)
-        return diff(exp.summand1, vars) + diff(exp.summand2, vars)
-      end
-
-      if exp.is_a?(Sy::Subtraction)
-        return diff(exp.minuend, vars) - diff(exp.subtrahend, vars)
+        return diff(exp.term1, vars) + diff(exp.term2, vars)
       end
 
       if exp.is_a?(Sy::Minus)
@@ -119,17 +115,13 @@ module Sy
     end
 
     # FIXME: Use the DistributiveLaw class for this.
-    # Multiply exp1 over each summand in exp2
+    # Multiply exp1 over each term in exp2
     def expand_right(exp1, exp2)
       if exp2.is_sum_exp?
         # exp2 is a sum and must be expanded.
         ret = 0.to_m
-        exp2.summands.each do |s|
+        exp2.terms.each do |s|
           ret = ret.add(expand_left(exp1, s))
-        end
-
-        exp2.subtrahends.each do |s|
-          ret = ret.sub(expand_left(exp1, s))
         end
 
         return ret
@@ -149,7 +141,7 @@ module Sy
       end
     end
 
-    # Multiply exp2 over each summand in exp1
+    # Multiply exp2 over each term in exp1
     def expand_left(exp1, exp2)
       if exp1.is_scalar? and exp2.is_scalar?
         # Both parts are scalar. Just multiply.
@@ -169,12 +161,8 @@ module Sy
       # Both parts have vector parts. Wedge the two expressions.
       ret = 0.to_m
 
-      exp1.summands.each do |s|
+      exp1.terms.each do |s|
         ret = ret.add(expand_right(s, exp2))
-      end
-
-      exp1.subtrahends.each do |s|
-        ret = ret.sub(expand_right(s, exp2))
       end
 
       return ret

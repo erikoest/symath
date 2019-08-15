@@ -13,11 +13,13 @@ module Sy
   
   describe Sy::Grad do
     grad = {
-      op(:grad, x1 - x1*x2 + x3**2) => (1 - x2)*x1v + 2*x3*x3v - x1*x2v
+      op(:grad, x1 - x1*x2 + x3**2) => (1 - x2)*x1v - x1*x2v + 2*x3*x3v
     }
 
     grad.each do |from, to|
       it "evaluates '#{from.to_s}' into '#{to}'" do
+        puts n.act(from.evaluate).to_s
+        puts to.to_s
         expect(n.act(from.evaluate)).to be == to
       end
     end

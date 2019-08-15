@@ -1,3 +1,4 @@
+
 module Sy
   class Value
     def deep_clone()
@@ -51,7 +52,6 @@ module Sy
         'Sy::Operator' => 1,
         'Sy::Function' => 2,
         'Sy::Sum' => 3,
-        'Sy::Subtraction' => 4,
         'Sy::Product' => 5,
         'Sy::Fraction' => 6,
         'Sy::Wedge' => 7,
@@ -134,7 +134,7 @@ module Sy
     end
 
     def -(other)
-      return Sy::Subtraction.new(self, other.to_m)
+      return Sy::Sum.new(self, Sy::Minus.new(other.to_m))
     end
 
     def -@()
@@ -317,7 +317,7 @@ module Sy
     # the subclasses. Default behaviour is defined here.
     ##
 
-    # Value is a sum, subtraction of unitary minus
+    # Value is a sum or unitary minus
     def is_sum_exp?()
       return false
     end
@@ -333,16 +333,10 @@ module Sy
       return true
     end
     
-    # Returns the positive elements of a sum in an array.
+    # Returns the terms of a sum in an array.
     # Defaults to self for non-sums.
-    def summands()
+    def terms()
       return [self]
-    end
-
-    # Returns the negative elements of a sum in an array.
-    # Defaults to nothing for non-sums.
-    def subtrahends()
-      return []
     end
 
     # Returns the base of a power expression.

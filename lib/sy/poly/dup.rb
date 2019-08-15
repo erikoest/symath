@@ -45,10 +45,8 @@ module Sy
       var = nil
       
       # First assert that this really is an univariate polynomial.
-      Enumerator.new do |ss|
-        e.summands.each { |s1| ss << s1 }
-        e.subtrahends.each { |s2| ss << s2 }
-      end.each do |s|
+      
+      e.terms.each do |s|
         s.vector_factors.each do |s|
           raise error
         end
@@ -95,7 +93,7 @@ module Sy
       terms = {}
       max_degree = 0
       
-      e.summands.each do |s|
+      e.terms.each do |s|
         d = 0
         s.scalar_factors.each do |term|
           if term.is_a?(Sy::Power)
@@ -111,29 +109,6 @@ module Sy
           terms[d] += coeff
         else
           terms[d] = coeff
-        end
-
-        if d > max_degree
-          max_degree = d
-        end
-      end
-
-      e.subtrahends.each do |s|
-        d = 0
-        s.scalar_factors.each do |term|
-          if term.is_a?(Sy::Power)
-            d = term.exponent.value
-          else
-            d = 1
-          end
-        end
-
-        coeff = s.sign*s.coefficient
-
-        if terms.key?(d)
-          terms[d] -= coeff
-        else
-          terms[d] = -coeff
         end
 
         if d > max_degree

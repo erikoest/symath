@@ -53,9 +53,14 @@ module Sy
 
     def do_sum(exp)
       one = 1.to_m
-      # Get normalized summands and subtrahends
-      add = exp.summands.map { |e| act(e) }
-      sub = exp.subtrahends.map { |e| act(e) }
+      # Get normalized terms
+      terms = exp.terms.map do |e|
+        if e.is_a?(Sy::Minus)
+          - act(e.argument)
+        else
+          act(e)
+        end
+      end
 
       # Collect equal elements into integer products
       # Vector parts are factorized out
@@ -63,7 +68,7 @@ module Sy
       # Hash: product[vector part][scalar part]
       products = {}
 
-      add.each do |e|
+      terms.each do |e|
         w = e.vector_factors_exp
         if !products.key?(w)
           products[w] = {}
@@ -79,65 +84,30 @@ module Sy
         end
       end
 
-      sub.each do |e|
-        w = e.vector_factors_exp
-        if !products.key?(w)
-          products[w] = {}
-        end
-
-        s = e.scalar_factors_exp
-        c = e.coefficient*e.sign
-        
-        if products[w].key?(s)
-          products[w][s] -= c
-        else
-          products[w][s] = -c
-        end
-      end
-
-      a2 = []
-      s2 = []
+      terms2 = []
 
       products.keys.sort.each do |w|
         # For each vector product, put scalar parts back into a sorted array
-        a3 = []
-        s3 = []
+        terms3 = []
         
         products[w].keys.sort.each do |k|
-          next if products[w][k] == 0
-        
-          if products[w][k] > 0
-            a3.push(products[w][k].to_m.mult(k))
-          elsif products[w][k] < 0
-            s3.push((-products[w][k]).to_m.mult(k))
+          if products[w][k] != 0
+            terms3.push(products[w][k].to_m.mult(k))
           end
         end
 
-        next if a3.length + s3.length == 0
-        
-        if w == one
-          a2 += a3
-          s2 += s3
-        else
-          if a3.length == 0
-            s2.push(s3.inject(:add).mult(w))
-          else
-            p = 0.to_m
-            a3.each { |s| p = p.add(s) }
-            s3.each { |s| p = p.sub(s) }
-            a2.push(p.mult(w))
-          end
-        end
+        next if terms3.empty?
+
+        terms2.push(terms3.inject(:add).mult(w))
       end
 
-      if a2.length + s2.length == 0
+      if terms2.empty?
         return 0.to_m
       end
 
       ret = 0.to_m
 
-      a2.each { |s| ret = ret.add(s) }
-      s2.each { |s| ret = ret.sub(s) }
+      terms2.each { |s| ret = ret.add(s) }
 
       return exp == ret ? nil : ret
     end

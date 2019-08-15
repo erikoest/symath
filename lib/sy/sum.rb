@@ -6,11 +6,11 @@ module Sy
       super('+', [arg1, arg2])
     end
 
-    def summand1()
+    def term1()
       return @args[0]
     end
 
-    def summand2()
+    def term2()
       return @args[1]
     end
     
@@ -19,35 +19,35 @@ module Sy
     end
 
     def is_scalar?()
-      return (summand1.is_scalar? and summand2.is_scalar?)
+      return (term1.is_scalar? and term2.is_scalar?)
     end
     
-    # Return positive summands
-    def summands()
+    # Return all terms in the sum
+    def terms()
       return Enumerator.new do |s|
-        summand1.summands.each { |s1| s << s1 }
-        summand2.summands.each { |s2| s << s2 }
-      end
-    end
-
-    # Return subtrahends 
-    def subtrahends()
-      return Enumerator.new do |s|
-        summand1.subtrahends.each { |s1| s << s1 }
-        summand2.subtrahends.each { |s2| s << s2 }
+        term1.terms.each { |s1| s << s1 }
+        term2.terms.each { |s2| s << s2 }
       end
     end
 
     def type()
-      return summand1.type.sum(summand2.type)
+      return term1.type.sum(term2.type)
     end
     
     def to_s()
-      return @args.map { |a| a.to_s }.join(' + ')
+      if term2.is_a?(Sy::Minus)
+        return term1.to_s + ' ' + term2.to_s
+      else
+        return term1.to_s + ' + ' + term2.to_s
+      end
     end
 
     def to_latex()
-      return @args.map { |a| a.to_latex }.join(' + ')
+      if term2.is_a?(Sy::Minus)
+        return term1.to_latex + ' ' + term2.to_latex
+      else
+        return term1.to_latex + ' + ' + term2.to_latex
+      end
     end
   end
 end

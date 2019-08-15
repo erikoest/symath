@@ -4,7 +4,6 @@ require "sy/parser"
 require 'sy/type'
 require 'sy/function'
 require 'sy/sum'
-require 'sy/subtraction'
 require 'sy/minus'
 require 'sy/product'
 require 'sy/wedge'

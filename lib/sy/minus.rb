@@ -46,12 +46,10 @@ module Sy
       return -argument.sign
     end
     
-    def summands()
-      return argument.subtrahends
-    end
-
-    def subtrahends()
-      return argument.summands
+    def terms()
+      return Enumerator.new do |s|
+        argument.terms.each { |s1| s << s1.minus }
+      end
     end
 
     def type()

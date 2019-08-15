@@ -24,7 +24,7 @@ module Sy
       return sub.nil? ? exp : sub
     end
 
-    def add_summand(sum, fact, divf, c, dc)
+    def add_term(sum, fact, divf, c, dc)
       if !sum.key?(divf)
         sum[divf] = {}
         sum[divf][:fact] = fact
@@ -65,22 +65,12 @@ module Sy
     def do_sum(exp)
       sum = {}
 
-      exp.summands.each do |s|
-        add_summand(
+      exp.terms.each do |s|
+        add_term(
           sum,
           s.scalar_factors.inject(:*),
           s.div_factors.inject(:*),
           s.coefficient,
-          s.div_coefficient,
-        )
-      end
-
-      exp.subtrahends.each do |s|
-        add_summand(
-          sum,
-          s.scalar_factors.inject(:*),
-          s.div_factors.inject(:*),
-          -s.coefficient,
           s.div_coefficient,
         )
       end

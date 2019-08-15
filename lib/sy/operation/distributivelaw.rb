@@ -16,6 +16,15 @@ module Sy
     end
 
     def single_pass(exp)
+      if exp.is_a?(Sy::Minus)
+        acted = act_subexpressions(exp.argument)
+        if acted.nil?
+          return nil
+        else
+          return - acted
+        end
+      end
+      
       if exp.is_a?(Sy::Product)
         if exp.factor1.is_sum_exp? and exp.factor1.arity > 1
           return multiply_right(exp)
@@ -33,14 +42,10 @@ module Sy
       p = exp.factor2
       ret = 0.to_m
 
-      exp.factor1.summands.each do |s|
+      exp.factor1.terms.each do |s|
         ret = ret.add(s.mult(p))
       end
         
-      exp.factor1.subtrahends.each do |s|
-        ret = ret.sub(s.mult(p))
-      end
-
       return ret      
     end
 
@@ -48,14 +53,10 @@ module Sy
       p = exp.factor1
       ret = 0.to_m
 
-      exp.factor2.summands.each do |s|
+      exp.factor2.terms.each do |s|
         ret = ret.add(p.mult(s))
       end
         
-      exp.factor2.subtrahends.each do |s|
-        ret = ret.sub(p.mult(s))
-      end
-
       return ret      
     end
   end

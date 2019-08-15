@@ -289,8 +289,7 @@ module Sy
     
     def do_sum(exp, var)
       ret = 0.to_m
-      exp.summands.each { |s| ret += int(s, var) }
-      exp.subtrahends.each { |s| ret -= int(s, var) }
+      exp.terms.each { |s| ret += int(s, var) }
       return ret
     end
   end
