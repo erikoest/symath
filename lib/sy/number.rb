@@ -21,7 +21,7 @@ module Sy
     end
 
     def type()
-      return type('natural')
+      return :natural.to_t
     end
   end
 end

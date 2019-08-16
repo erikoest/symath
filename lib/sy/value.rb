@@ -243,7 +243,7 @@ module Sy
 
       # -a*-b => a*b
       if o.is_a?(Sy::Minus) and self.is_a?(Sy::Minus)
-        return args[0].mult(o.args[0])
+        return argument.mult(o.argument)
       end
 
       # (-a)*b => -(a*b)

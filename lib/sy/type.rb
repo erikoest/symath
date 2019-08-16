@@ -11,33 +11,33 @@ module Sy
     # types further down.
     @@hierarchy = {
       # Scalar types
-      'scalar' => {
-        'complex' => {
-          'real' => {
-            'rational' => {
-              'integer' => {
-                'natural' => 1
+      :scalar => {
+        :complex => {
+          :real => {
+            :rational => {
+              :integer => {
+                :natural => 1
               }
             }
           },
-          'imaginary' => 1,
+          :imaginary => 1,
         },
       },
       # Vector types (one dimension param)
-      'tensor' => {
-        'nvector' => {
-          'vector' => 1,
+      :tensor => {
+        :nvector => {
+          :vector => 1,
         },
-        'nform' => {
-          'covector' => {
-            'dform' => 1,
+        :nform => {
+          :covector => {
+            :dform => 1,
           }
         },
       },
       # Matrices
-      'matrix' => {
-        'column' => 1,
-        'row' => 1,
+      :matrix => {
+        :column => 1,
+        :row => 1,
       }
     }
 
@@ -61,12 +61,31 @@ module Sy
 
     fill_subtype_hash(@@hierarchy)
 
+    @@types = {}
+
+    def self.types
+      return @@types
+    end
+
     def initialize(name, dimn: nil, dimm: nil, indexes: nil)
-      @name = name
+      @name = name.to_sym
       @dimn = dimn
       @dimm = dimm
       @indexes = indexes
     end
+
+    # Hash of simple types, for faster instansiations.
+    @@types = {
+      :natural   => Sy::Type.new(:natural),
+      :integer   => Sy::Type.new(:integer),
+      :rational  => Sy::Type.new(:rational),
+      :real      => Sy::Type.new(:real),
+      :complex   => Sy::Type.new(:complex),
+      :imaginary => Sy::Type.new(:imaginary),
+      :vector    => Sy::Type.new(:vector, indexes: ['u']),
+      :covector  => Sy::Type.new(:covector, indexes: ['l']),
+      :dform     => Sy::Type.new(:dform, indexes: ['l']),
+    }
 
     # Check if a type is a subtype of another
     def is_subtype?(other)
@@ -74,11 +93,10 @@ module Sy
       other = other.to_t
 
       # Types are not compatible if they have different attributes.
-      # FIXME: What is the correct way to define subtypes of matrices and tensors
-      # with respect to dimensions and indexes?
+      # FIXME: What is the correct way to define subtypes of matrices
+      # with respect to dimensions?
       return false if @dim1 != other.dimn
       return false if @dim2 != other.dimm
-      return false if @indexes != other.indexes
 
       # Same types, 
       return true if @name == other.name
@@ -95,8 +113,8 @@ module Sy
         return self
       elsif is_subtype?(other)
         return other
-      elsif is_subtype?(@@types['complex']) and other.is_subtype?(@@types['complex'])
-        return  @@types['complex']
+      elsif is_subtype?(@@types[:complex]) and other.is_subtype?(@@types[:complex])
+        return  @@types[:complex]
       else
         raise 'No common type for ' + to_s + ' and ' + other.to_s
       end
@@ -117,14 +135,14 @@ module Sy
     # Determine the type of a product
     def product(other)
       scalar = is_scalar?
-      oscalar = other.is_scalar
+      oscalar = other.is_scalar?
       
       if scalar and oscalar
         return common_parent(other)
       elsif scalar
-        return other.type
+        return other
       elsif oscalar
-        return type
+        return self
       elsif is_subtype?('matrix') and
            other.is_subtype?('matrix') and
            dimn == other.dimm
@@ -196,29 +214,12 @@ module Sy
 
     def to_s()
       if !@dimn.nil?
-        return @name + '[' + @dimm + 'x' + @dimm + ']'
-      elsif !@indexes.nil
-        return @name + '[' + @indexes.join('') + ']'
+        return @name.to_s + '[' + @dimm + 'x' + @dimm + ']'
+      elsif !@indexes.nil?
+        return @name.to_s + '[' + @indexes.join('') + ']'
       else
-        return @name
+        return @name.to_s
       end
-    end
-
-    # Hash of simple types, for faster instansiations.
-    @@types = {
-      'natural'   => Sy::Type.new('natural'),
-      'integer'   => Sy::Type.new('integer'),
-      'rational'  => Sy::Type.new('rational'),
-      'real'      => Sy::Type.new('real'),
-      'complex'   => Sy::Type.new('complex'),
-      'imaginary' => Sy::Type.new('imaginary'),
-      'vector'    => Sy::Type.new('vector', indexes: ['u']),
-      'covector'  => Sy::Type.new('covector', indexes: ['l']),
-      'dform'     => Sy::Type.new('dform', indexes: ['l']),
-    }
-
-    def self.types
-      return @@types
     end
 
     def to_t(*args)
@@ -229,8 +230,8 @@ end
 
 class String
   def to_t(*args)
-    if args.nil? and !Sy::Type.types.key?(self)
-      return Sy::Type.types[self]
+    if args.empty? and Sy::Type.types.key?(self.to_sym)
+      return Sy::Type.types[self.to_sym]
     end
 
     return Sy::Type.new(self, *args)
@@ -239,7 +240,7 @@ end
 
 class Symbol
   def to_t(*args)
-    if args.nil? and !Sy::Type.types.key?(self)
+    if args.empty? and Sy::Type.types.key?(self)
       return Sy::Type.types[self]
     end
 

@@ -161,7 +161,7 @@ module Sy
     attr_reader :name
     attr_reader :type
   
-    def initialize(name, t)
+    def initialize(name, t = 'real')
       @name = name
       @type = t.to_t
     end
@@ -234,11 +234,11 @@ module Sy
     # Returns variable which differential is based on
     # TODO: Check name collision with constant symbols (i, e, pi etc.)
     def undiff()
-      return Sy::Variable.new(@name, 'real')
+      return Sy::Variable.new(@name, :real)
     end
     
     def to_diff()
-      return Sy::Variable.new(@name, Sy::Type.new('dform'))
+      return @name.to_m(:dform)
     end
 
     # Return the vector dual of the dform
