@@ -128,6 +128,7 @@ require 'sy/grad'
 require 'sy/curl'
 require 'sy/div'
 require 'sy/laplacian'
+require 'sy/codiff'
 
 def op(name, *args)
   case name.to_s
@@ -153,6 +154,8 @@ def op(name, *args)
     return Sy::Div.new(*args.map { |a| a.to_m })
   when 'laplacian'
     return Sy::Laplacian.new(*args.map { |a| a.to_m })
+  when 'codiff'
+    return Sy::CoDiff.new(*args.map { |a| a.to_m })
   end
 
   return Sy::Operator.new(name, args.map { |a| a.to_m })
