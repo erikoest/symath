@@ -18,8 +18,6 @@ module Sy
 
     grad.each do |from, to|
       it "evaluates '#{from.to_s}' into '#{to}'" do
-        puts n.act(from.evaluate).to_s
-        puts to.to_s
         expect(n.act(from.evaluate)).to be == to
       end
     end

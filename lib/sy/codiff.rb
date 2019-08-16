@@ -12,17 +12,17 @@ module Sy
       vars = Sy.get_variable(:basis.to_m).row(0)
 
       # Calculate the co-differential, defined as:
-      #   (-1)**(n(k - 2) + 1)*d*(F)
+      #   (-1)**(n*k+ 1)*d*(F)
       # n : Dimension of the basis vector space
       # k : Grade of input function F
       n = vars.length
       k = args[0].type.degree
-      sign = (-1)**(n*(k - 2) + 1)
+      sign = (-1)**(n*k + 1)
       return @@actions[:eval].act(sign*op(:hodge, op(:diff, op(:hodge, args[0]), *vars)))
     end
 
     def to_latex()
-      return '\nabla\cdot ' + @args[0].to_latex
+      return '\delta ' + @args[0].to_latex
     end
   end
 end
