@@ -5,9 +5,6 @@ module Sy
   class Poly::Galois < Poly
     attr_reader :p
 
-    # FIXME: Array bracket operators for dup and galois?
-    # Add *, +, -, / operators?
-    
     # Create gl instance from dup or a gl of the same order.
     def initialize(args)
       if args.key?(:dup)
@@ -29,11 +26,9 @@ module Sy
     end
 
     def init_from_dup(dup, p)
-      @arr = dup.arr
+      @arr = dup.arr.map { |t| t % p }
       @p = p
       @var = dup.var
-
-      trunc!
     end
 
     def init_from_gl(gl)
@@ -83,11 +78,6 @@ module Sy
       end
       
       return Sy::Poly::DUP.new({ :arr => ret, :var => @var })
-    end
-
-    def trunc!
-      @arr = @arr.map { |t| t % @p }
-      strip!
     end
 
     def invert(a)
@@ -151,19 +141,19 @@ module Sy
 
         if !ff.zero?
           g = f.gcd(ff)
-          h = f.quo(g)
+          h = f / g
         
           i = 1
         
           while h.arr != [1]
             gg = g.gcd(h)
-            hh = h.quo(gg)
+            hh = h / gg
 
             if hh.degree > 0
               factors << [hh, i*n]
             end
 
-            g = g.quo(gg)
+            g = g / gg
             h = gg
             i += 1
           end
@@ -178,7 +168,7 @@ module Sy
         if !sqf
           d = f.degree/r
 
-          f = new_gl((0..d).map { |i| f.arr[i*r] })
+          f = new_gl((0..d).map { |i| f[i*r] })
           n = n*r
         else
           break
@@ -215,7 +205,7 @@ module Sy
 
       (n - 1).times do
         h = h.frobenius_map(g, b)
-        r = r.mul(h).rem(g)
+        r = (r*h) % g
       end
 
       return r.pow_mod((@p - 1)/2, g)
@@ -234,12 +224,12 @@ module Sy
       if @p < n
         (1..n - 1).each do |i|
           mon = b[i - 1].lshift(@p)
-          b << mon.rem(self)
+          b << mon % self
         end
       elsif n > 1
         b << new_gl([1, 0]).pow_mod(@p, self)
         (2..n - 1).each do |i|
-          b << b[i - 1].mul(b[1]).rem(self)
+          b << (b[i - 1]*b[1]) % self
         end
       end
 
@@ -259,10 +249,10 @@ module Sy
       end
       
       n = f.degree
-      sf = new_gl([f.arr[-1]])
+      sf = new_gl([f[-1]])
 
       (1..n).each do |i|
-        sf = sf.add(b[i].mul_ground(f.arr[n - i]))
+        sf += b[i]*f[n - i]
       end
 
       return sf
@@ -281,13 +271,13 @@ module Sy
 
       while 2*i <= f.degree
         g = g.frobenius_map(f, b)
-        h = f.gcd(g.sub(x))
+        h = f.gcd(g - x)
 
         if h.arr != [1]
           factors << [h, i]
 
-          f = f.quo(h)
-          g = g.rem(f)
+          f = f / h
+          g = g % f
           b = f.frobenius_monomial_base
         end
 
@@ -330,17 +320,17 @@ module Sy
           
           (2**(n*nn - 1)).times do
             r = r.pow_mod(2, self)
-            h = h.add(r)
+            h += r
           end
 
           g = gcd(h)
         else
           h = r.pow_pnm1d2(n, self, b)
-          g = gcd(h.sub_ground(1))
+          g = gcd(h - 1)
         end
         
-        if g.arr != [1] and g.arr != @arr
-          factors = g.edf_zassenhaus(n) + quo(g).edf_zassenhaus(n)
+        if g.arr != [1] and g != self
+          factors = g.edf_zassenhaus(n) + (self / g).edf_zassenhaus(n)
         end
       end
 
@@ -357,77 +347,7 @@ module Sy
       return sort_factors(factors)
     end
 
-    # Sum two polynomials
-    def add(g)
-      ret = @arr.clone
-
-      rd = degree
-      gd = g.degree
-      
-      if gd > rd
-        (gd - rd).times { ret.unshift(0) }
-        rd += gd - rd
-      end
-
-      (0..gd).each do |i|
-        ret[rd - i] = (ret[rd - i] + g.arr[gd - i]) % @p
-      end
-      
-      return new_gl(ret).strip!
-    end
-
-    # Subtract a polynomial from this one
-    def sub(g)
-      ret = @arr.clone
-
-      rd = degree
-      gd = g.degree
-
-      if gd > rd
-        (gd - rd).times { ret.unshift(0) }
-        rd += gd - rd
-      end
-
-      (0..gd).each do |i|
-        ret[rd - i] = (ret[rd - i] - g.arr[gd - i]) % @p
-      end
-      
-      return new_gl(ret).strip!
-    end
-
-    # Return the negative of the polynomial
-    def neg()
-      return new_dup(@arr.map { |t| -t % @p })
-    end
-    
-    def mul(g)
-      df = degree
-      dg = g.degree
-
-      dh = df + dg
-      if dh > 0
-        h = [0]*(dh + 1)
-      else
-        h = []
-      end
-
-      (0..dh).each do |i|
-        coeff = 0
-
-        a = [0, i - dg].max
-        b = [i, df].min
-        (a..b).each do |j|
-          coeff += @arr[j]*g.arr[i - j]
-        end
-
-        h[i] = coeff % p
-      end
-
-      ret = new_gl(h)
-      ret.strip!
-      return ret
-    end
-    
+    # Extended gcd for two polynomials
     def gcdex(g)
       assert_order(g)
 
@@ -461,33 +381,17 @@ module Sy
 
         inv = invert(c)
 
-        s = s0.sub(s1.mul(qq))
-        t = t0.sub(t1.mul(qq))
+        s = s0 - s1*qq
+        t = t0 - t1*qq
 
         s0 = s1
-        s1 = s.mul_ground(inv)
+        s1 = s*inv
 
         t0 = t1
-        t1 = t.mul_ground(inv)
+        t1 = t*inv
       end
 
       return [s1, t1, r1]
-    end
-
-    def add_ground(a)
-      return add(new_gl([a]))
-    end
-
-    def sub_ground(a)
-      return sub(new_gl([a]))
-    end
-    
-    def mul_ground(a)
-      if a == 0
-        return zero
-      else
-        return new_gl(@arr.map { |e| a*e % @p})
-      end
     end
 
     # Divide coefficients by lc
@@ -498,132 +402,6 @@ module Sy
 
       c = lc
       return [c, mul_ground(invert(c))]
-    end
-
-    def lshift(n)
-      if zero?
-        return zero
-      else
-        return new_gl(@arr + [0]*n)
-      end
-    end
-    
-    def pow_mod(n, g)
-      if n == 0
-        return one
-      elsif n == 1
-        return rem(g)
-      elsif n == 2
-        return sqr.rem(g)
-      end
-
-      f = self
-      h = one
-
-      while true
-        if n.odd?
-          h = h.mul(f).rem(g)
-          n -= 1
-        end
-
-        n >>= 1
-
-        if n == 0
-          break
-        end
-
-        f = f.sqr.rem(g)
-      end
-
-      return h
-    end
-
-    def sqr()
-      d = degree
-      dh = 2*d
-      h = []
-
-      (0..dh).each do |i|
-        coeff = 0
-
-        jmin = [0, i - d].max
-        jmax = [i, d].min
-
-        n = jmax - jmin + 1
-        jmax = jmin + n/2 - 1
-
-        (jmin..jmax).each do |j|
-          coeff += @arr[j]*@arr[i - j]
-        end
-
-        coeff += coeff
-
-        if n.odd?
-          elem = @arr[jmax + 1]
-          coeff += elem**2
-        end
-
-        h << coeff % @p
-      end
-
-      return new_gl(h).strip!
-    end
-
-    # Compute exact quotient
-    def quo(g)
-      return div(g)[0]
-    end
-
-    def rem(f)
-      return div(f)[1]
-    end
-
-    def div(g)
-      assert_order(g)
-
-      df = degree
-      dg = g.degree
-
-      if g.zero?
-        raise 'Division by zero'
-      elsif df < dg
-        return [zero, self.clone]
-      end
-
-      inv = invert(g.arr[0])
-
-      h = @arr.clone
-      dq = df - dg
-      dr = dg - 1
-
-      (0..df).each do |i|
-        coeff = h[i]
-
-        a = [0, dg - i].max
-        b = [df - i, dr].min
-        (a..b).each do |j|
-          coeff -= h[i + j - dg]*g.arr[dg - j]
-        end
-
-        if i <= dq
-          coeff *= inv
-        end
-
-        h[i] = coeff % @p
-      end
-
-      return [new_gl(h[0..dq]), new_gl(h[dq + 1..-1]).strip!]
-    end
-
-    # Return true if f is square free
-    def sqf?()
-      (x, f) = monic
-
-      if f.zero?
-        return true
-      else
-        return f.gcd(f.diff).arr == [1]
-      end
     end
 
     def diff()
@@ -646,6 +424,218 @@ module Sy
       return f.monic[1]
     end    
 
+    def pow_mod(n, g)
+      if n == 0
+        return one
+      elsif n == 1
+        return self % g
+      elsif n == 2
+        return self**2 % g
+      end
+
+      f = self
+      h = one
+
+      while true
+        if n.odd?
+          h = (h*f) % g
+          n -= 1
+        end
+
+        n >>= 1
+
+        if n == 0
+          break
+        end
+
+        f = f**2 % g
+      end
+
+      return h
+    end
+
+    # Return true if f is square free
+    def sqf?()
+      (x, f) = monic
+
+      if f.zero?
+        return true
+      else
+        return f.gcd(f.diff).arr == [1]
+      end
+    end
+
+    # Sum two polynomials
+    def add(g)
+      ret = @arr.clone
+
+      rd = degree
+      gd = g.degree
+      
+      if gd > rd
+        (gd - rd).times { ret.unshift(0) }
+        rd += gd - rd
+      end
+
+      (0..gd).each do |i|
+        ret[rd - i] = (ret[rd - i] + g[gd - i]) % @p
+      end
+      
+      return new_gl(ret).strip!
+    end
+
+    # Subtract a polynomial from this one
+    def sub(g)
+      ret = @arr.clone
+
+      rd = degree
+      gd = g.degree
+
+      if gd > rd
+        (gd - rd).times { ret.unshift(0) }
+        rd += gd - rd
+      end
+
+      (0..gd).each do |i|
+        ret[rd - i] = (ret[rd - i] - g[gd - i]) % @p
+      end
+      
+      return new_gl(ret).strip!
+    end
+
+    def add_ground(a)
+      return add(new_gl([a]))
+    end
+
+    def sub_ground(a)
+      return sub(new_gl([a]))
+    end
+    
+    # Return the negative of the polynomial
+    def neg()
+      return new_dup(@arr.map { |t| -t % @p })
+    end
+    
+    def mul(g)
+      df = degree
+      dg = g.degree
+
+      dh = df + dg
+      if dh > 0
+        h = [0]*(dh + 1)
+      else
+        h = []
+      end
+
+      (0..dh).each do |i|
+        coeff = 0
+
+        a = [0, i - dg].max
+        b = [i, df].min
+        (a..b).each do |j|
+          coeff += self[j]*g[i - j]
+        end
+
+        h[i] = coeff % p
+      end
+
+      ret = new_gl(h)
+      ret.strip!
+      return ret
+    end
+    
+    def mul_ground(a)
+      if a == 0
+        return zero
+      else
+        return new_gl(@arr.map { |e| a*e % @p})
+      end
+    end
+
+    def sqr()
+      d = degree
+      dh = 2*d
+      h = []
+
+      (0..dh).each do |i|
+        coeff = 0
+
+        jmin = [0, i - d].max
+        jmax = [i, d].min
+
+        n = jmax - jmin + 1
+        jmax = jmin + n/2 - 1
+
+        (jmin..jmax).each do |j|
+          coeff += self[j]*self[i - j]
+        end
+
+        coeff += coeff
+
+        if n.odd?
+          elem = self[jmax + 1]
+          coeff += elem**2
+        end
+
+        h << coeff % @p
+      end
+
+      return new_gl(h).strip!
+    end
+
+    def quo(g)
+      return div(g)[0]
+    end
+
+    def rem(f)
+      return div(f)[1]
+    end
+
+    def div(g)
+      assert_order(g)
+
+      df = degree
+      dg = g.degree
+
+      if g.zero?
+        raise 'Division by zero'
+      elsif df < dg
+        return [zero, self.clone]
+      end
+
+      inv = invert(g[0])
+
+      h = @arr.clone
+      dq = df - dg
+      dr = dg - 1
+
+      (0..df).each do |i|
+        coeff = h[i]
+
+        a = [0, dg - i].max
+        b = [df - i, dr].min
+        (a..b).each do |j|
+          coeff -= h[i + j - dg]*g[dg - j]
+        end
+
+        if i <= dq
+          coeff *= inv
+        end
+
+        h[i] = coeff % @p
+      end
+
+      return [new_gl(h[0..dq]), new_gl(h[dq + 1..-1]).strip!]
+    end
+
+    def lshift(n)
+      if zero?
+        return zero
+      else
+        return new_gl(@arr + [0]*n)
+      end
+    end
+    
     def to_s()
       return @arr.to_s + '/' + @p.to_s
     end

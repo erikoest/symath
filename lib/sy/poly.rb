@@ -62,6 +62,76 @@ module Sy
         [a[0].degree, a[1], a[0].arr] <=> [b[0].degree, b[1], b[0].arr]
       end
     end
+
+    def +(other)
+      if other.is_a?(self.class)
+        return add(other)
+      elsif other.is_a?(Integer)
+        return add_ground(other)
+      else
+        raise 'Cannot add ' + other.to_s
+      end
+    end
+
+    def -(other)
+      if other.is_a?(self.class)
+        return sub(other)
+      elsif other.is_a?(Integer)
+        return sub_ground(other)
+      else
+        raise 'Cannot subtract ' + other.to_s
+      end
+    end
+
+    def -@()
+      return neg
+    end
+
+    def *(other)
+      if other.is_a?(self.class)
+        return mul(other)
+      elsif other.is_a?(Integer)
+        return mul_ground(other)
+      else
+        raise 'Cannot multiply with ' + other.to_s
+      end
+    end
+
+    def /(other)
+      if other.is_a?(self.class)
+        return quo(other)
+      elsif other.is_a?(Integer)
+        return quo_ground(other)
+      else
+        raise 'Cannot divide by ' + other.to_s
+      end
+    end    
+    
+    def %(other)
+      if other.is_a?(self.class)
+        return rem(other)
+      elsif other.is_a?(Integer)
+        return trunc(other)
+      else
+        raise 'Cannot divide modulo ' + other.to_s
+      end
+    end
+
+    def **(other)
+      if other.is_a?(Integer) and other == 2
+        return sqr
+      else
+        raise 'Cannot raise to the power of ' + other.to_s
+      end
+    end
+    
+    def [](i)
+      return arr[i]
+    end
+
+    def ==(other)
+      return (self.class == other.class and @arr == other.arr)
+    end  
     
     # Returns leading coefficient (i.e coefficient of the biggest power)
     def lc()
