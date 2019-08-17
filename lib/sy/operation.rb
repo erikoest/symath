@@ -30,7 +30,7 @@ module Sy
       end
 
       if exp.is_a?(Sy::Minus)
-        return act(exp.args[0]).minus
+        return -act(exp.argument)
       end
       
       # Do operation on each argument

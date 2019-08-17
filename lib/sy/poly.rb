@@ -23,7 +23,7 @@ module Sy
           a = @var**(d - i)
         end
 
-        exp = exp.add(@arr[i].to_m.mult(a))
+        exp += @arr[i].to_m*a
       end
 
       return exp

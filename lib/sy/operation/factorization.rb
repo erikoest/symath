@@ -19,7 +19,7 @@ module Sy
       
       ret = factors[1].map do |f|
         if f[1] != 1
-          f[0].to_m**f[1]
+          f[0].to_m.power(f[1])
         else
           f[0].to_m
         end
@@ -29,7 +29,7 @@ module Sy
         ret.unshift(factors[0].to_m)
       end
 
-      return ret.inject(:*)
+      return ret.inject(:mul)
     end
   end
 end

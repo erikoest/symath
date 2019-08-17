@@ -49,13 +49,13 @@ module Sy
       if fact.nil?
         fact = c.to_m
       elsif c > 1
-        fact *= c.to_m
+        fact = fact.mul(c.to_m)
       end
 
       if s[:fact].nil?
-        fact += s[:c].to_m if s[:c] > 1
+        fact = fact.add(s[:c].to_m) if s[:c] > 1
       else
-        fact += s[:c] > 1 ? s[:c].to_m*s[:fact] : s[:fact]
+        fact = fact.add(s[:c] > 1 ? s[:c].to_m*s[:fact] : s[:fact])
       end
 
       s[:fact] = fact
@@ -68,8 +68,8 @@ module Sy
       exp.terms.each do |s|
         add_term(
           sum,
-          s.scalar_factors.inject(:*),
-          s.div_factors.inject(:*),
+          s.scalar_factors.inject(:mul),
+          s.div_factors.inject(:mul),
           s.coefficient,
           s.div_coefficient,
         )
@@ -82,23 +82,23 @@ module Sy
         if s[:c] > 1
           # TODO: Distribute the product over the sum, rather than applying it
           # over it.
-          r = s[:c].to_m*s[:fact]
+          r = s[:c].to_m.mul(s[:fact])
         else
           r = s[:fact]
         end
 
         if divf.nil?
-          r = r/s[:dc] if s[:dc] > 1
+          r = r.div(s[:dc]) if s[:dc] > 1
         elsif s[:dc] > 1
-          r = r/(s[:dc].to_m*divf)
+          r = r.div(s[:dc].to_m*divf)
         else
-          r = r/divf
+          r = r.div(divf)
         end
 
         if ret.nil?
           ret = r
         else
-          ret = ret + r
+          ret = ret.add(r)
         end
 
         return ret

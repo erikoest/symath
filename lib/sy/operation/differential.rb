@@ -121,7 +121,7 @@ module Sy
         # exp2 is a sum and must be expanded.
         ret = 0.to_m
         exp2.terms.each do |s|
-          ret = ret.add(expand_left(exp1, s))
+          ret += expand_left(exp1, s)
         end
 
         return ret
@@ -129,11 +129,11 @@ module Sy
         # Not a sum. Just multiply. If any of the expressions are scalar,
         # we can do with a scalar multiplication.
         if exp1.is_scalar?
-          return exp1.mult(exp2)
+          return exp1*exp2
         end
 
         if exp2.is_scalar?
-          return exp2.mult(exp1)
+          return exp2*exp1
         end
 
         # Both expressions are vectors and must be joined with a wedge operator
@@ -145,7 +145,7 @@ module Sy
     def expand_left(exp1, exp2)
       if exp1.is_scalar? and exp2.is_scalar?
         # Both parts are scalar. Just multiply.
-        return exp1.mult(exp2)
+        return exp1*exp2
       end
 
       if exp1.is_scalar?
@@ -162,27 +162,26 @@ module Sy
       ret = 0.to_m
 
       exp1.terms.each do |s|
-        ret = ret.add(expand_right(s, exp2))
+        ret += expand_right(s, exp2)
       end
 
       return ret
     end
 
-    # Apply wedge product or ordinary product between two expressions, depending
-    # on whether or not they have vector parts.
+    # Apply wedge product or ordinary product between two expressions,
+    # depending on whether or not they have vector parts.
     def wedge(exp1, exp2)
-      # Take out the divisor from both exp1 and exp2, then expand left and right side
-      # and put back the divisor in the end.
-      c = exp1.coefficient.to_m.mult(exp2.coefficient.to_m).mult(
-        exp1.sign).mult(exp2.sign)
-      d = (exp1.div_factors.to_a + exp2.div_factors.to_a).inject(:mult) || 1.to_m
+      # Take out the divisor from both exp1 and exp2, then expand left and
+      # right side and put back the divisor in the end.
+      c = exp1.coefficient.to_m*exp2.coefficient.to_m*exp1.sign*exp2.sign
+      d = (exp1.div_factors.to_a + exp2.div_factors.to_a).inject(:*) || 1.to_m
 
-      s1 = (exp1.scalar_factors.inject(:mult) || 1.to_m).mult(
-        exp1.vector_factors.inject(:wedge) || 1.to_m)
-      s2 = (exp2.scalar_factors.inject(:mult) || 1.to_m).mult(
-        exp2.vector_factors.inject(:wedge) || 1.to_m)
+      s1 = (exp1.scalar_factors.inject(:*) || 1.to_m)*(
+            exp1.vector_factors.inject(:^) || 1.to_m)
+      s2 = (exp2.scalar_factors.inject(:*) || 1.to_m)*(
+            exp2.vector_factors.inject(:^) || 1.to_m)
       s3 = expand_left(s1, s2)
-      return c.mult(s3).div(d)
+      return c*s3/d
     end
   end
 end

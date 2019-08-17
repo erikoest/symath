@@ -24,7 +24,7 @@ module Sy
 
     sums.each do |from, to|
       it "combines '#{from.to_s}' to '#{to}'" do
-        expect(n.act(op(:combfrac, from).evaluate)).to be == to
+        expect(n.act(op(:combfrac, from).evaluate)).to be_equal_to to
       end
     end
   end

@@ -126,52 +126,52 @@ module Sy
     end
     
     ##
-    # Overridden math operators
-    # These operators are purely compositional. No reductions are performed.
+    # Compositional math operator methods. No reductions are performed.
     ##
-    def +(other)
+    def add(other)
       return Sy::Sum.new(self, other.to_m)
     end
 
-    def -(other)
+    def sub(other)
       return Sy::Sum.new(self, Sy::Minus.new(other.to_m))
     end
 
-    def -@()
+    def neg()
       return Sy::Minus.new(self)
     end
 
-    def *(other)
+    def mul(other)
       return Sy::Product.new(self, other.to_m)
     end
 
-    def /(other)
+    def div(other)
       return Sy::Fraction.new(self, other.to_m)
     end
     
-    def **(other)
+    def power(other)
       return Sy::Power.new(self, other.to_m)
     end
 
-    def ^(other)
+    def wedge(other)
       return Sy::Wedge.new(self, other.to_m)
     end
 
     ##
-    # Math operations with simple reductions.
+    # Overridden object operators.
+    # These operations do some simple reductions.
     ##
-    def add(other)
+    def +(other)
       o = other.to_m
       return self if o == 0
       return o if self == 0
 
       # Is this really a subtraction
       if o.is_a?(Sy::Minus)
-        return sub(o.args[0])
+        return self - o.argument
       end
 
       if self.is_a?(Sy::Minus)
-        return o.sub(self.args[0])
+        return o - self.argument
       end
       
       s = scalar_factors_exp
@@ -180,60 +180,60 @@ module Sy
         w == o.vector_factors_exp
         ret = (coefficient + o.coefficient).to_m
         if s != 1.to_m
-          ret.mult(s)
+          ret *= s
         end
 
         if w != 1.to_m
-          ret *= w
+          ret = ret.mul(w)
         end
         
         return ret
       end
 
-      return self + o
+      return self.add(o)
     end
 
-    def sub(other)
+    def -(other)
       o = other.to_m
       return self if o == 0
-      return o.minus if self == 0
+      return -o if self == 0
 
       # Is this really an addition?
       if o.is_a?(Sy::Minus)
-        return self.add(o.args[0])
+        return self + o.argument
       end
       
       s = scalar_factors_exp
       w = vector_factors_exp
 
-      if s == other.scalar_factors_exp and
-        w == other.vector_factors_exp        
-        ret = (coefficient - other.coefficient).to_m
+      if s == o.scalar_factors_exp and
+        w == o.vector_factors_exp        
+        ret = (coefficient - o.coefficient).to_m
         return 0.to_m if ret == 0
         if s != 1.to_m
-          ret.mult(s)
+          ret = ret.mul(s)
         end
 
         if w != 1.to_m
-          ret *= w
+          ret = ret.mul(w)
         end
 
         return ret
       end
 
-      return self - o
+      return self.sub(o)
     end
-    
-    def minus()
+
+    def -@()
       if self.is_a?(Sy::Minus)
         # - - a => a
-        return self.args[0]
+        return self.argument
       else
-        return - self
+        return self.neg
       end
     end
 
-    def mult(other)
+    def *(other)
       o = other.to_m
 
       # First try some simple reductions
@@ -243,73 +243,76 @@ module Sy
 
       # -a*-b => a*b
       if o.is_a?(Sy::Minus) and self.is_a?(Sy::Minus)
-        return argument.mult(o.argument)
+        return argument*o.argument
       end
 
       # (-a)*b => -(a*b)
       # a*(-b) => -(a*b)
-      return self.mult(o.args[0]).minus if o.is_a?(Sy::Minus)
-      return self.args[0].mult(o).minus if self.is_a?(Sy::Minus)
+      return -(self*o.argument) if o.is_a?(Sy::Minus)
+      return -(self.argument*o) if self.is_a?(Sy::Minus)
       
       if o.is_a?(Sy::Matrix)
-        return o.mult(self)
+        return o*self
       end
       
-      if base == o.base
-        return base ** (exponent.add(o.exponent))
-      end
-
-      if self.is_a?(Sy::Fraction) and dividend == 1.to_m
-        return o / divisor
-      end
-
-      if o.is_a?(Sy::Fraction) and o.dividend == 1.to_m
-        return self / o.divisor
-      end
-      
-      return self * o
-    end
-
-    def div(other)
-      o = other.to_m
-      return self if o == 1
-
-      if self.is_a?(Sy::Fraction)
-        return dividend / (divisor * o)
-      end
-      
-      return self / o
-    end
-
-    def power(other)
-      o = other.to_m
-      if self.is_a?(Sy::Power)
-        return self.base.power(self.exponent.mult(o))
-      end
-
-      return self**o
-    end
-    
-    def wedge(other)
-      o = other.to_m
-      return self if o == 1
-      return o if self == 1
-
-      # FIXME: Reduce to 0 if the expressions have a common vector
-
       if base == o.base
         return base ** (exponent + o.exponent)
       end
 
+      # (1/a)*other => other/a
       if self.is_a?(Sy::Fraction) and dividend == 1.to_m
-        return o / divisor
+        return o/divisor
       end
 
+      # self*(1/a) => self*/a
       if o.is_a?(Sy::Fraction) and o.dividend == 1.to_m
-        return self / o.divisor
+        return self/o.divisor
       end
       
-      return self ^ o
+      return self.mul(o)
+    end
+
+    def /(other)
+      o = other.to_m
+      return self if o == 1
+
+      if self.is_a?(Sy::Fraction)
+        return dividend.div(divisor*o)
+      end
+      
+      return self.div(o)
+    end
+
+    def **(other)
+      o = other.to_m
+      if self.is_a?(Sy::Power)
+        return self.base**(self.exponent*o)
+      end
+
+      return self.power(o)
+    end
+
+    def ^(other)
+      o = other.to_m
+      return self if o == 1
+      return o if self == 1
+
+      w = vector_factors_exp
+      ow = o.vector_factors_exp
+
+      if ow == 1
+        # Ordinary multiplication
+        return self*o
+      else
+        # Other is a vector. If self is a product, assume vector part
+        # is in the second argument, and apply the wedge to it.
+        # Hack!
+        if self.is_a?(Sy::Product) and !self.is_a?(Sy::Wedge)
+          return factor1*(factor2^o)
+        else
+          return self.wedge(o)
+        end
+      end
     end
 
     ##
@@ -368,16 +371,16 @@ module Sy
     def scalar_factors_exp()
       ret = 1.to_m
       scalar_factors.each do |f|
-        ret = ret.mult(f)
+        ret *= f
       end
 
       d = div_coefficient.to_m
       div_factors.each do |f|
-        d = d.mult(f)
+        d *= f
       end
       
       if d != 1.to_m
-        ret /= d
+        ret= ret.div(d)
       end
       
       return ret
@@ -385,7 +388,7 @@ module Sy
 
     # Return vector factors as an expression
     def vector_factors_exp()
-      w = vector_factors.inject(:^)
+      w = vector_factors.inject(:wedge)
       if (w.nil?)
         return 1.to_m
       else
@@ -426,10 +429,6 @@ module Sy
     
     alias eql? ==
 
-    def to_str()
-      return to_s
-    end
-
     def to_m()
       return self
     end
@@ -439,7 +438,6 @@ end
 class Integer
   alias_method :super_add, :+
   alias_method :super_sub, :-
-  alias_method :super_min, :-@
   alias_method :super_mul, :*
   alias_method :super_div, :/
   alias_method :super_pow, :**
@@ -463,7 +461,7 @@ class Integer
 
   def *(other)
     if other.class.method_defined?(:to_m) and !other.is_a?(Integer)
-      return self.to_m * other.to_m
+      return self.to_m*other.to_m
     else
       return self.super_mul(other)
     end
@@ -471,7 +469,7 @@ class Integer
 
   def /(other)
     if other.class.method_defined?(:to_m) and !other.is_a?(Integer)
-      return self.to_m / other.to_m
+      return self.to_m/other.to_m
     else
       return self.super_div(other)
     end
@@ -479,7 +477,7 @@ class Integer
 
   def **(other)
     if other.class.method_defined?(:to_m)  and !other.is_a?(Integer)
-      return self.to_m ** other.to_m
+      return self.to_m**other.to_m
     else
       return self.super_pow(other)
     end
@@ -487,7 +485,7 @@ class Integer
 
   def ^(other)
     if other.class.method_defined?(:to_m)  and !other.is_a?(Integer)
-      return self.to_m ^ other.to_m
+      return self.to_m^other.to_m
     else
       return self.super_wedge(other)
     end
@@ -517,7 +515,7 @@ class Symbol
 
   def *(other)
     if other.class.method_defined?(:to_m)
-      return self.to_m * other.to_m
+      return self.to_m*other.to_m
     else
       return super(other)
     end
@@ -525,7 +523,7 @@ class Symbol
 
   def /(other)
     if other.class.method_defined?(:to_m)
-      return self.to_m / other.to_m
+      return self.to_m/other.to_m
     else
       return super(other)
     end
@@ -533,7 +531,7 @@ class Symbol
 
   def **(other)
     if other.class.method_defined?(:to_m)
-      return self.to_m ** other.to_m
+      return self.to_m**other.to_m
     else
       return super(other)
     end
@@ -541,7 +539,7 @@ class Symbol
 
   def ^(other)
     if other.class.method_defined?(:to_m)
-      return self.to_m ^ other.to_m
+      return self.to_m^other.to_m
     else
       return super(other)
     end

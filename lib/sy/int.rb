@@ -39,7 +39,7 @@ module Sy
     def to_s()
       ret = @name.to_s + '(' + @args.map { |a| a.to_s }.join(',')
       if !@var.nil?
-        ret += ',' + @var
+        ret += ',' + @var.to_s
       end
 
       if !@a.nil?

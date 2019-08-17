@@ -48,10 +48,10 @@ module Sy
       return @ncols == @nrows
     end
 
-    def mult(other)
+    def *(other)
       if !other.is_a?(Sy::Matrix)
-        data = (0..@nrows-1).map do |r|
-          (0..@ncols-1).map { |c| self[r, c].mult(other) }
+        data = (0..@nrows - 1).map do |r|
+          (0..@ncols - 1).map { |c| self[r, c]*other }
         end
 
         return Sy::Matrix.new(data)
@@ -59,45 +59,45 @@ module Sy
       
       raise 'Invalid dimensions' if @ncols != other.nrows
 
-      data = (0..@nrows-1).map do |r|
-        (0..other.ncols-1).map do |c|
-          (0..@ncols-1).map do |c2|
-            self[r, c2].mult(other[c2, c])
-          end.inject(:add) 
+      data = (0..@nrows - 1).map do |r|
+        (0..other.ncols - 1).map do |c|
+          (0..@ncols - 1).map do |c2|
+            self[r, c2]*other[c2, c]
+          end.inject(:+) 
         end
       end
 
       return Sy::Matrix.new(data)
     end
 
-    def div(other)
+    def /(other)
       raise 'Cannot divide matrix by matrix' if other.is_a?(Sy::Matrix)
 
-      data = (0..@nrows-1).map do |r|
-        (0..@ncols-1).map { |c| self[r, c].div(other) }
+      data = (0..@nrows - 1).map do |r|
+        (0..@ncols - 1).map { |c| self[r, c]/other }
       end
 
       return Sy::Matrix.new(data)
     end
 
-    def add(other)
+    def +(other)
       raise 'Invalid dimensions' if @ncols != other.ncols or @nrows != other.nrows
 
-      data = (0..@nrows-1).map do |r|
-        (0..@ncols-1).map do |c|
-          self[r, c].add(other[r, c])
+      data = (0..@nrows - 1).map do |r|
+        (0..@ncols - 1).map do |c|
+          self[r, c] + other[r, c]
         end
       end
 
       return Sy::Matrix.new(data)
     end
 
-    def sub(other)
+    def -(other)
       raise 'Invalid dimensions' if @ncols != other.ncols or @nrows != other.nrows
 
-      data = (0..@nrows-1).map do |r|
-        (0..@ncols-1).map do |c|
-          self[r, c].sub(other[r, c])
+      data = (0..@nrows - 1).map do |r|
+        (0..@ncols - 1).map do |c|
+          self[r, c] - other[r, c]
         end
       end
 
@@ -111,13 +111,13 @@ module Sy
     def inverse()
       raise 'Matrix is not square' if !is_square?
 
-      return adjugate.div(determinant)
+      return adjugate/determinant
     end
 
     # The adjugate of a matrix is the transpose of the cofactor matrix
     def adjugate()
-      data = (0..@ncols-1).map do |c|
-        (0..@nrows-1).map { |r| cofactor(r, c) }
+      data = (0..@ncols - 1).map do |c|
+        (0..@nrows - 1).map { |r| cofactor(r, c) }
       end
 
       return Sy::Matrix.new(data)
@@ -126,7 +126,7 @@ module Sy
     def determinant()
       raise 'Matrix is not square' if !is_square?
       
-      return minor((0..@nrows-1).to_a, (0..@ncols-1).to_a)
+      return minor((0..@nrows - 1).to_a, (0..@ncols - 1).to_a)
     end
 
     # The minor is the determinant of a submatrix. The submatrix is given by the rows and cols
@@ -149,9 +149,9 @@ module Sy
       cols.each do |c|
         subcols = cols - [c]
         if (sign > 0)
-          ret = ret.add(self[rows[0], c].mult(minor(subrows, subcols)))
+          ret += self[rows[0], c]*minor(subrows, subcols)
         else
-          ret = ret.sub(self[rows[0], c].mult(minor(subrows, subcols)))
+          ret -= self[rows[0], c]*minor(subrows, subcols)
         end
 
         sign *= -1
@@ -164,15 +164,15 @@ module Sy
     # element, multiplied by a sign factor which alternates for each row and column
     def cofactor(r, c)
       sign = (-1)**(r + c)
-      rows = (0..@nrows-1).to_a - [r]
-      cols = (0..@ncols-1).to_a - [c]
+      rows = (0..@nrows - 1).to_a - [r]
+      cols = (0..@ncols - 1).to_a - [c]
       return minor(rows, cols)*sign.to_m
     end
     
     def trace()
       raise 'Matrix is not square' if !is_square?
       
-      return (0..@nrows-1).map { |i| self[i, i] }.inject(:add)
+      return (0..@nrows - 1).map { |i| self[i, i] }.inject(:+)
     end
     
     def ==(other)
@@ -181,8 +181,8 @@ module Sy
       return false if nrows != other.nrows
       return false if ncols != other.ncols
 
-      (0..@nrows-1).each do |r|
-        (0..@ncols-1).each do |c|
+      (0..@nrows - 1).each do |r|
+        (0..@ncols - 1).each do |c|
           return false if self[r, c] != other[r, c]
         end
       end

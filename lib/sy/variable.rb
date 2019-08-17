@@ -88,8 +88,8 @@ module Sy
           dform = p.map { |i| brow[i].name.to_m('dform') }.inject(:^)
           vect = p.map { |i| brow[i].name.to_m('vector') }.inject(:^)
 
-          dnorm = sign.mult(norm.map { |i| brow[i].name.to_m('dform') }.inject(:^))
-          vnorm = sign.mult(norm.map { |i| brow[i].name.to_m('vector') }.inject(:^))
+          dnorm = sign*(norm.map { |i| brow[i].name.to_m('dform') }.inject(:^))
+          vnorm = sign*(norm.map { |i| brow[i].name.to_m('vector') }.inject(:^))
 
           @@norm_map[dform] = dnorm
           @@norm_map[vect] = vnorm
@@ -99,11 +99,11 @@ module Sy
           dsign = permutation_parity(p + dual)
           
           if dual.length == 0
-            hdd = sign.mult(1.to_m)
-            hdv = sign.mult(1.to_m)
+            hdd = sign
+            hdv = sign
           else
-            hdd = sign.mult(dsign.mult(dual.map { |i| brow[i].name.to_m('dform') }.inject(:^)))
-            hdv = sign.mult(dsign.mult(dual.map { |i| brow[i].name.to_m('vector') }.inject(:^)))
+            hdd = sign*dsign*(dual.map { |i| brow[i].name.to_m('dform') }.inject(:^))
+            hdv = sign*dsign*(dual.map { |i| brow[i].name.to_m('vector') }.inject(:^))
           end
 
           @@hodge_map[dform] = hdd
@@ -115,8 +115,8 @@ module Sy
       v = brow.map { |bb| bb.name.to_m('vector') }
       d = brow.map { |bb| bb.name.to_m('dform') }
 
-      flat = g.mult(Sy::Matrix.new(d).transpose).normalize.col(0)
-      sharp = g.inverse.mult(Sy::Matrix.new(v).transpose).normalize.col(0)
+      flat = (g*Sy::Matrix.new(d).transpose).normalize.col(0)
+      sharp = (g.inverse*Sy::Matrix.new(v).transpose).normalize.col(0)
 
       @@flat_map = (0..dim-1).map { |i| [v[i], flat[i]] }.to_h
       @@sharp_map = (0..dim-1).map { |i| [d[i], sharp[i]] }.to_h
@@ -145,7 +145,7 @@ module Sy
       sorted = vectors.sort      
       sign = permutation_parity(sorted.map { |v| vhash[v] })
 
-      return  sign.to_m.mult(sorted.inject(:^))
+      return  sign.to_m*sorted.inject(:^)
     end
 
     # Return the hodge dual of an expression consisting only of basis vectors or basis

@@ -50,7 +50,7 @@ module Sy
 
     def do_constant(exp, var)
       # c => c*x
-      return exp*var.undiff
+      return exp.mul(var.undiff)
     end
     
     def do_product(exp, var)
@@ -106,8 +106,8 @@ module Sy
     end
 
     def do_inv(exp, var)
-      # Hack: integrate 1/exp (but by convention of the sibling functions, it should
-      # have integrated exp)
+      # Hack: integrate 1/exp (but by convention of the sibling functions,
+      # it should have integrated exp)
       xp = exp.exponent
       vu = var.undiff
       vset = [vu].to_set
@@ -126,6 +126,7 @@ module Sy
     end
 
     # Anti-derivatives of simple functions with one variable
+    # FIXME: Clean up formulas
     @@functions = {
       # Logarithm
       :ln  => :a.to_m*fn(:ln, :a.to_m) - :a.to_m,

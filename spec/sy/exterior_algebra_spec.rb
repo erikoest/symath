@@ -18,7 +18,7 @@ module Sy
 
     grad.each do |from, to|
       it "evaluates '#{from.to_s}' into '#{to}'" do
-        expect(n.act(from.evaluate)).to be == to
+        expect(n.act(from.evaluate)).to be_equal_to to
       end
     end
   end
@@ -30,7 +30,7 @@ module Sy
 
     curl.each do |from, to|
       it "evaluates '#{from.to_s}' into '#{to}'" do
-        expect(n.act(from.evaluate)).to be == to
+        expect(n.act(from.evaluate)).to be_equal_to to
       end
     end
   end
@@ -42,7 +42,7 @@ module Sy
 
     div.each do |from, to|
       it "evaluates '#{from.to_s}' into '#{to}'" do
-        expect(n.act(from.evaluate)).to be == to
+        expect(n.act(from.evaluate)).to be_equal_to to
       end
     end
   end
@@ -54,7 +54,7 @@ module Sy
     
     div.each do |from, to|
       it "evaluates '#{from.to_s}' into '#{to}'" do
-        expect(n.act(from.evaluate)).to be == to
+        expect(n.act(from.evaluate)).to be_equal_to to
       end
     end
   end

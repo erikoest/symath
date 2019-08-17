@@ -17,7 +17,7 @@ module Sy
         c = exp.coefficient.to_m
         dc = exp.div_coefficient.to_m
         h = Sy::Variable.hodge_dual(exp.vector_factors_exp)
-        return exp.sign.to_m.mult(c.mult(s).div(dc)).mult(h)
+        return exp.sign.to_m*c*s*h/dc
       end
     end
   end

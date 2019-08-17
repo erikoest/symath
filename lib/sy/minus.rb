@@ -48,7 +48,7 @@ module Sy
     
     def terms()
       return Enumerator.new do |s|
-        argument.terms.each { |s1| s << s1.minus }
+        argument.terms.each { |s1| s << s1.neg }
       end
     end
 
@@ -61,7 +61,11 @@ module Sy
     end
     
     def to_s()
-      return '- ' + argument.to_s
+      if argument.is_a?(Sy::Sum)
+        return '- (' + argument.to_s + ')'
+      else
+        return '- ' + argument.to_s
+      end
     end
 
     def to_latex()

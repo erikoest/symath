@@ -29,7 +29,7 @@ end
 class Integer
   def to_m()
     if self < 0
-      return -Sy::Number.new(-self)
+      return Sy::Number.new(-self).neg
     else
       return Sy::Number.new(self)
     end

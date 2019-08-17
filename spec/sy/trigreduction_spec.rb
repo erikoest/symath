@@ -23,7 +23,7 @@ module Sy
 
     exp.each do |from, to|
       it "reduces '#{from.to_s}' to '#{to}'" do
-        expect(op(:trigreduct, from).evaluate).to be == to
+        expect(op(:trigreduct, from).evaluate).to be_equal_to to
       end
     end
   end

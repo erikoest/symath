@@ -17,47 +17,44 @@ module Sy
 
     def single_pass(exp)
       if exp.is_a?(Sy::Minus)
-        acted = act_subexpressions(exp.argument)
-        if acted.nil?
+        acted = act(exp.argument)
+        if acted == exp.argument
           return nil
         else
-          return - acted
+          return -acted
         end
+      end
+
+      if exp.is_a?(Sy::Product)
+        if (exp.factor1.is_sum_exp? and exp.factor1.arity > 1) or
+          (exp.factor2.is_sum_exp? and exp.factor2.arity > 1)
+          return expand(exp.factor1, exp.factor2)
+        end
+      end
+
+      return nil
+    end
+
+    def expand(exp1, exp2)
+      if exp1.is_sum_exp? and exp1.arity > 1
+        ret = 0.to_m
+        
+        exp1.terms.each do |t|
+          ret += expand(t, exp2)
+        end
+        return ret
       end
       
-      if exp.is_a?(Sy::Product)
-        if exp.factor1.is_sum_exp? and exp.factor1.arity > 1
-          return multiply_right(exp)
-        elsif exp.factor2.is_sum_exp? and exp.factor2.arity > 1
-          return multiply_left(exp)
+      if exp2.is_sum_exp? and exp2.arity > 1
+        ret = 0.to_m
+
+        exp2.terms.each do |t|
+          ret += expand(exp1, t)
         end
+        return ret
       end
 
-      if exp.is_sum_exp?
-        return act_subexpressions(exp)
-      end
-    end
-
-    def multiply_right(exp)
-      p = exp.factor2
-      ret = 0.to_m
-
-      exp.factor1.terms.each do |s|
-        ret = ret.add(s.mult(p))
-      end
-        
-      return ret      
-    end
-
-    def multiply_left(exp)
-      p = exp.factor1
-      ret = 0.to_m
-
-      exp.factor2.terms.each do |s|
-        ret = ret.add(p.mult(s))
-      end
-        
-      return ret      
+      return exp1*exp2
     end
   end
 end

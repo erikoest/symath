@@ -11,3 +11,15 @@ RSpec.configure do |config|
     c.syntax = :expect
   end
 end
+
+RSpec::Matchers.define :be_equal_to do |expected|
+  match do |actual|
+    actual == expected
+  end
+  failure_message do |actual|
+    "expected: #{expected.to_s}\ngot:      #{actual.to_s}"
+  end
+  failure_message_when_negated do |actual|
+    "expected: #{expected.to_s}\ngot:      #{actual.to_s}"
+  end
+end

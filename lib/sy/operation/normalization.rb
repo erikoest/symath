@@ -6,8 +6,8 @@ module Sy
   #   equal arguments of a product are contracted to integer powers
   #   arguments of a product are sorted
 
-  #   equal arguments of a sum (with subtractions) are contracted to integer products
-  #   arguments in a sum are sorted
+  #   equal arguments of a sum (with subtractions) are contracted to integer
+  #   products arguments in a sum are sorted
   #   subtractive elements are put after the additive elements
 
   #   vector parts are factorized out of sums
@@ -56,7 +56,7 @@ module Sy
       # Get normalized terms
       terms = exp.terms.map do |e|
         if e.is_a?(Sy::Minus)
-          - act(e.argument)
+          act(e.argument).neg
         else
           act(e)
         end
@@ -92,13 +92,13 @@ module Sy
         
         products[w].keys.sort.each do |k|
           if products[w][k] != 0
-            terms3.push(products[w][k].to_m.mult(k))
+            terms3.push(products[w][k].to_m*k)
           end
         end
 
         next if terms3.empty?
 
-        terms2.push(terms3.inject(:add).mult(w))
+        terms2.push(terms3.inject(:+)*w)
       end
 
       if terms2.empty?
@@ -107,7 +107,7 @@ module Sy
 
       ret = 0.to_m
 
-      terms2.each { |s| ret = ret.add(s) }
+      terms2.each { |s| ret += s }
 
       return exp == ret ? nil : ret
     end
@@ -183,9 +183,9 @@ module Sy
         elsif powers[k] == -1
           d2.push(k)
         elsif powers[k] > 0
-          p2.push(k**(powers[k].to_m))
+          p2.push(k.power(powers[k].to_m))
         elsif powers[k] < 0
-          d2.push(k**((-powers[k]).to_m))
+          d2.push(k.power((-powers[k]).to_m))
         end
       end
 
@@ -194,7 +194,7 @@ module Sy
       end
 
       if p2.length > 0
-        ret = p2.inject(:*)
+        ret = p2.inject(:mul)
       else
         ret = 1.to_m
       end
@@ -204,13 +204,13 @@ module Sy
       end
 
       if d2.length > 0
-        ret = ret / d2.inject(:*)
+        ret = ret.div(d2.inject(:mul))
       end
 
-      ret = ret.mult(Sy::Variable.normalize_vectors(exp.vector_factors.to_a))
+      ret *= Sy::Variable.normalize_vectors(exp.vector_factors.to_a)
 
       if (s < 0)
-        ret = -ret
+        ret = ret.neg
       end
 
       return exp == ret ? nil : ret
@@ -221,8 +221,8 @@ module Sy
       expo = act(exp.exponent)
 
       if base.is_a?(Sy::Number)
-        if expo.is_a?(Sy::Minus) and expo.args[0].is_a?(Sy::Number)
-          return (1.to_m/(base.value ** expo.args[0].value)).to_m
+        if expo.is_a?(Sy::Minus) and expo.argument.is_a?(Sy::Number)
+          return (1.to_m.div(base.value ** expo.argument.value)).to_m
         end
         if expo.is_a?(Sy::Number)
           return (base.value ** expo.value).to_m
@@ -230,10 +230,10 @@ module Sy
       end
 
       if base.is_a?(Sy::Power)
-        return base.base.power(base.exponent * expo)
+        return base.base.power(base.exponent.mul(expo))
       end
 
-      ret = base ** expo
+      ret = base.power(expo)
 
       return exp == ret ? nil : ret
     end
