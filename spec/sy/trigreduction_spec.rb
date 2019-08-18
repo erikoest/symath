@@ -22,8 +22,8 @@ module Sy
     }
 
     exp.each do |from, to|
-      it "reduces '#{from.to_s}' to '#{to}'" do
-        expect(op(:trigreduct, from).evaluate).to be_equal_to to
+      it "reduces '#{from.to_s}' to '#{to.to_s}'" do
+        expect(from.trig_reduct).to be_equal_to to
       end
     end
   end

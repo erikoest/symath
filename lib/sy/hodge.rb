@@ -9,7 +9,7 @@ module Sy
 
     def evaluate()
       # Must normalize input, operation depends on factorized vectors
-      return @@actions[:hodge].act(@@actions[:norm].act(*args))
+      return args[0].normalize.hodge
     end
     
     def to_latex()

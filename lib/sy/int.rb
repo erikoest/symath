@@ -29,10 +29,10 @@ module Sy
 
     def evaluate()
       if a.nil?
-        return @@actions[:int].act(*args, var) + :C.to_m
+        return args[0].anti_derivative(var) + :C.to_m
       else
-        int = @@actions[:int].act(*args, var)
-        return op(:bounds, int, var.undiff, a, b)
+        int = args[0].anti_derivative(var)
+        return op(:bounds, var.undiff, a, b)
       end
     end
     

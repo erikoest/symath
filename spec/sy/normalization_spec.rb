@@ -34,8 +34,8 @@ module Sy
     }
 
     sums.each do |from, to|
-      it "normalizes '#{from.to_s}' to '#{to}'" do
-        expect(op(:norm, from).evaluate).to be_equal_to to
+      it "normalizes '#{from.to_s}' to '#{to.to_s}'" do
+        expect(from.normalize).to be_equal_to to
       end
     end
   end
@@ -59,8 +59,8 @@ module Sy
     }
 
     products.each do |from, to|
-      it "normalizes '#{from.to_s}' to '#{to}'" do
-        expect(op(:norm, from).evaluate).to be_equal_to to
+      it "normalizes '#{from.to_s}' to '#{to.to_s}'" do
+        expect(from.normalize).to be_equal_to to
       end
     end
   end
@@ -74,8 +74,8 @@ module Sy
     }
 
     powers.each do |from, to|
-      it "normalizes '#{from.to_s}' to '#{to}'" do
-        expect(op(:norm, from).evaluate).to be_equal_to to
+      it "normalizes '#{from.to_s}' to '#{to.to_s}'" do
+        expect(from.normalize).to be_equal_to to
       end
     end
   end
@@ -97,8 +97,8 @@ module Sy
     }
 
     wedges.each do |from, to|
-      it "normalizes '#{from.to_s}' to '#{to}'" do
-        expect(op(:norm, from).evaluate).to be_equal_to to
+      it "normalizes '#{from.to_s}' to '#{to.to_s}'" do
+        expect(from.normalize).to be_equal_to to
       end
     end
   end

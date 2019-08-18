@@ -201,6 +201,11 @@ module Sy
       return @name.to_s <=> other.name.to_s
     end
 
+    # Variables do not evaluate to anything
+    def has_action?
+      return false
+    end
+
     def is_scalar?()
       return type.is_scalar?()
     end

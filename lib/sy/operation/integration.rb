@@ -1,130 +1,19 @@
 require 'sy/operation'
 require 'set'
 
-module Sy
+module Sy::Operation::Integration
   class IntegrationError < StandardError
   end
   
-  class Operation::Integration < Operation
-    # Calculate some simple indefinite integrals (anti derivatives)
-    # NB: This operation is home made and extermely limited. It should be
-    # replaced with some of the known integration algorithm
-    def description
-      return 'Calculate indefinite integral'
-    end
+  # This operation provides methods for calculating some simple indefinite
+  # integrals (anti derivatives), and definite integrals from the boundaries
+  # of the anti-derivatives.
+  # NB: The algorithm is home made and extermely limited. It should be
+  # replaced with some of the known integration algorithm
 
-    def act(exp, var)
-      begin
-        return int(exp, var)
-      rescue IntegrationError => e
-        puts e.to_s
-#        puts e.backtrace.join("\n")
-      end
+  @@functions = {}
 
-      # Expression is not an integral, or the integration
-      # routine failed.
-      return
-    end
-    
-    def int(exp, var)
-      raise 'Var is not a differential' if !var.is_diff?
-
-      if exp.is_constant?([var.undiff].to_set)
-        return do_constant(exp, var)
-      end
-      
-      if exp.is_sum_exp?
-        return do_sum(exp, var)
-      end
-
-      if exp.is_prod_exp?
-        return do_product(exp, var)
-      end
-
-      return do_other(exp, var)
-    end
-
-    def failure(exp)
-      raise Sy::IntegrationError, 'Cannot find an antiderivative for expression ' + exp.to_s
-    end
-
-    def do_constant(exp, var)
-      # c => c*x
-      return exp.mul(var.undiff)
-    end
-    
-    def do_product(exp, var)
-      vu = var.undiff
-      vset = [vu].to_set
-
-      divc = exp.div_coefficient.to_m
-      diva = []
-
-      exp.div_factors.each do |d|
-        if d.is_constant?(vset)
-          divc *= d
-        else
-          diva.push(d)
-        end
-      end
-
-      prodc = exp.coefficient.to_m
-      proda = []
-
-      exp.scalar_factors.each do |f|
-        if f.is_constant?(vset)
-          prodc *= f
-        else
-          proda.push(f)
-        end
-      end
-
-      # We don't know how to integrate vectors
-      exp.vector_factors.each do |v|
-        failure(exp)
-      end
-
-      if exp.sign < 0
-        prodc -= prodc
-      end
-
-      prodc /= divc
-      
-      if proda.length + diva.length == 0
-        failure(exp)
-      end
-
-      if proda.length == 0 and diva.length == 1
-        return prodc*do_inv(diva[0], var)
-      end
-      
-      if proda.length == 1 and diva.length == 0
-        return prodc*do_other(proda[0], var)
-      end
-
-      failure(exp)
-    end
-
-    def do_inv(exp, var)
-      # Hack: integrate 1/exp (but by convention of the sibling functions,
-      # it should have integrated exp)
-      xp = exp.exponent
-      vu = var.undiff
-      vset = [vu].to_set
-      
-      if exp.base == vu and xp.is_constant?(vset)
-        if xp == 1.to_m
-          # 1/x => ln|x|
-          return fn(:ln, fn(:abs, vu))
-        else
-          # 1/x**n => x**(1 - n)/(1 - n)
-          return vu**(1.to_m - xp)/(1.to_m - xp)
-        end
-      end
-
-      failure(1.to_m/exp)
-    end
-
+  def self.initialize()
     # Anti-derivatives of simple functions with one variable
     # FIXME: Clean up formulas
     @@functions = {
@@ -140,10 +29,14 @@ module Sy
       # Inverse trigonometric functions
       :arcsin => :a.to_m*fn(:arcsin, :a.to_m) + fn(:sqrt, 1.to_m - :a.to_m**2),
       :arccos => :a.to_m*fn(:arccos, :a.to_m) - fn(:sqrt, 1.to_m - :a.to_m**2),
-      :arctan => :a.to_m*fn(:arctan, :a.to_m) - fn(:ln, fn(:abs, 1.to_m + :a.to_m**2))/2,
-      :arccot => :a.to_m*fn(:arccot, :a.to_m) + fn(:ln, fn(:abs, 1.to_m + :a.to_m**2))/2,
-      :arcsec => :a.to_m*fn(:arcsec, :a.to_m) - fn(:ln, fn(:abs, 1.to_m + fn(:sqrt, 1.to_m - :a.to_m**-2))),
-      :arccsc => :a.to_m*fn(:arccsc, :a.to_m) + fn(:ln, fn(:abs, 1.to_m + fn(:sqrt, 1.to_m - :a.to_m**-2))),
+      :arctan => :a.to_m*fn(:arctan, :a.to_m) -
+                 fn(:ln, fn(:abs, 1.to_m + :a.to_m**2))/2,
+      :arccot => :a.to_m*fn(:arccot, :a.to_m) +
+                 fn(:ln, fn(:abs, 1.to_m + :a.to_m**2))/2,
+      :arcsec => :a.to_m*fn(:arcsec, :a.to_m) -
+                 fn(:ln, fn(:abs, 1.to_m + fn(:sqrt, 1.to_m - :a.to_m**-2))),
+      :arccsc => :a.to_m*fn(:arccsc, :a.to_m) +
+                 fn(:ln, fn(:abs, 1.to_m + fn(:sqrt, 1.to_m - :a.to_m**-2))),
       # Hyperbolic functions
       :sinh => fn(:cosh, :a.to_m),
       :cosh => fn(:sinh, :a.to_m),
@@ -159,139 +52,256 @@ module Sy
       :arsech => :a.to_m*fn(:arsech, :a.to_m) + fn(:arcsin, :a.to_m),
       :arcsch => :a.to_m*fn(:arcsch, :a.to_m) + fn(:abs, fn(:arsinh, :a.to_m)),
     }
-
-    def do_function(exp, var)
-      vu = var.undiff
-      vset = [vu].to_set
-      arg = exp.args[0]
-
-      # Split exp into a constant part and (hopefully) a single factor
-      # which equals to var
-      divc = arg.div_coefficient.to_m
-
-      # We expect all divisor factors to be constant with respect to var
-      arg.div_factors.each do |d|
-        if !d.is_constant?(vset)
-          failure(exp)
-        end
-        divc *= d
+  end
+  
+  def anti_derivative(var)
+    begin
+      raise 'Var is not a differential' if !var.is_diff?
+    
+      if is_constant?([var.undiff].to_set)
+        return int_constant(var)
+      end
+    
+      if is_sum_exp?
+        return int_sum(var)
       end
 
-      prodc = arg.coefficient.to_m
-      has_var = false
+      if is_prod_exp?
+        return int_product(var)
+      end
 
-      arg.scalar_factors.each do |f|
-        # Constant factor with respect to var
+      return int_other(var)
+    rescue IntegrationError => e
+      puts e.to_s
+      # puts e.backtrace.join("\n")
+    end
+
+    # Expression is not an integral, or the integration
+    # routine failed.
+    return
+  end
+    
+  def int_failure()
+    raise Sy::IntegrationError, 'Cannot find an antiderivative for expression ' + to_s
+  end
+
+  def int_constant(var)
+    # c => c*x
+    return mul(var.undiff)
+  end
+    
+  def int_product(var)
+    vu = var.undiff
+    vset = [vu].to_set
+    
+    divc = div_coefficient.to_m
+    diva = []
+
+    div_factors.each do |d|
+      if d.is_constant?(vset)
+        divc *= d
+      else
+        diva.push(d)
+      end
+    end
+
+    prodc = coefficient.to_m
+    proda = []
+
+    scalar_factors.each do |f|
+      if f.is_constant?(vset)
+        prodc *= f
+      else
+        proda.push(f)
+      end
+    end
+
+    # We don't know how to integrate vectors
+    vector_factors.each do |v|
+      int_failure
+    end
+
+    if sign < 0
+      prodc -= prodc
+    end
+
+    prodc /= divc
+      
+    if proda.length + diva.length == 0
+      int_failure
+    end
+
+    if proda.length == 0 and diva.length == 1
+      return prodc*diva[0].int_inv(var)
+    end
+      
+    if proda.length == 1 and diva.length == 0
+      return prodc*proda[0].int_other(var)
+    end
+
+    int_failure
+  end
+
+  def int_inv(var)
+    # Hack: integrate 1/exp (but by convention of the sibling functions,
+    # it should have integrated exp)
+    xp = exponent
+    vu = var.undiff
+    vset = [vu].to_set
+    
+    if base == vu and xp.is_constant?(vset)
+      if xp == 1.to_m
+        # 1/x => ln|x|
+        return fn(:ln, fn(:abs, vu))
+      else
+        # 1/x**n => x**(1 - n)/(1 - n)
+        return vu**(1.to_m - xp)/(1.to_m - xp)
+      end
+    end
+
+    (1.to_m/self).int_failure
+  end
+
+  def int_function(var)
+    vu = var.undiff
+    vset = [vu].to_set
+    arg = args[0]
+    
+    # Split exp into a constant part and (hopefully) a single factor
+    # which equals to var
+    divc = arg.div_coefficient.to_m
+
+    # We expect all divisor factors to be constant with respect to var
+    arg.div_factors.each do |d|
+      if !d.is_constant?(vset)
+        int_failure
+      end
+      divc *= d
+    end
+
+    prodc = arg.coefficient.to_m
+    has_var = false
+
+    arg.scalar_factors.each do |f|
+      # Constant factor with respect to var
+      if f.is_constant?(vset)
+        prodc *= f
+        next
+      end
+
+      # Found more than one var
+      if has_var
+        int_failure
+      end
+      
+      # Factor is var. Remember it, but continue to examine the other factors.
+      if f == vu
+        has_var = true
+        next
+      end
+
+      # Factor is a function of var. Too difficult for us to integrate
+      int_failure
+    end
+
+    # We don't know how to integrate vectors
+    arg.vector_factors.each do |v|
+      int_failure
+    end
+
+    if arg.sign < 0
+      prodc -= prodc
+    end
+
+    # Calculate divc as the inverse of the constant part of the function arg
+    divc /= prodc
+
+    # int(func(n*x)) -> Func(n*x)/n
+    fexp = @@functions[name.to_sym].deep_clone
+    fexp.replace({ :a.to_m =>  arg })
+    return divc*fexp
+  end
+
+  def int_other(var)
+    # At this point, exp should not be a constant, a sum or a product.
+    vu = var.undiff
+    vset = [vu].to_set
+
+    if is_a?(Sy::Function) and @@functions.key?(name.to_sym)
+      return int_function(var)
+    end
+
+    b = base
+    xp = exponent
+
+    if b == vu
+      if !xp.is_constant?(vset)
+        # Cannot integrate x**f(x)
+        int_failure
+      end
+
+      # x**n => x**(n + 1)/(n + 1)
+      return vu**(xp + 1)/(xp + 1)
+    end
+
+    # Check exponential functions
+    if b.is_constant?(vset)
+      # FIXME: Should consider moving this code out to the value class
+      # We could extend the coefficient methods to include an optional
+      # variable set, and return the part of the expression which is
+      # constant with respect to the set.
+      divc = xp.div_coefficient.to_m
+        
+      xp.div_factors.each do |d|
+        if d.is_constant?(vset)
+          divc *= d
+        else
+          int_failure
+        end
+      end
+
+      prodc = xp.coefficient.to_m
+      proda = []
+      
+      xp.scalar_factors.each do |f|
         if f.is_constant?(vset)
           prodc *= f
-          next
+        elsif f == vu
+          proda.push(f)
+        else
+          int_failure
         end
-
-        # Found more than one var
-        if has_var
-          failure(exp)
-        end
-
-        # Factor is var. Remember it, but continue to examine the other factors.
-        if f == vu
-          has_var = true
-          next
-        end
-
-        # Factor is a function of var. Too difficult for us to integrate
-        failure(exp)
       end
 
-      # We don't know how to integrate vectors
-      arg.vector_factors.each do |v|
-        failure(exp)
-      end
-
-      if arg.sign < 0
+      if xp.sign < 0
         prodc -= prodc
       end
 
-      # Calculate divc as the inverse of the constant part of the function arg
-      divc /= prodc
-
-      # int(func(n*x)) -> Func(n*x)/n
-      fexp = @@functions[exp.name.to_sym].deep_clone
-      fexp.replace({ :a.to_m =>  arg })
-      return divc*fexp
-    end
-
-    def do_other(exp, var)
-      # At this point, exp should not be a constant, a sum or a product.
-      vu = var.undiff
-      vset = [vu].to_set
-
-      if exp.is_a?(Sy::Function) and @@functions.key?(exp.name.to_sym)
-        return do_function(exp, var)
+      if (proda.length != 1)
+        int_failure
       end
 
-      b = exp.base
-      xp = exp.exponent
-
-      if b == vu
-        if !xp.is_constant?(vset)
-          # Cannot integrate x**f(x)
-          failure(exp)
-        end
-
-        # x**n => x**(n + 1)/(n + 1)
-        return vu**(xp + 1)/(xp + 1)
-      end
-
-      # Check exponential functions
-      if b.is_constant?(vset)
-        # FIXME: Should consider moving this code out to the value class
-        # We could extend the coefficient methods to include an optional
-        # variable set, and return the part of the expression which is
-        # constant with respect to the set.
-        divc = xp.div_coefficient.to_m
+      prodc /= divc
         
-        xp.div_factors.each do |d|
-          if d.is_constant?(vset)
-            divc *= d
-          else
-            failure(exp)
-          end
-        end
-
-        prodc = xp.coefficient.to_m
-        proda = []
-      
-        xp.scalar_factors.each do |f|
-          if f.is_constant?(vset)
-            prodc *= f
-          elsif f == vu
-            proda.push(f)
-          else
-            failure(exp)
-          end
-        end
-
-        if xp.sign < 0
-          prodc -= prodc
-        end
-
-        if (proda.length != 1)
-          failure(exp)
-        end
-
-        prodc /= divc
-        
-        # a**(b*x) => a**(b*x)/(b*ln(a))
-        return b**(prodc*vu)/(prodc*fn(:ln, b))
-      end
-      
-      failure(exp)
+      # a**(b*x) => a**(b*x)/(b*ln(a))
+      return b**(prodc*vu)/(prodc*fn(:ln, b))
     end
+      
+    int_failure
+  end
     
-    def do_sum(exp, var)
-      ret = 0.to_m
-      exp.terms.each { |s| ret += int(s, var) }
-      return ret
-    end
+  def int_sum(var)
+    ret = 0.to_m
+    terms.each { |s| ret += s.anti_derivative(var) }
+    return ret
+  end
+
+  # This method calculates the difference of two boundary values of an
+  # expression (typically used for calculating the definite integral from
+  # the anti-derivative, using the fundamental theorem of calculus)
+  def integral_bounds(var, a, b)
+    bexp = deep_clone.replace({ var =>  b })
+    aexp = deep_clone.replace({ var =>  a })
+    return bexp - aexp
   end
 end

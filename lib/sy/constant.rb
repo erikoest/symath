@@ -6,6 +6,10 @@ module Sy
       super(name, [])
     end
 
+    def has_action?
+      return false
+    end
+    
     def to_s()
       return @name.to_s
     end

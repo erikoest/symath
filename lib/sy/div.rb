@@ -16,7 +16,7 @@ module Sy
       vars = Sy.get_variable(:basis.to_m).row(0)
 
       # Div is defined as *d*(Fb)
-      return @@actions[:eval].act(op(:hodge, op(:diff, op(:hodge, op(:lower, args[0])), *vars)))
+      return op(:hodge, op(:diff, op(:hodge, op(:lower, args[0])), *vars)).eval
     end
 
     def to_latex()

@@ -1,23 +1,20 @@
 require 'sy/operation'
 
-module Sy
-  class Operation::Evaluation < Operation
-    def description
-      return 'Evaluate an operator or function'
+module Sy::Operation::Evaluation
+  # This operation provides the method eval which evaluates operators
+  # and formulaic functions in the expression.
+  
+  def eval()
+    res = deep_clone
+    
+    # Recurse down operator arguments
+    res = res.act_subexpressions('eval')
+    res = deep_clone if res.nil?
+
+    if res.is_a?(Sy::Operator) and has_action?
+      res = res.evaluate
     end
 
-    def act(exp)
-      res = exp.deep_clone
-
-      # Recurse down operator arguments
-      res = act_subexpressions(res)
-      res = exp if res.nil?
-
-      if res.is_a?(Sy::Operator) and res.has_action?
-        res = res.evaluate
-      end
-
-      return res
-    end
+    return res
   end
 end

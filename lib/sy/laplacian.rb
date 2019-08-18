@@ -12,7 +12,7 @@ module Sy
       vars = Sy.get_variable(:basis.to_m).row(0)
       
       # The laplacian is defined as *d*dF
-      return @@actions[:eval].act(op(:hodge, op(:diff, op(:hodge, op(:diff, args[0], *vars)), *vars)))
+      return op(:hodge, op(:diff, op(:hodge, op(:diff, args[0], *vars)), *vars)).eval
     end
 
     def to_latex()

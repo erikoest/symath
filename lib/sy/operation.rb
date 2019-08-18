@@ -1,84 +1,42 @@
-module Sy
-  class Operation
-    def description
-      return '(no operation)'
+module Sy::Operation
+  def iterate(method)
+    result = deep_clone
+
+    while true
+      pass = result.send(method)
+      break if pass.nil?
+      result = pass
     end
 
-    def result_is_normal?
-      return false
-    end
-    
-    def iterate(exp)
-      result = exp.deep_clone
-
-      while true
-        pass = self.single_pass(result)
-        break if pass.nil?
-        result = pass
-      end
-
-      return result
-    end
-
-    def act_subexpressions(exp)
-      if exp.is_a?(Sy::Constant)
-        return
-      end
-      
-      if exp.is_a?(Sy::Variable)
-        return
-      end
-
-      if exp.is_a?(Sy::Minus)
-        return -act(exp.argument)
-      end
-      
-      # Do operation on each argument
-      newargs = exp.args.map { |a| act(a) }
-
-      if newargs == exp.args
-        return
-      end
-      
-      exp.args = newargs
-      return exp
-    end
+    return result
   end
-end
 
-require 'sy/operation/normalization'
-require 'sy/operation/trigreduction'
-require 'sy/operation/differential'
-require 'sy/operation/integration'
-require 'sy/operation/distributivelaw'
-require 'sy/operation/combinefractions'
-require 'sy/operation/bounds'
-require 'sy/operation/evaluation'
-require 'sy/operation/raise'
-require 'sy/operation/lower'
-require 'sy/operation/hodge'
-require 'sy/operation/factorization'
+  def act_subexpressions(method)
+    if is_a?(Sy::Constant)
+      return
+    end
+      
+    if is_a?(Sy::Variable)
+      return
+    end
 
-module Sy
-  class Value
-    @@actions = {
-      # Evaluation operation
-      :eval       => Sy::Operation::Evaluation.new,
-      # Expression rewriting
-      :trigreduct => Sy::Operation::TrigReduction.new,
-      :norm       => Sy::Operation::Normalization.new,
-      :dist       => Sy::Operation::DistributiveLaw.new,
-      :combfrac   => Sy::Operation::CombineFractions.new,
-      # Derivation/integration
-      :diff       => Sy::Operation::Differential.new,
-      :int        => Sy::Operation::Integration.new,
-      :bounds     => Sy::Operation::Bounds.new,
-      # Exterior algebra
-      :raise      => Sy::Operation::Raise.new,
-      :lower      => Sy::Operation::Lower.new,
-      :hodge      => Sy::Operation::Hodge.new,
-    }
+    if is_a?(Sy::Minus)
+      return -argument.send(method)
+    end
 
-    @@builtin_operators = @@actions.keys.to_set
+    puts "subexpressions"
+    puts self.to_s
+    # Call method on each argument
+    newargs = args.map { |a| a.send(method) }
+    puts newargs.map { |a| a.to_s }.to_s
+
+    if newargs == args
+      return
+    end
+
+    ret = self.deep_clone
+    ret.args = newargs
+    
+    return ret
   end
 end

@@ -11,14 +11,11 @@ module Sy
     end
 
     def has_action?()
-      return @@actions.key?(@name.to_sym)
+      return true
     end
-
+    
     def evaluate()
-      if has_action?
-        return @@actions[@name.to_sym].act(*args)
-      end
-
+      # Custom defined operators
       o = Sy.get_operator(self.name.to_sym)
       if !o.nil?
         d = o[:definition]

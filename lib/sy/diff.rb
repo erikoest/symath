@@ -26,7 +26,7 @@ module Sy
     end
 
     def evaluate()
-      return @@actions[:diff].act(*args, @vars)
+      return args[0].diff(@vars)
     end
 
     def to_latex()

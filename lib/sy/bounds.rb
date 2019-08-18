@@ -22,7 +22,7 @@ module Sy
     end
 
     def evaluate()
-      return @@actions[:bounds].act(*args, var, a, b)
+      return args[0].integral_bounds(var, a, b)
     end
 
     def to_s()

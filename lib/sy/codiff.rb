@@ -18,7 +18,7 @@ module Sy
       n = vars.length
       k = args[0].type.degree
       sign = (-1)**(n*k + 1)
-      return @@actions[:eval].act(sign*op(:hodge, op(:diff, op(:hodge, args[0]), *vars)))
+      return sign*op(:hodge, op(:diff, op(:hodge, args[0]), *vars)).eval
     end
 
     def to_latex()

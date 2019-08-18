@@ -19,7 +19,6 @@ require 'sy/diff'
 require 'sy/poly'
 require 'sy/poly/dup'
 require 'sy/poly/galois'
-require 'sy/operation'
 require 'sy/path'
 
 module Sy
@@ -188,4 +187,7 @@ module Sy
 
   # Calculate basis vectors on startup
   Sy::Variable.recalc_basis_vectors
+  Sy::Operation::Differential.initialize()
+  Sy::Operation::Integration.initialize()
+  Sy::Operation::TrigReduction.initialize()
 end

@@ -1,6 +1,23 @@
 
+require 'sy/operation'
+require 'sy/operation/evaluation'
+require 'sy/operation/normalization'
+require 'sy/operation/distributivelaw'
+require 'sy/operation/differential'
+require 'sy/operation/integration'
+require 'sy/operation/exterior'
+require 'sy/operation/trigreduction'
+
 module Sy
   class Value
+    include Operation::Evaluation
+    include Operation::Normalization
+    include Operation::DistributiveLaw
+    include Operation::TrigReduction
+    include Operation::Differential
+    include Operation::Integration
+    include Operation::Exterior
+    
     def deep_clone()
       return Marshal.load(Marshal.dump(self))
     end
@@ -423,10 +440,6 @@ module Sy
       return 'scalar'.to_t
     end
 
-    def normalize()
-      return @@actions[:norm].act(self)
-    end
-    
     alias eql? ==
 
     def to_m()
@@ -545,3 +558,4 @@ class Symbol
     end
   end
 end
+

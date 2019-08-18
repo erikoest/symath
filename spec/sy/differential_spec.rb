@@ -2,8 +2,6 @@ require 'spec_helper'
 require 'sy'
 
 module Sy
-  n = Sy::Operation::Normalization.new
-
   x = :x
   dx = :x.to_m('dform')
   y = :y
@@ -18,8 +16,8 @@ module Sy
     }
 
     poly.each do |from, to|
-      it "differentiates '#{from.to_s}' into '#{to}'" do
-        expect(n.act(from.evaluate)).to be_equal_to to
+      it "differentiates '#{from.to_s}' into '#{to.to_s}'" do
+        expect(from.evaluate.normalize).to be_equal_to to
       end
     end
   end
@@ -31,8 +29,8 @@ module Sy
     }
 
     exp.each do |from, to|
-      it "differentiates '#{from.to_s}' into '#{to}'" do
-        expect(n.act(from.evaluate)).to be_equal_to to
+      it "differentiates '#{from.to_s}' into '#{to.to_s}'" do
+        expect(from.evaluate.normalize).to be_equal_to to
       end
     end
   end
