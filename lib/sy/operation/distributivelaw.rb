@@ -16,7 +16,7 @@ module Sy::Operation::DistributiveLaw
     if is_a?(Sy::Minus)
       acted = argument.expand
       if acted == argument
-        return nil
+        return
       else
         return -acted
       end
@@ -29,7 +29,7 @@ module Sy::Operation::DistributiveLaw
       end
     end
 
-    return nil
+    return
   end
 
   def expand_recurse(exp1, exp2)

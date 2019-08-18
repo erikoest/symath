@@ -24,11 +24,8 @@ module Sy::Operation
       return -argument.send(method)
     end
 
-    puts "subexpressions"
-    puts self.to_s
     # Call method on each argument
     newargs = args.map { |a| a.send(method) }
-    puts newargs.map { |a| a.to_s }.to_s
 
     if newargs == args
       return

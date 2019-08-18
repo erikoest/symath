@@ -5,10 +5,6 @@ module Sy
   class Operator < Value
     attr_reader :name
     attr_accessor :args
-    
-    def self.builtin_operators()
-      return @@builtin_operators
-    end
 
     def has_action?()
       return true
@@ -16,7 +12,7 @@ module Sy
     
     def evaluate()
       # Custom defined operators
-      o = Sy.get_operator(self.name.to_sym)
+      o = Sy.get_operator(name.to_sym)
       if !o.nil?
         d = o[:definition]
         res = o[:expression].deep_clone

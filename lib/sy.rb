@@ -187,7 +187,10 @@ module Sy
 
   # Calculate basis vectors on startup
   Sy::Variable.recalc_basis_vectors
-  Sy::Operation::Differential.initialize()
-  Sy::Operation::Integration.initialize()
-  Sy::Operation::TrigReduction.initialize()
+
+  # Initialize various static data used by the operation
+  # modules.
+  Sy::Operation::Differential.initialize
+  Sy::Operation::Integration.initialize
+  Sy::Operation::TrigReduction.initialize
 end
