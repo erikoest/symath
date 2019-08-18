@@ -9,8 +9,19 @@ module Sy
 
     def type()
       if factor1.type.is_subtype?('tensor') and
-        factor2.type.is_subtype?('tensor')
-        return 'tensor'.to_t(indexes: factor1.type.indexes + factor2.type.indexes)
+         factor2.type.is_subtype?('tensor')
+        # Wedge product of two tensor-like object. Determine index signature
+        # and subtype.
+        indexes = factor1.type.indexes + factor2.type.indexes
+        if (indexes - ['u']).empty?
+          type = 'nvector'
+        elsif (indexes - ['l']).empty?
+          type = 'nform'
+        else
+          type = 'tensor'
+        end
+        
+        return type.to_t(indexes: indexes)
       else
         return factor1.type.sum(factor2.type)
       end

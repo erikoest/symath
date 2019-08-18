@@ -23,13 +23,13 @@ require 'sy/path'
 
 module Sy
   @@global_settings = {
-    # Symbol used by parser and to_s/to_latex methods to represent the differential
-    # operator on variables
+    # Symbol used by parser and to_s/to_latex methods to represent the
+    # differential operator on variables
     :diff_symbol => 'd',
     # Symbol used by parser and to_s method to represent vector variables
     :vector_symbol => '''',
-    # Boolean setting for whether to represent square roots with the root symbol
-    # or as a fraction exponent
+    # Boolean setting for whether to represent square roots with the root
+    # symbol or as a fraction exponent
     :sq_exponent_form => false,
     # Show the multiplication sign in LaTeX output
     :ltx_mult_sign => false,
@@ -49,9 +49,10 @@ module Sy
   @@variable_assignments = {
     # Some variables with special meanings
 
-    # Row matrix of variable names used as the coordinates in differential geometry
-    # analyses. These define the dimension of the manifold, and also as the default names
-    # of the basis vectors and co-vectors of the tangent space.
+    # Row matrix of variable names used as the coordinates in differential
+    # geometry analyses. These define the dimension of the manifold, and
+    # also as the default names of the basis vectors and co-vectors of the
+    # tangent space.
     :basis.to_m => [:x1, :x2, :x3].to_m,
 
     # Metric tensor, relative to the chosen basis (subscript indexes)
@@ -151,10 +152,13 @@ module Sy
   end
 
   def self.get_variable(var)
-    return @@variable_assignments[var]
+    return @@variable_assignments[var.to_m]
   end
 
   def self.assign_variable(var, value)
+    var = var.to_m
+    value = value.to_m
+    
     # Check that name is a variable
     if !var.is_a?(Sy::Variable)
       raise var.to_s + ' is not a variable'
@@ -174,7 +178,7 @@ module Sy
   end
 
   def self.clear_variable(var)
-    @@variable_assignments.delete(var)
+    @@variable_assignments.delete(var.to_m)
   end
 
   def self.clear_variables()

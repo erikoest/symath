@@ -171,14 +171,26 @@ module Sy
       return is_subtype?('nvector')
     end
 
-    # True if type is a pseudovector (relative to given default vector room)
+    # True if type is a pseudovector. We use the notion of a pseudovector
+    # both for N-1 dimensional nvectors and nforms (N being the dimensionality
+    # of the default vector space)
     def is_pseudovector?()
-      return false
+      if !is_subtype?('nvector') and !is_subtype?('nform')
+        return false
+      end
+
+      return degree == Sy.get_variable(:basis).ncols - 1
     end
 
-    # True if type is a pseudoscalar (relative to given default vector room)
+    # True if type is a pseudoscalar. We use the notion of a pseudoscalar
+    # both for N dimensional nvectors and nforms (N being the dimensionality
+    # of the default vector space)
     def is_pseudoscalar?()
-      return false
+      if !is_subtype?('nvector') and !is_subtype?('nform')
+        return false
+      end
+
+      return degree == Sy.get_variable(:basis).ncols
     end
     
     # True if type is the dual of an nvector
@@ -186,6 +198,7 @@ module Sy
       return is_subtype?('nform')
     end
 
+    # FIXME: What is the difference between a covector and a dform?
     def is_covector?()
       return is_subtype?('covector')
     end
@@ -194,7 +207,8 @@ module Sy
       return is_subtype?('dform')
     end
     
-    # Return index list as a string coded with upper indices as ' and lower indices as .
+    # Return index list as a string coded with upper indices as ' and lower
+    # indices as .
     def index_str()
       return @indexes.map do |i|
         if i == 'u'

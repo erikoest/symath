@@ -41,17 +41,20 @@ module Sy
     # This does not scale for higher dimensions, but that will most probably
     # be out of scope for this library anyway.
     def self.recalc_basis_vectors()
-      b = Sy.get_variable(:basis.to_m)
-      g = Sy.get_variable(:g.to_m)
+      b = Sy.get_variable(:basis)
+      g = Sy.get_variable(:g)
 
-      # If the basis and the metric tensor do not 
-      # basis is not a matrix
-      # g (metric tensor) is not a square matrix
-      # basis and metric tensor g have different dimensions
+      # If the basis and the metric tensor are not of the required types
+      # and dimensionality, undefine all the data structures. The
+      # operators using them will then fail until both the basis and
+      # the metric tensor are defined correctly. The requirements are:
+      #   basis is a matrix
+      #   g (metric tensor) is a square matrix
+      #   basis and metric tensor g have different dimensions
       if !b.is_a?(Sy::Matrix) or
         !g.is_a?(Sy::Matrix) or
-        !g.is_square?        
-        b.nrows != g.nrows
+        !g.is_square?
+        b.ncols != g.nrows
         @@basis_order = nil
         @@norm_map = nil
         @@hodge_map = nil
@@ -64,16 +67,16 @@ module Sy
       dim = brow.length
       
       # Hash up the order of the basis vectors
-      @@basis_order = (0..dim-1).map do |i|
+      @@basis_order = (0..dim - 1).map do |i|
         [brow[i].name.to_sym, i]
       end.to_h
 
-      # Calculate all possible permutations of all possible combinations of the
-      # basis vectors (including no vectors).
+      # Calculate all possible permutations of all possible combinations of
+      # the basis vectors (including no vectors).
       @@norm_map = {}
       @@hodge_map = {}
       (0..dim).each do |d|
-        (0..dim-1).to_a.permutation(d).each do |p|
+        (0..dim - 1).to_a.permutation(d).each do |p|
           if p.length == 0
             @@norm_map[1.to_m] = 1.to_m
             @@hodge_map[1.to_m] = brow.map { |bb| bb.name.to_m('dform') }.inject(:^)
@@ -95,7 +98,7 @@ module Sy
           @@norm_map[vect] = vnorm
 
           # Hash them to their hodge dual
-          dual = (0..dim-1).to_a - norm
+          dual = (0..dim - 1).to_a - norm
           dsign = permutation_parity(p + dual)
           
           if dual.length == 0
@@ -118,8 +121,8 @@ module Sy
       flat = (g*Sy::Matrix.new(d).transpose).normalize.col(0)
       sharp = (g.inverse*Sy::Matrix.new(v).transpose).normalize.col(0)
 
-      @@flat_map = (0..dim-1).map { |i| [v[i], flat[i]] }.to_h
-      @@sharp_map = (0..dim-1).map { |i| [d[i], sharp[i]] }.to_h
+      @@flat_map = (0..dim - 1).map { |i| [v[i], flat[i]] }.to_h
+      @@sharp_map = (0..dim - 1).map { |i| [d[i], sharp[i]] }.to_h
     end
 
     # Normalize a list of basis vectors, and combine them into a wedge product
