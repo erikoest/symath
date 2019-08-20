@@ -108,48 +108,40 @@ module Sy
 
       return self
     end
+
+    @@builtin_operators = {
+      :diff   => 'Sy::Diff',
+      :int    => 'Sy::Int',
+      :bounds => 'Sy::Bounds',
+      :'='    => 'Sy::Equation',
+      :sharp  => 'Sy::Sharp',
+      :flat   => 'Sy::Flat',
+      :hodge  => 'Sy::Hodge',
+      :grad   => 'Sy::Grad',
+      :curl   => 'Sy::Curl',
+      :div    => 'Sy::Div',
+      :laplacian => 'Sy::Laplacian',
+      :codiff => 'Sy::Codiff',        
+    }
+
+    def self.builtin(name, args)
+      name = name.to_sym
+      if !@@builtin_operators.key?(name)
+        return
+      end
+
+      clazz = Object.const_get(@@builtin_operators[name])
+      return clazz.new(*args.map { |a| a.to_m })
+    end
   end
 end
 
-require 'sy/diff'
-require 'sy/int'
-require 'sy/bounds'
-require 'sy/raise'
-require 'sy/lower'
-require 'sy/hodge'
-require 'sy/grad'
-require 'sy/curl'
-require 'sy/div'
-require 'sy/laplacian'
-require 'sy/codiff'
-
 def op(name, *args)
-  case name.to_s
-  when 'diff'
-    return Sy::Diff.new(*args.map { |a| a.to_m })
-  when 'int'
-    return Sy::Int.new(*args.map { |a| a.to_m })
-  when 'bounds'
-    return Sy::Bounds.new(*args.map { |a| a.to_m })
-  when '='
-    return Sy::Equation.new(*args.map { |a| a.to_m })
-  when 'raise'
-    return Sy::Raise.new(*args.map { |a| a.to_m })
-  when 'lower'
-    return Sy::Lower.new(*args.map { |a| a.to_m })
-  when 'hodge'
-    return Sy::Hodge.new(*args.map { |a| a.to_m })
-  when 'grad'
-    return Sy::Grad.new(*args.map { |a| a.to_m })
-  when 'curl'
-    return Sy::Curl.new(*args.map { |a| a.to_m })
-  when 'div'
-    return Sy::Div.new(*args.map { |a| a.to_m })
-  when 'laplacian'
-    return Sy::Laplacian.new(*args.map { |a| a.to_m })
-  when 'codiff'
-    return Sy::CoDiff.new(*args.map { |a| a.to_m })
+  op = Sy::Operator.builtin(name, args)
+  if !op.nil?
+    return op
   end
 
+  # Not a built-in operator. Create a custom one.
   return Sy::Operator.new(name, args.map { |a| a.to_m })
 end

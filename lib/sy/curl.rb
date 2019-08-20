@@ -16,7 +16,7 @@ module Sy
       vars = Sy.get_variable(:basis.to_m).row(0)
       
       # Curl is defined as (*(d(Fb)))#
-      return op(:raise, op(:hodge, op(:diff, op(:lower, args[0]), *vars))).eval
+      return op(:sharp, op(:hodge, op(:diff, op(:flat, args[0]), *vars))).eval
     end
 
     def to_latex()

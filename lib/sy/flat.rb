@@ -2,9 +2,9 @@ require 'sy/value'
 require 'sy/operator'
 
 module Sy
-  class Lower < Operator
+  class Flat < Operator
     def initialize(arg)
-      super('lower', [arg])
+      super('flat', [arg])
     end
 
     def evaluate()
