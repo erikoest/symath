@@ -36,7 +36,7 @@ module Sy
     # Represent square roots with the root symbol or as a fraction exponent
     :sq_exponent_form => false,
     # Show the multiplication sign in LaTeX output
-    :ltx_mult_sign => false,
+    :ltx_product_sign => false,
 
     # Simplify expression at the time they are composed
     :compose_with_simplify => true,

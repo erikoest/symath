@@ -83,13 +83,15 @@ module Sy
     end
 
     def to_latex()
+      dot = Sy.setting(:ltx_product_sign) ? ' \cdot ' : ' ';
+      
       return @args.map do |a|
         if a.is_sum_exp?
           '(' + a.to_latex + ')'
         else
           a.to_latex
         end
-      end.join(' \cdot ')
+      end.join(dot)
     end      
   end
 end
