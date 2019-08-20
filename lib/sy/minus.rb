@@ -61,15 +61,19 @@ module Sy
     end
     
     def to_s()
-      if argument.is_a?(Sy::Sum)
-        return '- (' + argument.to_s + ')'
+      if Sy.setting(:expl_parentheses)
+        return '(- '.to_s + argument.to_s + ')'.to_s
       else
-        return '- ' + argument.to_s
+        if argument.is_a?(Sy::Sum)
+          return '- ('.to_s + argument.to_s + ')'.to_s
+        else
+          return '- '.to_s + argument.to_s
+        end
       end
     end
 
     def to_latex()
-      return '- ' + argument.to_latex
+      return '- '.to_s + argument.to_latex
     end
   end
 end

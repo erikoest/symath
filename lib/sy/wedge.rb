@@ -28,13 +28,17 @@ module Sy
     end
     
     def to_s()
-      return @args.map do |a|
-        if a.is_sum_exp?
-          '(' + a.to_s + ')'
-        else
-          a.to_s
-        end
-      end.join('^')
+      if Sy.setting(:expl_parentheses)
+        return '('.to_s + factor1.to_s + '^' + factor2.to_s + ')'.to_s
+      else
+        return @args.map do |a|
+          if a.is_sum_exp?
+            '(' + a.to_s + ')'
+          else
+            a.to_s
+          end
+        end.join('^')
+      end
     end
 
     def to_latex()

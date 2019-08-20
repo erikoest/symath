@@ -23,17 +23,38 @@ require 'sy/path'
 
 module Sy
   @@global_settings = {
-    # Symbol used by parser and to_s/to_latex methods to represent the
-    # differential operator on variables
+    # Symbol used to represent the differential operator
+    # on variables
     :diff_symbol => 'd',
-    # Symbol used by parser and to_s method to represent vector variables
+    # Symbol used to represent vector variables
     :vector_symbol => '''',
-    # Boolean setting for whether to represent square roots with the root
-    # symbol or as a fraction exponent
+
+    # Show all parantheses on +, *, / and ^ operators.
+    :expl_parentheses => false,
+    # Represent square roots with the root symbol or as a fraction exponent
     :sq_exponent_form => false,
     # Show the multiplication sign in LaTeX output
     :ltx_mult_sign => false,
+
+    # Simplify expression at the time they are composed
+    :compose_with_simplify => true,
   }
+
+  # Note: No type checking here, although the library code expects the various parameters
+  # to be of specific types (boolean, string, etc.). Failure and/or strange behaviour
+  # must be expected if they are set to different types.
+  def self.setting(name, value = nil)
+    name = name.to_sym
+    if !@@global_settings.key?(name)
+      raise 'Setting #{name} does not exist'
+    end
+
+    if !value.nil?
+      @@global_settings[name] = value
+    end
+
+    return @@global_settings[name]
+  end
   
   @@function_definitions = {
   }

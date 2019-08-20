@@ -179,6 +179,11 @@ module Sy
     ##
     def +(other)
       o = other.to_m
+
+      if !Sy.setting(:compose_with_simplify)
+        return self.add(o)
+      end
+      
       return self if o == 0
       return o if self == 0
 
@@ -212,6 +217,11 @@ module Sy
 
     def -(other)
       o = other.to_m
+
+      if !Sy.setting(:compose_with_simplify)
+        return self.sub(o)
+      end
+      
       return self if o == 0
       return -o if self == 0
 
@@ -242,6 +252,10 @@ module Sy
     end
 
     def -@()
+      if !Sy.setting(:compose_with_simplify)
+        return self.neg
+      end
+      
       if self.is_a?(Sy::Minus)
         # - - a => a
         return self.argument
@@ -253,6 +267,10 @@ module Sy
     def *(other)
       o = other.to_m
 
+      if !Sy.setting(:compose_with_simplify)
+        return self.mul(o)
+      end
+      
       # First try some simple reductions
       # a*1 => a
       return self if o == 1
@@ -302,6 +320,11 @@ module Sy
 
     def **(other)
       o = other.to_m
+
+      if !Sy.setting(:compose_with_simplify)
+        return self.power(o)
+      end
+      
       if self.is_a?(Sy::Power)
         return self.base**(self.exponent*o)
       end
@@ -311,6 +334,11 @@ module Sy
 
     def ^(other)
       o = other.to_m
+
+      if !Sy.setting(:compose_with_simplify)
+        return self.wedge(o)
+      end
+      
       return self if o == 1
       return o if self == 1
 

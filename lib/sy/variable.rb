@@ -281,7 +281,7 @@ module Sy
     
     def to_s()
       if @type.is_dform?
-        return :d.to_s + @name.to_s
+        return Sy.setting(:diff_symbol) + @name.to_s
       elsif @type.is_vector?
         return @name.to_s + '\''
       elsif @type.is_covector?
@@ -295,7 +295,7 @@ module Sy
 
     def to_latex()
       if is_diff?
-        return 'd' + undiff.to_latex
+        return Sy.setting(:diff_symbol) + undiff.to_latex
       else
         return @name.to_s
       end
