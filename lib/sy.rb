@@ -27,7 +27,9 @@ module Sy
     # on variables
     :diff_symbol => 'd',
     # Symbol used to represent vector variables
-    :vector_symbol => '''',
+    :vector_symbol => '\'',
+    # Symbol used to represent covector variables
+    :covector_symbol => '.',
 
     # Show all parantheses on +, *, / and ^ operators.
     :expl_parentheses => false,

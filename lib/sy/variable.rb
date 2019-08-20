@@ -283,19 +283,26 @@ module Sy
       if @type.is_dform?
         return Sy.setting(:diff_symbol) + @name.to_s
       elsif @type.is_vector?
-        return @name.to_s + '\''
+        return @name.to_s + Sy.setting(:vector_symbol)
       elsif @type.is_covector?
-        return @name.to_s + '.'
+        return @name.to_s + Sy.setting(:covector_symbol)
       elsif @type.is_subtype?('tensor')
-        return @name.to_s + '[' + @type.index_str + ']'
+        return @name.to_s + '['.to_s + @type.index_str + ']'.to_s
       else
         return @name.to_s
       end
     end
 
     def to_latex()
-      if is_diff?
+      if is_dform?
         return Sy.setting(:diff_symbol) + undiff.to_latex
+      elsif @type.is_vector?
+        return '\vec{'.to_s + @name.to_s + '}'.to_s
+      elsif @type.is_covector?
+        # What is the best way to denote a covector without using indexes?
+        return '\vec{'.to_s + @name.to_s + '}'.to_s
+      elsif @type.is_subtype?('tensor')
+        return @name.to_s + '['.to_s + @type.index_str + ']'.to_s
       else
         return @name.to_s
       end
