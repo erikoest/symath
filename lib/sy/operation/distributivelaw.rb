@@ -14,8 +14,8 @@ module Sy::Operation::DistributiveLaw
 
   def expand_single_pass
     if is_a?(Sy::Minus)
-      acted = argument.expand
-      if acted == argument
+      acted = argument.expand_single_pass
+      if acted.nil?
         return
       else
         return -acted
@@ -27,8 +27,29 @@ module Sy::Operation::DistributiveLaw
          (factor2.is_sum_exp? and factor2.arity > 1)
         return expand_recurse(factor1, factor2)
       end
+
+      return
     end
 
+    changed = false
+    if is_sum_exp?
+      ret = 0.to_m
+      
+      terms.each do |t|
+        acted = t.expand_single_pass
+        if acted.nil?
+          ret += t
+        else
+          ret += acted
+          changed = true
+        end
+      end
+
+      if changed
+        return ret
+      end
+    end
+    
     return
   end
 
@@ -51,13 +72,45 @@ module Sy::Operation::DistributiveLaw
       return ret
     end
 
+    if exp1.is_a?(Sy::Product)
+      exp1 = expand_recurse(exp1.factor1, exp1.factor2)
+    end
+
+    if exp2.is_a?(Sy::Product)
+      exp2 = expand_recurse(exp2.factor1, exp2.factor2)
+    end
+    
     return exp1*exp2
+  end
+
+  def has_fractional_terms?()
+    terms.each do |t|
+      t.div_factors.each do |f|
+        return true
+      end
+
+      if t.div_coefficient != 1
+        return true
+      end
+    end
+
+    return false
   end
 
   # The factorize() method factorizes a univariate polynomial expression
   # with integer coefficients.
-  # FIXME: Rewrite to support factorization with rational coefficients.
   def factorize()
+    if (has_fractional_terms?)
+      e = combine_fractions
+      if e.is_a?(Sy::Fraction)
+        return e.dividend.factorize_integer_poly.div(e.divisor)
+      end
+    else
+      return factorize_integer_poly
+    end
+  end
+    
+  def factorize_integer_poly()
     dup = Sy::Poly::DUP.new(self)
     factors = dup.factor
       
@@ -76,6 +129,7 @@ module Sy::Operation::DistributiveLaw
     return ret.inject(:mul)
   end
 
+
   # The combine_fractions() method combines fractions by first determining
   # their least common denominator, then applying the distributive law.
   # Examples:
@@ -92,7 +146,12 @@ module Sy::Operation::DistributiveLaw
     return sub.nil? ? deep_clone : sub
   end
 
-  def combfrac_add_term(sum, fact, divf, c, dc)
+  def combfrac_add_term(sum, t)
+    fact = t.scalar_factors.inject(:mul)
+    divf = t.div_factors.inject(:mul)
+    c = t.sign*t.coefficient
+    dc = t.div_coefficient
+
     if !sum.key?(divf)
       sum[divf] = {}
       sum[divf][:fact] = fact
@@ -133,14 +192,8 @@ module Sy::Operation::DistributiveLaw
   def combfrac_sum
     sum = {}
 
-    terms.each do |s|
-      combfrac_add_term(
-        sum,
-        s.scalar_factors.inject(:mul),
-        s.div_factors.inject(:mul),
-        s.coefficient,
-        s.div_coefficient,
-      )
+    terms.each do |t|
+      combfrac_add_term(sum, t)
     end
 
     ret = nil
@@ -148,8 +201,6 @@ module Sy::Operation::DistributiveLaw
     sum.keys.each do |divf|
       s = sum[divf]
       if s[:c] > 1
-        # TODO: Distribute the product over the sum, rather than applying it
-        # over it.
         r = s[:c].to_m.mul(s[:fact])
       else
         r = s[:fact]

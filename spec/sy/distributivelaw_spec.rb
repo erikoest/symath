@@ -10,11 +10,14 @@ module Sy
   
   describe Sy::Operation::DistributiveLaw, ', expand' do
     sums = {
-      x*(1 + 3*y)                              => 3*(x*y) + x,
-      -x*(-y - 3)                              => x*y + 3*x,
-      -x*(x - 3)                               => 3*x - x**2,
-      (a + b)*c                                => a*c + b*c,
-      (fn(:sin, :x) + :y)*(fn(:cos, :x) + :y)  => fn(:cos, x)*fn(:sin, x) + fn(:cos, x)*y + fn(:sin, x)*y + y**2,
+      x*(1 + 3*y)                           => 3*(x*y) + x,
+      -x*(-y - 3)                           => x*y + 3*x,
+      -x*(x - 3)                            => 3*x - x**2,
+      (a + b)*c                             => a*c + b*c,
+      (fn(:sin, x) + y)*(fn(:cos, x) + y)   =>
+        fn(:cos, x)*fn(:sin, x) + fn(:cos, x)*y + fn(:sin, x)*y + y**2,
+      3*x*(2*x - 1)*(4*x + 3)*(3*x**3 + 1)  =>
+        6*x**2 + 24*x**3 - 27*x**4 + 18*x**5 + 72*x**6 - 9*x,
     }
 
     sums.each do |from, to|
@@ -41,6 +44,21 @@ module Sy
     sums.each do |from, to|
       it "combines '#{from.to_s}' to '#{to.to_s}'" do
         expect(from.combine_fractions.normalize).to be_equal_to to
+      end
+    end
+  end
+
+  describe Sy::Operation::DistributiveLaw, ', factorization' do
+    poly = {
+      6*x**2 + 24*x**3 - 27*x**4 + 18*x**5 + 72*x**6 - 9*x =>
+        3*(2*x - 1)*(3*x**3 + 1)*(4*x + 3)*x,
+      :x**4/:b - 1/(:b*4)                                  =>
+        (2*x**2 - 1)*(2*x**2 + 1)/(4*b),
+    }
+
+    poly.each do |from, to|
+      it "factorizes '#{from.to_s}' to '#{to.to_s}'" do
+        expect(from.factorize.normalize).to be_equal_to to
       end
     end
   end
