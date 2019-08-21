@@ -5,7 +5,15 @@ module Sy
   class ConstantSymbol < Constant
     attr_reader :value
 
-    @@symbols = ['pi', 'e', 'i', 'phi'].to_set
+    @@symbols = [:pi, :e, :i, :phi, :oo, :NaN].to_set
+
+    @@ltx_symbol = {
+      :pi  => '\pi',
+      :e   => '\mathrm{e}',
+      :phi => '\varphi',
+      :NaN => '\mathrm{NaN}',
+      :oo  => '\infty',
+    };
 
     def self.builtin_constants()
       return @@symbols
@@ -15,6 +23,10 @@ module Sy
       raise 'Not a known symbol: ' + name.to_s if !@@symbols.member?(name.to_s)
       super(name)
       @value = value
+    end
+
+    def is_finite()
+      return (@name != :oo and @name != :NaN)
     end
 
     def match(other, varmap)
@@ -36,12 +48,8 @@ module Sy
     end
     
     def to_latex()
-      if @name == 'pi'
-        return '\pi'
-      elsif @name == 'phi'
-        return '\varphi'
-      elsif @name == 'e'
-        return '\mathrm{e}'
+      if @@ltx_symbol.key?(@name)
+        return @@ltx_symbol[@name]
       else
         return @name
       end
