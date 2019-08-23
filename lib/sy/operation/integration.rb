@@ -74,7 +74,7 @@ module Sy::Operation::Integration
       fn(:tanh, :x)**2           => :a - fn(:tanh, :a),
       # Combined trigonometric functions
       fn(:sin, :a)*fn(:cos, :a)     => fn(:sin, :a)**2/2,
-      fn(:sec, :a)*fn(:cot, :a)     => fn(:sec, :a),
+      fn(:sec, :a)*fn(:tan, :a)     => fn(:sec, :a),
       fn(:csc, :a)*fn(:cot, :a)     => - fn(:csc, :a),
       1/(fn(:sin, :a)*fn(:cos, :a)) => fn(:ln, fn(:abs, fn(:tan, :a))),
       fn(:sin, fn(:ln, :a))         => :a*(fn(:sin, fn(:ln, :a)) -
@@ -201,7 +201,7 @@ module Sy::Operation::Integration
 
     # c*exp
     if proda.length == 1 and diva.length == 0
-      return prodc*proda[0].int_power(var)
+      return prodc*proda[0].anti_derivative(var)
     end
 
     int_pattern(var)
