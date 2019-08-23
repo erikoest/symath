@@ -60,7 +60,7 @@ module Sy
   def self.setting(name, value = nil)
     name = name.to_sym
     if !@@global_settings.key?(name)
-      raise 'Setting #{name} does not exist'
+      raise "Setting #{name} does not exist"
     end
 
     if !value.nil?

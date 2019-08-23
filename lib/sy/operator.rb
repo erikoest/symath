@@ -9,7 +9,24 @@ module Sy
     def has_action?()
       return true
     end
+
+    # Return arguments 
+    def args_assoc()
+      if is_associative?
+        return args.map { |a| a.class == self.class ? a.args_assoc : [a] }.inject(:+)
+      else
+        return args
+      end
+    end
+
+    def is_commutative?()
+      return false
+    end
     
+    def is_associative?()
+      return false
+    end
+
     def evaluate()
       # Custom defined operators
       o = Sy.get_operator(name.to_sym)

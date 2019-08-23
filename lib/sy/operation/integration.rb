@@ -52,6 +52,36 @@ module Sy::Operation::Integration
       :arsech => :a.to_m*fn(:arsech, :a.to_m) + fn(:arcsin, :a.to_m),
       :arcsch => :a.to_m*fn(:arcsch, :a.to_m) + fn(:abs, fn(:arsinh, :a.to_m)),
     }
+
+    @@patterns = {
+      # Logarithmic functions
+      fn(:ln, :a)**2             => :a*fn(:ln, :a)**2 - 2*:a*fn(:ln, :a) + 2*:a,
+      1/(:a*fn(:ln, :a))         => fn(:ln, fn(:abs, fn(:ln, :a))),
+      # Trigonometric functions
+      fn(:sin, :a)**2            => (:a - fn(:sin, :a)*fn(:cos, :a))/2,
+      fn(:sin, :a)**3            => fn(:cos, 3*:a)/12 - 3*fn(:cos, :a)/4,
+      fn(:cos, :a)**2            => (:a + fn(:sin, :a)*fn(:cos, :a))/2,
+      fn(:cos, :a)**3            => fn(:sin, 3*:a)/12 + 3*fn(:sin, :a)/4,
+      fn(:sec, :a)**2            => fn(:tan, :a),
+      fn(:sec, :a)**3            => fn(:sec, :a)*fn(:tan, :a)/2 +
+                                    fn(:ln, fn(:abs, fn(:sec, :a) + fn(:tan, :a)))/2,    
+      fn(:csc, :a)**2            => - fn(:cot, :a),
+      fn(:csc, :a)**3            => - fn(:csc, :a)*fn(:cot, :a)/2 -
+                                    fn(:ln, fn(:abs, fn(:csc, :a) + fn(:cot, :a)))/2,
+      # Hyperbolic functions
+      fn(:sinh, :x)**2           => fn(:sinh, 2*:a)/4 - :a/2,
+      fn(:cosh, :x)**2           => fn(:sinh, 2*:a)/4 + :a/2,
+      fn(:tanh, :x)**2           => :a - fn(:tanh, :a),
+      # Combined trigonometric functions
+      fn(:sin, :a)*fn(:cos, :a)     => fn(:sin, :a)**2/2,
+      fn(:sec, :a)*fn(:cot, :a)     => fn(:sec, :a),
+      fn(:csc, :a)*fn(:cot, :a)     => - fn(:csc, :a),
+      1/(fn(:sin, :a)*fn(:cos, :a)) => fn(:ln, fn(:abs, fn(:tan, :a))),
+      fn(:sin, fn(:ln, :a))         => :a*(fn(:sin, fn(:ln, :a)) -
+                                           fn(:cos, fn(:ln, :a)))/2,
+      fn(:cos, fn(:ln, :a))         => :a*(fn(:sin, fn(:ln, :a)) +
+                                           fn(:cos, fn(:ln, :a)))/2,
+    }
   end
   
   def anti_derivative(var)
@@ -70,7 +100,11 @@ module Sy::Operation::Integration
         return int_product(var)
       end
 
-      return int_other(var)
+      if is_a?(Sy::Function) and @@functions.key?(name.to_sym)
+        return int_function(var)
+      end
+
+      return int_power(var)
     rescue IntegrationError => e
       puts e.to_s
       # puts e.backtrace.join("\n")
@@ -81,8 +115,34 @@ module Sy::Operation::Integration
     return
   end
     
-  def int_failure()
-    raise Sy::IntegrationError, 'Cannot find an antiderivative for expression ' + to_s
+  def int_failure()    
+    raise IntegrationError, 'Cannot find an antiderivative for expression ' + to_s
+  end
+
+  def int_pattern(var)
+    # Try to match expression against various patterns
+    vu = var.undiff
+    a = :a.to_m
+
+    @@patterns.each do |f, f_int|
+      m = match(f, [a])
+      next if m.nil?
+
+      m.each do |mi|
+        # We must check that variable a maps to c1*x + c2
+        (c1, c2) = get_linear_constants(mi[a], var)
+        next if c1.nil?
+
+        # We have found a match, and the argument is a linear function. Substitute
+        # the argument into the free variable of the pattern function.
+        ret = f_int.deep_clone
+        ret.replace({ a => mi[a] })
+        return c1.inv*ret
+      end
+    end
+
+    # Give up!
+    int_failure
   end
 
   def int_constant(var)
@@ -97,6 +157,7 @@ module Sy::Operation::Integration
     divc = div_coefficient.to_m
     diva = []
 
+    # Filter out constant divisions factors, add them to the coefficient
     div_factors.each do |d|
       if d.is_constant?(vset)
         divc *= d
@@ -108,6 +169,7 @@ module Sy::Operation::Integration
     prodc = coefficient.to_m
     proda = []
 
+    # Filter out constant product factors, add them to the coefficient
     scalar_factors.each do |f|
       if f.is_constant?(vset)
         prodc *= f
@@ -126,24 +188,104 @@ module Sy::Operation::Integration
     end
 
     prodc /= divc
-      
+
+    # This should never happen here. We have already checked for constant
     if proda.length + diva.length == 0
       int_failure
     end
 
+    # c/exp
     if proda.length == 0 and diva.length == 1
       return prodc*diva[0].int_inv(var)
     end
-      
+
+    # c*exp
     if proda.length == 1 and diva.length == 0
-      return prodc*proda[0].int_other(var)
+      return prodc*proda[0].int_power(var)
     end
 
-    int_failure
+    int_pattern(var)
+  end
+
+  def get_linear_constants(arg, var)
+    # Check that arg is on the form c1*var + c2. Return the two constants.
+    vu = var.undiff
+    vset = [vu].to_set
+    c2 = 0.to_m
+    
+    if arg.is_sum_exp?
+      varterm = nil
+      
+      arg.terms.each do |t|
+        if t.is_constant?(vset)
+          c2 += t
+        elsif !varterm.nil?
+          # Found more than one term with variable. Don't know how to
+          # handle this.
+          return
+        else
+          varterm = t
+        end
+      end
+
+      # Return negative if the whole expression is constant
+      return if varterm.nil?
+
+      # Use the variable term as argument from now on.
+      arg = varterm
+    end
+
+    # Split exp into a constant part and (hopefully) a single factor
+    # which equals to var
+    divc = arg.div_coefficient.to_m
+
+    arg.div_factors.each do |d|
+      if !d.is_constant?(vset)
+        # Non-constant divisor. Arg is not linear.
+        return
+      end
+      divc *= d
+    end
+
+    prodc = arg.coefficient.to_m
+    has_var = false
+
+    arg.scalar_factors.each do |f|
+      # Constant factor with respect to var
+      if f.is_constant?(vset)
+        prodc *= f
+        next
+      end
+
+      # Found more than one var. Return negative
+      if has_var
+        return
+      end
+      
+      # Factor is var. Remember it, but continue to examine the other factors.
+      if f == vu
+        has_var = true
+        next
+      end
+
+      # Factor is a function of var. Return negative
+      return
+    end
+
+    # We don't know how to integrate vectors
+    arg.vector_factors.each do |v|
+      return
+    end
+
+    if arg.sign < 0
+      prodc -= prodc
+    end
+
+    return [prodc/divc, c2]
   end
 
   def int_inv(var)
-    # Hack: integrate 1/exp (but by convention of the sibling functions,
+    # Hack: integrate 1/exp (by convention of the sibling functions,
     # it should have integrated exp)
     xp = exponent
     vu = var.undiff
@@ -163,73 +305,26 @@ module Sy::Operation::Integration
   end
 
   def int_function(var)
-    vu = var.undiff
-    vset = [vu].to_set
+    # At this point exp is a single argument function which we know how
+    # to integrate. Check that the argument is a linear function
     arg = args[0]
-    
-    # Split exp into a constant part and (hopefully) a single factor
-    # which equals to var
-    divc = arg.div_coefficient.to_m
-
-    # We expect all divisor factors to be constant with respect to var
-    arg.div_factors.each do |d|
-      if !d.is_constant?(vset)
-        int_failure
-      end
-      divc *= d
+    (c1, c2) = get_linear_constants(arg, var)
+    if c1.nil?
+      # Argument is not linear. Try pattern match as a last resort.
+      return int_pattern(var)
+    else
+      # The function argument is linear. Do the integration.
+      # int(func(c1*x + c2)) -> Func(c1*x+ c2)/c1
+      fexp = @@functions[name.to_sym].deep_clone
+      fexp.replace({ :a.to_m =>  arg })
+      return c1.inv*fexp
     end
-
-    prodc = arg.coefficient.to_m
-    has_var = false
-
-    arg.scalar_factors.each do |f|
-      # Constant factor with respect to var
-      if f.is_constant?(vset)
-        prodc *= f
-        next
-      end
-
-      # Found more than one var
-      if has_var
-        int_failure
-      end
-      
-      # Factor is var. Remember it, but continue to examine the other factors.
-      if f == vu
-        has_var = true
-        next
-      end
-
-      # Factor is a function of var. Too difficult for us to integrate
-      int_failure
-    end
-
-    # We don't know how to integrate vectors
-    arg.vector_factors.each do |v|
-      int_failure
-    end
-
-    if arg.sign < 0
-      prodc -= prodc
-    end
-
-    # Calculate divc as the inverse of the constant part of the function arg
-    divc /= prodc
-
-    # int(func(n*x)) -> Func(n*x)/n
-    fexp = @@functions[name.to_sym].deep_clone
-    fexp.replace({ :a.to_m =>  arg })
-    return divc*fexp
   end
 
-  def int_other(var)
+  def int_power(var)
     # At this point, exp should not be a constant, a sum or a product.
     vu = var.undiff
     vset = [vu].to_set
-
-    if is_a?(Sy::Function) and @@functions.key?(name.to_sym)
-      return int_function(var)
-    end
 
     b = base
     xp = exponent
@@ -246,48 +341,14 @@ module Sy::Operation::Integration
 
     # Check exponential functions
     if b.is_constant?(vset)
-      # FIXME: Should consider moving this code out to the value class
-      # We could extend the coefficient methods to include an optional
-      # variable set, and return the part of the expression which is
-      # constant with respect to the set.
-      divc = xp.div_coefficient.to_m
+      (c1, c2) = get_linear_constants(xp, var)
         
-      xp.div_factors.each do |d|
-        if d.is_constant?(vset)
-          divc *= d
-        else
-          int_failure
-        end
-      end
-
-      prodc = xp.coefficient.to_m
-      proda = []
-      
-      xp.scalar_factors.each do |f|
-        if f.is_constant?(vset)
-          prodc *= f
-        elsif f == vu
-          proda.push(f)
-        else
-          int_failure
-        end
-      end
-
-      if xp.sign < 0
-        prodc -= prodc
-      end
-
-      if (proda.length != 1)
-        int_failure
-      end
-
-      prodc /= divc
-        
-      # a**(b*x) => a**(b*x)/(b*ln(a))
-      return b**(prodc*vu)/(prodc*fn(:ln, b))
+      # b**(c1*x + c2) => b**(c1*x + c2)/(b*ln(c1))
+      return b**(xp)/(c1*fn(:ln, b))
     end
-      
-    int_failure
+
+    # Try pattern match as last resort
+    int_pattern(var)
   end
     
   def int_sum(var)

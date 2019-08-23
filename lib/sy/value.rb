@@ -1,5 +1,6 @@
 
 require 'sy/operation'
+require 'sy/operation/match'
 require 'sy/operation/evaluation'
 require 'sy/operation/normalization'
 require 'sy/operation/distributivelaw'
@@ -10,6 +11,7 @@ require 'sy/operation/trigreduction'
 
 module Sy
   class Value
+    include Operation::Match
     include Operation::Evaluation
     include Operation::Normalization
     include Operation::DistributiveLaw
@@ -215,6 +217,10 @@ module Sy
       return self.add(o)
     end
 
+    def inv()
+      return 1/self
+    end
+    
     def -(other)
       o = other.to_m
 
@@ -312,7 +318,13 @@ module Sy
       return self if o == 1
 
       if self.is_a?(Sy::Fraction)
-        return dividend.div(divisor*o)
+        if o.is_a?(Sy::Fraction)
+          return (dividend*o.divisor).div(divisor*o.dividend)
+        else
+          return dividend.div(divisor*o)
+        end
+      elsif o.is_a?(Sy::Fraction)
+        return (self*o.divisor).div(o.dividend)
       end
       
       return self.div(o)
