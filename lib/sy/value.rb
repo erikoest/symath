@@ -100,6 +100,31 @@ module Sy
       return (self <=> other) >= 0
     end
 
+    # Default properties for operators
+    def is_nan?()
+      return
+    end
+
+    def is_finite?()
+      return
+    end
+
+    def is_positive?()
+      return
+    end
+
+    def is_negative?()
+      if is_nan?
+        return :NaN.to_m
+      end
+      
+      return (is_positive? == false and is_zero? == false)
+    end
+    
+    def is_zero?()
+      return
+    end
+
     # Returns true if this is a function declaration, a operator declaration or
     # a variable assignment
     def is_definition?()
@@ -175,6 +200,157 @@ module Sy
       return Sy::Wedge.new(self, other.to_m)
     end
 
+    # Add infinite values
+    def add_inf(o)
+      # NaN add to NaN
+      if self.is_nan? or o.is_nan?
+        return :NaN.to_m
+      end
+
+      # oo - oo = -oo + oo = NaN
+      if (self.is_finite? == false and o.is_finite? == false)
+        if (self.is_positive? and o.is_negative?) or
+          (self.is_negative? and o.is_positive?)
+          return :NaN.to_m
+        end
+      end
+
+      # oo + n = n + oo = oo + oo = oo
+      if self.is_finite? == false
+        return self
+      end
+
+      # n - oo = - oo + n = -oo - oo = -oo
+      if o.is_finite? == false
+        return o
+      end
+
+      raise 'Internal error'
+    end
+
+    # Sub infinite values
+    def sub_inf(o)
+      # NaN subtracts to NaN
+      if self.is_nan? or o.is_nan?
+        return :NaN.to_m
+      end
+
+      # At this point self and o are either finite, oo or -oo
+      
+      # oo - oo = -oo + oo = NaN
+      if (self.is_finite? == false and o.is_finite? == false)
+        if (self.is_positive? and o.is_positive?) or
+          (self.is_negative? and o.is_negative?)
+          return :NaN.to_m
+        end
+      end
+
+      # oo + n = oo + oo = oo
+      # -oo + n = -oo - oo = -oo
+      if self.is_finite? == false
+        return self
+      end
+
+      # n - oo = -oo
+      # n + oo = oo
+      if o.is_finite? == false
+        return -o
+      end
+
+      raise 'Internal error'
+    end
+    
+    # Multiply infinite values
+    def mul_inf(o)
+      # NaN multiplies to NaN
+      if self.is_nan? or o.is_nan?
+        return :NaN.to_m
+      end
+
+      # oo*0     => NaN
+      if self.is_zero? or o.is_zero?
+        return :NaN.to_m
+      end
+
+      if (self.is_positive? and o.is_positive?) or
+        (self.is_negative? and o.is_negative?)
+        return :oo.to_m
+      end
+
+      if (self.is_negative? and o.is_positive?) or
+        (self.is_positive? and o.is_negative?)
+        return -:oo.to_m
+      end
+
+      raise 'Internal error'
+    end
+
+    # Divide infinite values
+    def div_inf(o)
+      # NaN/* = */NaN = NaN
+      if self.is_nan? or o.is_nan?
+        return :NaN.to_m
+      end
+      
+      # oo/oo = oo/-oo = -oo/oo = NaN
+      if self.is_finite? == false and o.is_finite? == false
+        return :NaN.to_m
+      end
+
+      # */0 = NaN
+      if o.is_zero?
+        return :NaN.to_m
+      end
+
+      # n/oo = n/-oo = 0
+      if self.is_finite?
+        return 0.to_m
+      end
+
+      # oo/n = -oo/-n = oo, -oo/n = oo/-n = -oo
+      if o.is_finite?
+        if self.sign == o.sign
+          return :oo.to_m
+        else
+          return -:oo.to_m
+        end
+      end
+
+      raise 'Internal error'
+    end
+
+    # Power of infinite values
+    def power_inf(o)
+      # NaN**(..) = NaN, (..)**NaN = NaN
+      if self.is_nan? or o.is_nan?
+        return :NaN.to_m
+      end
+
+      # 1**oo = 1**-oo = oo**0 = -oo**0 = NaN
+      if self == 1 or o.is_zero?
+        return :NaN.to_m
+      end
+
+      # 0**-oo = NaN
+      if self.is_zero? and o.is_finite? == false
+        return :NaN.to_m
+      end
+      
+      # n**-oo = oo**-oo = -oo**-oo = 0
+      if o.is_finite? == false and o.is_negative?
+        return 0.to_m
+      end
+
+      # -oo**n = -oo**oo = -oo
+      if self.is_finite? == false and self.is_negative?
+        return -:oo.to_m
+      end
+
+      # The only remaining possibilities:
+      # oo**n = n*oo = oo*oo = oo
+      return :oo.to_m      
+    end
+    
     ##
     # Overridden object operators.
     # These operations do some simple reductions.
@@ -184,6 +360,10 @@ module Sy
 
       if !Sy.setting(:compose_with_simplify)
         return self.add(o)
+      end
+
+      if is_finite?() == false or o.is_finite?() == false
+        return self.add_inf(o)
       end
       
       return self if o == 0
@@ -226,6 +406,10 @@ module Sy
 
       if !Sy.setting(:compose_with_simplify)
         return self.sub(o)
+      end
+      
+      if is_finite?() == false or o.is_finite?() == false
+        return self.sub_inf(o)
       end
       
       return self if o == 0
@@ -277,6 +461,10 @@ module Sy
         return self.mul(o)
       end
       
+      if is_finite?() == false or o.is_finite?() == false
+        return self.mul_inf(o)
+      end
+      
       # First try some simple reductions
       # a*1 => a
       return self if o == 1
@@ -315,7 +503,21 @@ module Sy
 
     def /(other)
       o = other.to_m
+
+      if !Sy.setting(:compose_with_simplify)
+        return self.div(o)
+      end
+      
       return self if o == 1
+
+      if is_finite?() == false or o.is_finite?() == false
+        return self.div_inf(o)
+      end
+      
+      # Divide by zero
+      if o.is_zero?
+        return :NaN.to_m
+      end
 
       if self.is_a?(Sy::Fraction)
         if o.is_a?(Sy::Fraction)
@@ -337,6 +539,15 @@ module Sy
         return self.power(o)
       end
       
+      if is_finite?() == false or o.is_finite?() == false
+        return self.power_inf(o)
+      end
+            
+      # 0**0 = NaN
+      if self.is_zero? and o.is_zero?
+        return :NaN.to_m
+      end
+
       if self.is_a?(Sy::Power)
         return self.base**(self.exponent*o)
       end

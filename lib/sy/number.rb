@@ -9,7 +9,23 @@ module Sy
     def has_action?()
       return false
     end
+
+    def is_nan?()
+      return false
+    end
     
+    def is_finite?()
+      return true
+    end
+
+    def is_positive?()
+      return value() > 0
+    end
+    
+    def is_zero?()
+      return value() == 0
+    end
+
     # Scalar factor is empty because the numeric value is counted as
     # coefficient
     def scalar_factors()

@@ -20,15 +20,27 @@ module Sy
     end
     
     def initialize(name, value = nil)
-      raise 'Not a known symbol: ' + name.to_s if !@@symbols.member?(name.to_s)
+      raise 'Not a known symbol: ' + name.to_s if !@@symbols.member?(name.to_sym)
       super(name)
       @value = value
     end
 
-    def is_finite()
+    def is_nan?()
+      return @name == :NaN
+    end
+    
+    def is_finite?()
       return (@name != :oo and @name != :NaN)
     end
 
+    def is_positive?()
+      return !is_zero?
+    end
+    
+    def is_zero?()
+      return false
+    end
+    
     def match(other, varmap)
       if self == other then
         return varmap

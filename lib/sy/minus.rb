@@ -9,6 +9,26 @@ module Sy
     def argument()
       return @args[0]
     end
+
+    def is_positive?()
+      if argument.is_nan?
+        return :NaN.to_m
+      end
+
+      if argument.is_positive?().nil?
+        return
+      end
+
+      return (!argument.is_positive?() and !argument.is_zero?)
+    end
+
+    def is_zero?()
+      return argument.is_zero?
+    end
+
+    def is_finite?()
+      return argument.is_finite?
+    end
     
     def is_sum_exp?()
       return true
