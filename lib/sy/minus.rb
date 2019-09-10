@@ -12,7 +12,12 @@ module Sy
 
     def is_positive?()
       if argument.is_nan?
-        return :NaN.to_m
+        return
+      end
+
+      if Sy.setting(:complex_arithmetic) and argument.is_finite? == false
+        # Define complex infinity to be positive
+        return true
       end
 
       if argument.is_positive?().nil?

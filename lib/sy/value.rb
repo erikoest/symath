@@ -202,27 +202,44 @@ module Sy
 
     # Add infinite values
     def add_inf(o)
+      # Indefinite terms
+      if self.is_finite?.nil? or o.is_finite?.nil?
+        return self.add(o)
+      end
+      
       # NaN add to NaN
       if self.is_nan? or o.is_nan?
         return :NaN.to_m
       end
 
-      # oo - oo = -oo + oo = NaN
-      if (self.is_finite? == false and o.is_finite? == false)
-        if (self.is_positive? and o.is_negative?) or
-          (self.is_negative? and o.is_positive?)
+      if Sy.setting(:complex_arithmetic)
+        # +- oo +- oo = NaN
+        if (self.is_finite? == false and o.is_finite? == false)
           return :NaN.to_m
         end
-      end
 
-      # oo + n = n + oo = oo + oo = oo
-      if self.is_finite? == false
-        return self
-      end
+        # oo + n = n + oo = NaN
+        if (self.is_finite? == false or o.is_finite? == false)
+          return :oo.to_m
+        end
+      else
+        # oo - oo = -oo + oo = NaN
+        if (self.is_finite? == false and o.is_finite? == false)
+          if (self.is_positive? and o.is_negative?) or
+            (self.is_negative? and o.is_positive?)
+            return :NaN.to_m
+          end
+        end
+        
+        # oo + n = n + oo = oo + oo = oo
+        if self.is_finite? == false
+          return self
+        end
 
-      # n - oo = - oo + n = -oo - oo = -oo
-      if o.is_finite? == false
-        return o
+        # n - oo = - oo + n = -oo - oo = -oo
+        if o.is_finite? == false
+          return o
+        end
       end
 
       raise 'Internal error'
@@ -230,31 +247,46 @@ module Sy
 
     # Sub infinite values
     def sub_inf(o)
+      # Indefinite terms
+      if self.is_finite?.nil? or o.is_finite?.nil?
+        return self.sub(o)
+      end
+
       # NaN subtracts to NaN
       if self.is_nan? or o.is_nan?
         return :NaN.to_m
       end
 
-      # At this point self and o are either finite, oo or -oo
-      
-      # oo - oo = -oo + oo = NaN
-      if (self.is_finite? == false and o.is_finite? == false)
-        if (self.is_positive? and o.is_positive?) or
-          (self.is_negative? and o.is_negative?)
+      if Sy.setting(:complex_arithmetic)
+        # +- oo +- oo = NaN
+        if (self.is_finite? == false and o.is_finite? == false)
           return :NaN.to_m
         end
-      end
 
-      # oo + n = oo + oo = oo
-      # -oo + n = -oo - oo = -oo
-      if self.is_finite? == false
-        return self
-      end
+        # oo + n = n + oo = oo
+        if (self.is_finite? == false or o.is_finite? == false)
+          return :oo.to_m
+        end
+      else
+        # oo - oo = -oo + oo = NaN
+        if (self.is_finite? == false and o.is_finite? == false)
+          if (self.is_positive? and o.is_positive?) or
+            (self.is_negative? and o.is_negative?)
+            return :NaN.to_m
+          end
+        end
 
-      # n - oo = -oo
-      # n + oo = oo
-      if o.is_finite? == false
-        return -o
+        # oo + n = oo + oo = oo
+        # -oo + n = -oo - oo = -oo
+        if self.is_finite? == false
+          return self
+        end
+        
+        # n - oo = -oo
+        # n + oo = oo
+        if o.is_finite? == false
+          return -o
+        end
       end
 
       raise 'Internal error'
@@ -262,31 +294,45 @@ module Sy
     
     # Multiply infinite values
     def mul_inf(o)
+      # Indefinite factors
+      if self.is_finite?.nil? or o.is_finite?.nil?
+        return self.mul(o)
+      end
+
       # NaN multiplies to NaN
       if self.is_nan? or o.is_nan?
         return :NaN.to_m
       end
 
-      # oo*0     => NaN
+      # oo*0 = 0*oo = NaN
       if self.is_zero? or o.is_zero?
         return :NaN.to_m
       end
 
-      if (self.is_positive? and o.is_positive?) or
-        (self.is_negative? and o.is_negative?)
+      if Sy.setting(:complex_arithmetic)
         return :oo.to_m
-      end
+      else
+        if (self.is_positive? and o.is_positive?) or
+          (self.is_negative? and o.is_negative?)
+          return :oo.to_m
+        end
 
-      if (self.is_negative? and o.is_positive?) or
-        (self.is_positive? and o.is_negative?)
-        return -:oo.to_m
+        if (self.is_negative? and o.is_positive?) or
+          (self.is_positive? and o.is_negative?)
+          return -:oo.to_m
+        end
       end
-
+      
       raise 'Internal error'
     end
 
     # Divide infinite values
     def div_inf(o)
+      # Indefinite factors
+      if self.is_finite?.nil? or o.is_finite?.nil?
+        return self.div(o)
+      end
+
       # NaN/* = */NaN = NaN
       if self.is_nan? or o.is_nan?
         return :NaN.to_m
@@ -299,7 +345,11 @@ module Sy
 
       # */0 = NaN
       if o.is_zero?
-        return :NaN.to_m
+        if Sy.setting(:complex_arithmetic)
+          return :oo.to_m
+        else
+          return :NaN.to_m
+        end
       end
 
       # n/oo = n/-oo = 0
@@ -309,10 +359,14 @@ module Sy
 
       # oo/n = -oo/-n = oo, -oo/n = oo/-n = -oo
       if o.is_finite?
-        if self.sign == o.sign
+        if Sy.setting(:complex_arithmetic)
           return :oo.to_m
         else
-          return -:oo.to_m
+          if self.sign == o.sign
+            return :oo.to_m
+          else
+            return -:oo.to_m
+          end
         end
       end
 
@@ -321,6 +375,11 @@ module Sy
 
     # Power of infinite values
     def power_inf(o)
+      # Indefinite factors
+      if self.is_finite?.nil? or o.is_finite?.nil?
+        return self.power(o)
+      end
+
       # NaN**(..) = NaN, (..)**NaN = NaN
       if self.is_nan? or o.is_nan?
         return :NaN.to_m
@@ -331,24 +390,49 @@ module Sy
         return :NaN.to_m
       end
 
-      # 0**-oo = NaN
-      if self.is_zero? and o.is_finite? == false
-        return :NaN.to_m
-      end
-      
-      # n**-oo = oo**-oo = -oo**-oo = 0
-      if o.is_finite? == false and o.is_negative?
-        return 0.to_m
-      end
+      if Sy.setting(:complex_arithmetic)
+        if o.is_finite? == false
+          return :NaN.to_m
+        elsif o.is_finite? == true
+          return :oo.to_m
+        else
+          # We don't know whether or not exponent is finite. Cannot simplify
+          return self.power(o)
+        end
+      else
+        if self.is_zero? and o.is_finite? == false
+          return :NaN.to_m
+        end
 
-      # -oo**n = -oo**oo = -oo
-      if self.is_finite? == false and self.is_negative?
-        return -:oo.to_m
-      end
+        if self.is_finite?.nil? or o.is_finite?.nil?
+          # We don't know whether base or exponent are finite. Cannot simplify
+          return self.power(o)
+        end
+        
+        # n**-oo = oo**-oo = -oo**-oo = 0
+        if o.is_finite? == false and o.is_negative?
+          return 0.to_m
+        end
+        
+        if self.is_finite? == false and self.is_negative?
+          if o.is_finite? == true
+            # -oo*n = oo*(-1**n)
+            return :oo.to_m.mul(self.sign**o)
+          else
+            # -oo**oo = NaN
+            return :NaN.to_m
+          end
+        end
 
-      # The only remaining possibilities:
-      # oo**n = n*oo = oo*oo = oo
-      return :oo.to_m      
+        # -n**oo => NaN
+        if self.is_finite? and self.is_negative?
+          return NaN.to_m
+        end
+        
+        # The only remaining possibilities:
+        # oo**n = n*oo = oo*oo = oo
+        return :oo.to_m
+      end
     end
     
     ##
@@ -516,7 +600,15 @@ module Sy
       
       # Divide by zero
       if o.is_zero?
-        return :NaN.to_m
+        if Sy.setting(:complex_arithmetic)
+          if self.is_zero?
+            return :NaN.to_m
+          else
+            return :oo.to_m
+          end
+        else
+          return :NaN.to_m
+        end
       end
 
       if self.is_a?(Sy::Fraction)

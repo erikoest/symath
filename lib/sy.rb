@@ -52,6 +52,11 @@ module Sy
 
     # Simplify expression at the time they are composed
     :compose_with_simplify => true,
+
+    # Use complex arithmetic. Negative square roots are reduced to i*square root
+    # of the positive part. The complex infinity is used rather than the positive
+    # and negative real infinities.
+    :complex_arithmetic => true,
   }
 
   # Note: No type checking here, although the library code expects the various parameters
