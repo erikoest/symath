@@ -62,7 +62,7 @@ module Sy::Operation::Normalization
     
     # Hash: product[vector part][scalar part]
     products = {}
-    
+
     terms.each do |e|
       w = e.vector_factors_exp
       if !products.key?(w)
@@ -104,7 +104,7 @@ module Sy::Operation::Normalization
 
     terms2.each { |s| ret += s }
 
-    return self == ret ? nil : ret
+    return change_or_nil(ret)
   end
   
   def normalize_product()
@@ -189,7 +189,7 @@ module Sy::Operation::Normalization
     end
 
     if p2.length > 0
-      ret = p2.inject(:mul)
+      ret = p2.inject(:*)
     else
       ret = 1.to_m
     end
@@ -199,7 +199,7 @@ module Sy::Operation::Normalization
     end
 
     if d2.length > 0
-      ret = ret.div(d2.inject(:mul))
+      ret = ret / d2.inject(:*)
     end
 
     ret *= Sy::Variable.normalize_vectors(vector_factors.to_a)
@@ -208,7 +208,7 @@ module Sy::Operation::Normalization
       ret = ret.neg
     end
 
-    return self == ret ? nil : ret
+    return change_or_nil(ret)
   end
 
   def normalize_power()
@@ -230,7 +230,7 @@ module Sy::Operation::Normalization
 
     ret = base.power(expo)
 
-    return self == ret ? nil : ret
+    return change_or_nil(ret)
   end
 
   def normalize_matrix()
@@ -238,7 +238,6 @@ module Sy::Operation::Normalization
       row(r).map { |e| e.normalize }
     end
 
-    ret = Sy::Matrix.new(data)
-    return self == ret ? nil : ret
+    return change_or_nil(Sy::Matrix.new(data))
   end
 end

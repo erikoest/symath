@@ -393,22 +393,14 @@ module Sy
       if Sy.setting(:complex_arithmetic)
         if o.is_finite? == false
           return :NaN.to_m
-        elsif o.is_finite? == true
-          return :oo.to_m
         else
-          # We don't know whether or not exponent is finite. Cannot simplify
-          return self.power(o)
+          return :oo.to_m
         end
       else
         if self.is_zero? and o.is_finite? == false
           return :NaN.to_m
         end
 
-        if self.is_finite?.nil? or o.is_finite?.nil?
-          # We don't know whether base or exponent are finite. Cannot simplify
-          return self.power(o)
-        end
-        
         # n**-oo = oo**-oo = -oo**-oo = 0
         if o.is_finite? == false and o.is_negative?
           return 0.to_m

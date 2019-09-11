@@ -294,7 +294,7 @@ module Sy
     end
 
     def to_latex()
-      if is_dform?
+      if type.is_dform?
         return Sy.setting(:diff_symbol) + undiff.to_latex
       elsif @type.is_vector?
         return '\vec{'.to_s + @name.to_s + '}'.to_s

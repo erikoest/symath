@@ -32,7 +32,7 @@ module Sy
         return args[0].anti_derivative(var) + :C.to_m
       else
         int = args[0].anti_derivative(var)
-        return op(:bounds, var.undiff, a, b)
+        return op(:bounds, int, var.undiff, a, b)
       end
     end
     

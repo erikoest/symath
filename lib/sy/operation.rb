@@ -36,4 +36,9 @@ module Sy::Operation
     
     return ret
   end
+
+  def change_or_nil(e)
+    e = e.to_m
+    return self == e ? nil : e
+  end
 end
