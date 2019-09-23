@@ -26,11 +26,12 @@ module Sy
     end
 
     def to_s()
-      return '[' + @args[0].to_s + '](' + @a + ',' + @b + ')'
+      return '[' + @args[0].to_s + '](' + @a.to_s + ',' + @b.to_s + ')'
     end
 
     def to_latex()
-      return '\left[' + @args[0].to_latex + '\right]^{' + @b.to_latex + '}_{' + @a.to_latex + '}'
+      return '\left[' + @args[0].to_latex + '\right]^{' + @b.to_latex + '}_{' +
+             @a.to_latex + '}'
     end
   end
 end
