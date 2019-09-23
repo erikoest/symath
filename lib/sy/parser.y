@@ -7,27 +7,29 @@ class Parser
     left '*' '/' '^'
     left '+' '-'
     left '='
+    CMD
   preclow
 rule
   target: exp
-      | /* none */     { result = 0 }
-  exp: exp '=' exp     { result = operator('Sy::Equation', [val[0], val[2]], val[0]) }
-     | exp '+' exp     { result = operator('Sy::Sum', [val[0], val[2]], val[0]) }
-     | exp '-' exp     { result = operator('Sy::Subtraction', [val[0], val[2]], val[0]) }
-     | exp '*' exp     { result = operator('Sy::Product', [val[0], val[2]], val[0]) }
-     | exp '/' exp     { result = operator('Sy::Fraction', [val[0], val[2]], val[0]) }
-     | exp '^' exp     { result = operator('Sy::Wedge', [val[0], val[2]], val[0]) }
-     | exp '**' exp    { result = operator('Sy::Power', [val[0], val[2]], val[0]) }
+     | /* none */     { result = nil }
+  exp: CMD exp         { result = val[1].send(val[0]) }
+     | exp '=' exp     { result = Sy::Equation(val[0], val[2]) }
+     | exp '+' exp     { result = val[0].add(val[2]) }
+     | exp '-' exp     { result = val[0].sub(val[2]) }
+     | exp '*' exp     { result = val[0].mul(val[2]) }
+     | exp '/' exp     { result = val[0].div(val[2]) }
+     | exp '^' exp     { result = val[0].wedge(val[2]) }
+     | exp '**' exp    { result = val[0].power(val[2]) }
      | '(' exp ')'     { result = val[1] }
-     | '-' exp =UMINUS { result = operator('Sy::Minus', [val[1]], val[0]) }
+     | '-' exp =UMINUS { result = val[1].neg }
      | func
 
   func: NAME '(' ')'      { result = function(val[0], []) }
       | NAME '(' args ')' { result = function(val[0], val[2]) }
       | '#' '(' exp ')'   { result = function('sharp', [val[2]]) }
       | '|' exp '|'       { result = function('abs', [val[1]]) }
-      | NUMBER            { result = leaf('Sy::Number', val[0]) }
-      | NAME              { result = self.named_value(val[0]) }
+      | NUMBER            { result = val[0].to_i.to_m }
+      | NAME              { result = named_node(val[0]) }
 
   args: args ',' exp { result = val[0].push(val[2]) }
       | exp          { result = [val[0]] }
@@ -40,99 +42,63 @@ module Sy
 ---- inner
   attr_reader :exp
 
-  def named_value(node)
-if (node.val.match(/^(pi|e|i)$/)) then
-      return leaf('Sy::ConstantSymbol', node)
-    end
-    return leaf('Sy::Variable', node)
-  end
-
-  def operator(clazz, subnodes, pos)
-    args = subnodes.map { |s| s.val }
-    paths = [Sy::Path.new([], pos.paths[0].pos)]
-    (0...subnodes.length).to_a.each { |i| paths += subnodes[i].paths.map { |p| p.unshift(i) } }
-    return Sy::Node.new(Kernel.const_get(clazz).new(*args), paths)
-  end
-
   def function(name, subnodes)
-    args = subnodes.map { |s| s.val }
-    paths = name.paths.clone
-    (0...subnodes.length).to_a.each { |i| paths += subnodes[i].paths.map { |p| p.unshift(i) } }
+    args = subnodes
 
     # If name is a built-in operator, create it rather than a function
-      name = 'lower' if name.eql?('b')
+    name = 'lower' if name.eql?('b')
       
-    if Sy::Operator.builtin_operators.member?(name.val.to_sym)
-      return Sy::Node.new(op(name.val, *args), paths)
+    if Sy::Operator.is_builtin?(name.to_sym)
+      return op(name, *args)
+    else
+      return fn(name, *args)
     end
-    
-    return Sy::Node.new(Sy::Function.new(name.val, args), paths)
   end
 
-  def leaf(clazz, name)
-    if clazz.eql?('Sy::Variable')
-      n = name.val
-      t = 'real'
-     if n =~ /^d/
-       n = n[1..-1]
-       t = 'dform'
-     end
-     return Sy::Node.new(Sy::Variable.new(n,t), name.paths)
+  # Create a variable or constant
+  def named_node(name)
+    if name.length >= 2 and name.match(/^d/)
+      name = name[1..-1]
+      return name.to_m('dform')
     end
-    
-    return Sy::Node.new(Kernel.const_get(clazz).new(name.val), name.paths)
-  end
 
+    return name.to_m
+  end
+	
   def parse(str)
     @q = []
 
-    pos = 0
     until str.empty?
       case str
       when /\A\s+/
         # whitespace, do nothing
+      when /(eval|normalize|expand|combine_fractions)/
+        # command
+        @q.push [:CMD, $&]
       when /\A[A-Za-z_]+[A-Za-z_0-9]*/
         # name (char + (char|num))
-        @q.push [:NAME, Sy::Node.new($&, [Sy::Path.new([], pos)])]
+        @q.push [:NAME, $&]
       when /\A\d+(\.\d+)?/
         # number (digits.digits)
-        @q.push [:NUMBER, Sy::Node.new($&, [Sy::Path.new([], pos)])]
+        @q.push [:NUMBER, $&]
       when /\A\*\*/
         # two character operators
         s = $&
-        @q.push [s, Sy::Node.new(s, [Sy::Path.new([], pos)])]
+        @q.push [s, s]
       when /\A.|\n/o
         # other signs
         s = $&
-        @q.push [s, Sy::Node.new(s, [Sy::Path.new([], pos)])]
+        @q.push [s, s]
       end
-      pos += str.length - $'.length
       str = $'
     end
     @q.push [false, '$end']
-    nodes = do_parse
-    return if nodes == 0
+    exp = do_parse
+    return if exp.nil?
 
-    @paths = nodes.paths
-    @exp = nodes.val
-    # dump_paths
-
-    return nodes.val
+    return exp
   end
 
-  def dump_paths
-    @paths.each do |p|
-      puts sprintf("%d %s %s", p.pos, p.path, @val.seek(p).to_s)
-    end
-  end
-
-  def paths_by_position(pos)
-    # find highest position < pos
-    highest = @paths.map { |p| p.pos <= pos ? p.pos : 0 }.max
-    # return all paths having the highest position (can be multiple)
-    return @paths.select { |p| p.pos == highest }.sort
-  end
-  
   def next_token()
     @q.shift
   end
