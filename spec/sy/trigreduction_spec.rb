@@ -2,7 +2,7 @@ require 'spec_helper'
 require 'sy'
 
 module Sy
-  describe Sy::Operation::TrigReduction do
+  describe Sy::Operation::Normalization, ', trigreduction' do
     exp = {
       fn(:sin, 0)                  => 0.to_m,
       fn(:sin, :pi/6)              => 1.to_m/2,
@@ -23,7 +23,7 @@ module Sy
 
     exp.each do |from, to|
       it "reduces '#{from.to_s}' to '#{to.to_s}'" do
-        expect(from.trig_reduct).to be_equal_to to
+        expect(from.normalize).to be_equal_to to
       end
     end
   end

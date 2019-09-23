@@ -141,9 +141,13 @@ module Sy
       :codiff => 'Sy::Codiff',        
     }
 
+    def self.is_builtin?(name)
+      return @@builtin_operators.key?(name)
+    end
+
     def self.builtin(name, args)
       name = name.to_sym
-      if !@@builtin_operators.key?(name)
+      if !self.is_builtin?(name)
         return
       end
 

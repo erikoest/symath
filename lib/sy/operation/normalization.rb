@@ -44,7 +44,11 @@ module Sy::Operation::Normalization
       return normalize_matrix
     end
 
-    return act_subexpressions('normalize')
+    # Normalize all arguments,
+    norm = act_subexpressions('normalize')
+    return change_or_nil(self.reduce) if norm.nil?
+    # and then simplify the expression.
+    return norm.reduce
   end
 
   def normalize_sum()

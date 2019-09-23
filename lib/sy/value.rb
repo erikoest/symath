@@ -7,7 +7,6 @@ require 'sy/operation/distributivelaw'
 require 'sy/operation/differential'
 require 'sy/operation/integration'
 require 'sy/operation/exterior'
-require 'sy/operation/trigreduction'
 
 module Sy
   class Value
@@ -19,6 +18,55 @@ module Sy
     include Operation::Differential
     include Operation::Integration
     include Operation::Exterior
+    
+    @@class_order = [
+      'Sy::Operator',
+      'Sy::Function',
+      'Sy::Function::Abs',
+      'Sy::Function::Arccos',
+      'Sy::Function::Arcosh',
+      'Sy::Function::Arccot',
+      'Sy::Function::Arcoth',
+      'Sy::Function::Arccsc',
+      'Sy::Function::Arcsch',
+      'Sy::Function::Arcsec',
+      'Sy::Function::Arsech',
+      'Sy::Function::Arcsin',
+      'Sy::Function::Arsinh',
+      'Sy::Function::Arctan',
+      'Sy::Function::Artanh',
+      'Sy::Function::Cos',
+      'Sy::Function::Cosh',
+      'Sy::Function::Cot',
+      'Sy::Function::Coth',
+      'Sy::Function::Csc',
+      'Sy::Function::Csch',
+      'Sy::Function::Exp',
+      'Sy::Function::Fact',
+      'Sy::Function::Ln',
+      'Sy::Function::Sec',
+      'Sy::Function::Sech',
+      'Sy::Function::Sin',
+      'Sy::Function::Sinh',
+      'Sy::Function::Sqrt',
+      'Sy::Function::Tan',
+      'Sy::Function::Tanh',
+      'Sy::Sum',
+      'Sy::Product',
+      'Sy::Fraction',
+      'Sy::Wedge',
+      'Sy::Power',
+      'Sy::Minus',
+      'Sy::Variable',
+      'Sy::ConstantSymbol',
+      'Sy::Number',
+    ]
+
+    @@class_order_hash = {}
+
+    @@class_order.each_with_index do |e, i|
+      @@class_order_hash[e] = i
+    end
     
     def deep_clone()
       return Marshal.load(Marshal.dump(self))
@@ -67,21 +115,7 @@ module Sy
     # Sorting/ordering operator. The ordering is used by the normalization to
     # order the parts of a sum, product etc.
     def <=>(other)
-      class_order = {
-        'Sy::Operator' => 1,
-        'Sy::Function' => 2,
-        'Sy::Sum' => 3,
-        'Sy::Product' => 5,
-        'Sy::Fraction' => 6,
-        'Sy::Wedge' => 7,
-        'Sy::Power' => 8,
-        'Sy::Minus' => 9,
-        'Sy::Variable' => 10,
-        'Sy::ConstantSymbol' => 11,
-        'Sy::Number' => 12,
-      }
-
-      return class_order[self.class.name] <=> class_order[other.class.name]
+      return @@class_order_hash[self.class.name] <=> @@class_order_hash[other.class.name]
     end
 
     def <(other)
@@ -166,6 +200,11 @@ module Sy
 
     # Replaces map of variables with expressions. Overridden by subclasses
     def replace(map)
+      return self
+    end
+
+    # Reduce expression if possible. Defaults to no reduction
+    def reduce()
       return self
     end
     

@@ -57,6 +57,9 @@ module Sy
     # of the positive part. The complex infinity is used rather than the positive
     # and negative real infinities.
     :complex_arithmetic => true,
+
+    # Biggest factorial that we calculate to a value
+    :max_calculated_factorial => 100,
   }
 
   # Note: No type checking here, although the library code expects the various parameters
@@ -236,5 +239,5 @@ module Sy
   # modules.
   Sy::Operation::Differential.initialize
   Sy::Operation::Integration.initialize
-  Sy::Operation::TrigReduction.initialize
+  Sy::Function::Trig.initialize
 end

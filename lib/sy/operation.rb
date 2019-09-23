@@ -38,6 +38,7 @@ module Sy::Operation
   end
 
   def change_or_nil(e)
+    return nil if e.nil?
     e = e.to_m
     return self == e ? nil : e
   end
