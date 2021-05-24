@@ -41,15 +41,15 @@ module Sy
     def type()
       return term1.type.sum(term2.type)
     end
-    
+
     def to_s()
       if Sy.setting(:expl_parentheses)
         return '('.to_s + term1.to_s + ' + ' + term2.to_s + ')'.to_s
       else
         if term2.is_a?(Sy::Minus)
-          return term1.to_s + ' ' + term2.to_s
+          return term1.to_s + " " + term2.to_s
         else
-          return term1.to_s + ' + ' + term2.to_s
+          return term1.to_s + " + " + term2.to_s
         end
       end
     end

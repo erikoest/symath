@@ -221,7 +221,7 @@ module Sy
       end
     end
 
-    def vector_factors()
+    def vector_factors_REMOVE()
       if @type.is_vector? or @type.is_dform?
         return [self].to_enum
       else

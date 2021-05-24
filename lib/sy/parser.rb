@@ -7,12 +7,11 @@
 require 'racc/parser.rb'
 
 require 'sy'
-require 'sy/node'
 
 module Sy
 class Parser < Racc::Parser
 
-module_eval(<<'...end parser.y/module_eval...', 'parser.y', 43)
+module_eval(<<'...end parser.y/module_eval...', 'parser.y', 42)
   attr_reader :exp
 
   def function(name, subnodes)
@@ -45,7 +44,7 @@ module_eval(<<'...end parser.y/module_eval...', 'parser.y', 43)
       case str
       when /\A\s+/
         # whitespace, do nothing
-      when /(eval|normalize|expand|combine_fractions)/
+      when /(eval|normalize|expand|factorize|combine_fractions)/
         # command
         @q.push [:CMD, $&]
       when /\A[A-Za-z_]+[A-Za-z_0-9]*/

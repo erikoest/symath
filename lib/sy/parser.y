@@ -36,7 +36,6 @@ rule
 end
 ---- header
 require 'sy'
-require 'sy/node'
 
 module Sy
 ---- inner
@@ -68,11 +67,20 @@ module Sy
   def parse(str)
     @q = []
 
+    cmd = [
+      'eval',
+      'normalize',
+      'expand',
+      'factorize',
+      'factorize_simple'
+      'combine_fractions'
+    ]
+
     until str.empty?
       case str
       when /\A\s+/
         # whitespace, do nothing
-      when /(eval|normalize|expand|combine_fractions)/
+      when *cmd
         # command
         @q.push [:CMD, $&]
       when /\A[A-Za-z_]+[A-Za-z_0-9]*/

@@ -10,10 +10,18 @@ module Sy
       return @args[0]
     end
 
+    def factor1=(f)
+      @args[0] = f
+    end
+
     def factor2()
       return @args[1]
     end
     
+    def factor2=(f)
+      @args[1] = f
+    end
+
     def is_commutative?()
       return true
     end
@@ -45,10 +53,17 @@ module Sy
     end
 
     # TODO: Error if both factors have vector components
-    def vector_factors()
+    def vector_factors_REMOVE()
       return Enumerator.new do |f|
-        factor1.vector_factors.each { |f1| f << f1 }
-        factor2.vector_factors.each { |f2| f << f2 }
+        factor1.vector_factors_REMOVE.each { |f1| f << f1 }
+        factor2.vector_factors_REMOVE.each { |f2| f << f2 }
+      end
+    end
+
+    def factors()
+      return Enumerator.new do |f|
+        factor1.factors.each { |f1| f << f1 }
+        factor2.factors.each { |f2| f << f2 }
       end
     end
     

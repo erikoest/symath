@@ -24,7 +24,11 @@ module Sy
         return
       end
 
-      return (!argument.is_positive?() and !argument.is_zero?)
+      return (!argument.is_positive? and !argument.is_zero?)
+    end
+
+    def is_negative_number?()
+      return argument.is_number?
     end
 
     def is_zero?()
@@ -55,10 +59,17 @@ module Sy
       return argument.div_factors
     end
 
-    def vector_factors()
-      return argument.vector_factors
+    def vector_factors_REMOVE()
+      return argument.vector_factors_REMOVE
     end
     
+    def factors()
+      return Enumerator.new do |f|
+        f << -1.to_m
+        argument.factors.each { |f1| f << f1 }
+      end
+    end
+
     def coefficient()
       return argument.coefficient
     end
@@ -75,6 +86,21 @@ module Sy
       return Enumerator.new do |s|
         argument.terms.each { |s1| s << s1.neg }
       end
+    end
+
+    def order()
+      return -arguent.order
+    end
+    
+    def reduce_constant_factors()
+      return -argument.reduce_constant_factors
+    end
+      
+    # Simple reduction rules, allows sign to change. Returns
+    # (reduced exp, sign, changed).
+    def reduce_modulo_sign
+      red, sign, changed = argument.reduce_modulo_sign
+      return red, -sign, true
     end
 
     def type()

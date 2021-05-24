@@ -47,6 +47,8 @@ module Sy
     :expl_parentheses => false,
     # Represent square roots with the root symbol or as a fraction exponent
     :sq_exponent_form => false,
+    # Represent fraction of scalars as a negative exponent
+    :fraction_exponent_form => false,
     # Show the multiplication sign in LaTeX output
     :ltx_product_sign => false,
 
@@ -54,17 +56,17 @@ module Sy
     :compose_with_simplify => true,
 
     # Use complex arithmetic. Negative square roots are reduced to i*square root
-    # of the positive part. The complex infinity is used rather than the positive
-    # and negative real infinities.
+    # of the positive part. The complex infinity is used rather than the
+    # positive and negative real infinities.
     :complex_arithmetic => true,
 
     # Biggest factorial that we calculate to a value
     :max_calculated_factorial => 100,
   }
 
-  # Note: No type checking here, although the library code expects the various parameters
-  # to be of specific types (boolean, string, etc.). Failure and/or strange behaviour
-  # must be expected if they are set to different types.
+  # Note: No type checking here, although the library code expects the various
+  # parameters to be of specific types (boolean, string, etc.). Failure and/or
+  # strange behaviour must be expected if they are set to different types.
   def self.setting(name, value = nil)
     name = name.to_sym
     if !@@global_settings.key?(name)

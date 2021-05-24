@@ -21,6 +21,10 @@ module Sy
     def is_positive?()
       return value() > 0
     end
+
+    def is_number?()
+      return true
+    end
     
     def is_zero?()
       return value() == 0

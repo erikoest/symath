@@ -13,11 +13,11 @@ module Sy
       x*(1 + 3*y)                           => 3*(x*y) + x,
       -x*(-y - 3)                           => x*y + 3*x,
       -x*(x - 3)                            => 3*x - x**2,
-      (a + b)*c                             => a*c + b*c,
+      (a + b)*c                             => b*c + a*c,
       (fn(:sin, x) + y)*(fn(:cos, x) + y)   =>
-        fn(:cos, x)*fn(:sin, x) + fn(:cos, x)*y + fn(:sin, x)*y + y**2,
+        fn(:cos, x)*fn(:sin, x) + y*fn(:sin, x) + y*fn(:cos, x) + y**2,
       3*x*(2*x - 1)*(4*x + 3)*(3*x**3 + 1)  =>
-        6*x**2 + 24*x**3 - 27*x**4 + 18*x**5 + 72*x**6 - 9*x,
+        72*x**6 + 18*x**5 - 27*x**4 + 24*x**3 + 6*x**2 - 9*x,
     }
 
     sums.each do |from, to|
@@ -35,10 +35,10 @@ module Sy
       a/2                 => a/2,
       a/b                 => a/b,
       2/a                 => 2/a,
-      a/c + b/c           => (a + b)/c,
+      a/c + b/c           => (b + a)/c,
       2.to_m/3 + 3.to_m/4 => 17.to_m/12,
       a/2 + 2*a/3         => 7*a/6,
-      2*a/b + 2*c/(3*b)   => (6*a + 2*c)/(3*b),
+      2*a/b + 2*c/(3*b)   => (2*c + 6*a)/(3*b),
     }
 
     sums.each do |from, to|
@@ -51,9 +51,9 @@ module Sy
   describe Sy::Operation::DistributiveLaw, ', factorization' do
     poly = {
       6*x**2 + 24*x**3 - 27*x**4 + 18*x**5 + 72*x**6 - 9*x =>
-        3*(2*x - 1)*(3*x**3 + 1)*(4*x + 3)*x,
+        3*x*(2*x - 1)*(4*x + 3)*(3*x**3 + 1),
       :x**4/:b - 1/(:b*4)                                  =>
-        (2*x**2 - 1)*(2*x**2 + 1)/(4*b),
+        (2*x**2 + 1)*(2*x**2 - 1)/(4*b),
     }
 
     poly.each do |from, to|

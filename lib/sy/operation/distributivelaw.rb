@@ -54,11 +54,23 @@ module Sy::Operation::DistributiveLaw
   end
 
   def expand_recurse(exp1, exp2)
+    sign = 1.to_m
+
+    if exp1.is_a?(Sy::Minus)
+      exp1 = exp1.argument
+      sign = -sign
+    end
+
+    if exp2.is_a?(Sy::Minus)
+      exp2 = exp2.argument
+      sign = -sign
+    end
+
     if exp1.is_sum_exp? and exp1.arity > 1
       ret = 0.to_m
       
       exp1.terms.each do |t|
-        ret += expand_recurse(t, exp2)
+        ret += sign*expand_recurse(t, exp2)
       end
       return ret
     end
@@ -67,7 +79,7 @@ module Sy::Operation::DistributiveLaw
       ret = 0.to_m
       
       exp2.terms.each do |t|
-        ret += expand_recurse(exp1, t)
+        ret += sign*expand_recurse(exp1, t)
       end
       return ret
     end
@@ -80,7 +92,7 @@ module Sy::Operation::DistributiveLaw
       exp2 = expand_recurse(exp2.factor1, exp2.factor2)
     end
     
-    return exp1*exp2
+    return sign*exp1*exp2
   end
 
   def has_fractional_terms?()
@@ -97,6 +109,125 @@ module Sy::Operation::DistributiveLaw
     return false
   end
 
+  # Collect factors which occur in each term.
+  def factorize_simple()
+    return self if !self.is_sum_exp?
+
+    sfactors = {}
+    vfactors = {}
+    coeffs = []
+    dcoeffs = []
+    vectors = []
+    
+    terms.each_with_index do |t, i|
+      coeffs.push(t.coefficient)
+      dcoeffs.push(t.div_coefficient)
+      vectors.push(t.vector_factors_exp)
+      t.vector_factors.each do |v|
+        if !vfactors[v] = []
+          vfactors[v] = []
+        end
+
+        vfactors[v][i] = 1
+      end
+      
+      t.scalar_factors.each do |f|
+        if f.exponent.is_number?
+          ex = f.base
+          n = f.exponent
+        else
+          ex = f
+          n = 1
+        end
+      
+        if !sfactors.key?(ex)
+          sfactors[ex] = []
+        end
+      
+        sfactors[ex][i] = n.value
+      end
+
+      t.div_factors.each do |d|
+        if d.exponent.is_number?
+          ex = d.base
+          n = d.exponent
+        else
+          ex = d
+          n = 1
+        end
+
+        if !sfactors.key?(ex)
+          sfactors[ex] = []
+        end
+
+        if sfactors[ex][i].nil?
+          sfactors[ex][i] = -n.value
+        else
+          sfactors[ex][i] -= n.value
+        end
+      end
+    end
+
+    # If there is only one term, there is nothing to factorize
+    if coeffs.length == 1
+      return self
+    end
+
+    # Try to factorize the scalar part
+    spart = 1.to_m
+    dpart = 1.to_m
+    sfactors.each do |ex, pow|
+      # Replace nil with 0 and extend array to full length
+      pow.map! { |i| i || 0 }
+      (coeffs.length - pow.length).times { pow << 0 }
+
+      if pow.max > 0 and pow.min > 0
+        f = pow.min
+        pow.map! { |i| i - f }
+        spart = spart*ex**f
+      end
+      
+      if pow.max < 0 and pow.min < 0
+        f = pow.max
+        pow.map! { |i| i - f }
+        dpart = dpart*ex**(-f)
+      end
+    end
+    
+    # Return self if there were no common factors.
+    if spart == 1 and dpart == 1
+      return self
+    end
+
+    # Extract gcd from coeffs and dcoeffs
+    gcd_coeffs = coeffs.inject(:gcd)
+    gcd_dcoeffs = dcoeffs.inject(:gcd)
+    coeffs.map! { |i| i/gcd_coeffs }
+    dcoeffs.map! { |i| i/gcd_dcoeffs }
+    
+    newsum = 0.to_m
+
+    (0..coeffs.length-1).each do |i|
+      t = coeffs[i].to_m
+      
+      sfactors.each do |ex, pow|
+        next if pow[i].nil?
+        if pow[i] > 0
+          t *= ex**pow[i]
+        elsif pow[i] < 0
+          t /= ex**(-pow[i])
+        end
+      end
+
+      t /= dcoeffs[i]
+      t *= vectors[i]
+
+      newsum += t
+    end
+
+    return gcd_coeffs*spart*newsum/(gcd_dcoeffs*dpart)
+  end
+  
   # The factorize() method factorizes a univariate polynomial expression
   # with integer coefficients.
   def factorize()
@@ -136,10 +267,11 @@ module Sy::Operation::DistributiveLaw
   #   a/c + b/c   -> (a + b)/c
   #   2/3 + 3/4   -> 17/12
   #   a/2 + 2*a/3 -> 7*a/6
-  #   2*a/b + 2*c/(3*b) -> (6*a + 2*c)/(3*b) ?
+  #   2*a/b + 2*c/(3*b) -> (6*a + 2*c)/(3*b)
   def combine_fractions()
     if is_sum_exp?
-      return combfrac_sum
+      sum = combfrac_sum
+      return sum.nil? ? deep_clone : sum
     end
     
     sub = act_subexpressions('combine_fractions')
@@ -147,10 +279,33 @@ module Sy::Operation::DistributiveLaw
   end
 
   def combfrac_add_term(sum, t)
-    fact = t.scalar_factors.inject(:mul)
-    divf = t.div_factors.inject(:mul)
-    c = t.sign*t.coefficient
-    dc = t.div_coefficient
+    c = 1
+    dc = 1
+    fact = 1.to_m
+    divf = 1.to_m
+
+    t.factors.each do |f|
+      if f.is_number?
+        c *= f.value
+        next
+      end
+
+      if f == -1
+        fact *= -1
+        next
+      end
+
+      if f.is_divisor_factor?
+        if f.base.is_number?
+          dc *= (f.base.value**f.exponent.argument.value)
+        else
+          divf *= f.base
+        end
+        next
+      end
+
+      fact *= f
+    end
 
     if !sum.key?(divf)
       sum[divf] = {}

@@ -70,7 +70,7 @@ module Sy::Operation::Differential
     if is_a?(Sy::Product)
       return diff_product(vars)
     end
-      
+
     if is_a?(Sy::Wedge)
       return diff_product(vars)
     end
@@ -122,16 +122,7 @@ module Sy::Operation::Differential
   # Apply wedge product or ordinary product between two expressions,
   # depending on whether or not they have vector parts.
   def _diff_wedge(exp1, exp2)
-    # Take out the divisor from both exp1 and exp2, then expand left and
-    # right side and put back the divisor in the end.
-    c = exp1.coefficient.to_m*exp2.coefficient.to_m*exp1.sign*exp2.sign
-    d = (exp1.div_factors.to_a + exp2.div_factors.to_a).inject(:*) || 1.to_m
-
-    s1 = (exp1.scalar_factors.inject(:*) || 1.to_m)*(
-          exp1.vector_factors.inject(:^) || 1.to_m)
-    s2 = (exp2.scalar_factors.inject(:*) || 1.to_m)*(
-          exp2.vector_factors.inject(:^) || 1.to_m)
-    s3 = s1.mul(s2).expand
-    return c*s3/d
+    # FIXME: Insert wedge instead of * if factors are vectors?
+    return (exp1.factors.to_a + exp2.factors.to_a).inject(:*)
   end
 end

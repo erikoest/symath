@@ -39,76 +39,56 @@ module Sy
     end
     
     def init_from_exp(e)
-      # From this point, expect p to be a Sy::Value
+      # From this point, expect e to be a Sy::Value
       error = 'Expression ' + e.to_s + ' is not an univariate polynomial'
+      max_degree = 0
+      terms = {}
 
-      var = nil
-      
-      # First assert that this really is an univariate polynomial.
-      
+      # Assert that this really is an univariate polynomial, and build
+      # the dup array representation.
       e.terms.each do |s|
-        s.vector_factors.each do |s|
-          raise error
-        end
-
-        s.div_factors.each do |s|
-          raise error
-        end
-
-        if s.div_coefficient != 1
-          raise error
-        end
+        var = nil
+        c = 1
+        d = 0
         
-        if s.scalar_factors.to_a.size > 1
-          raise error
-        end
-
-        s.scalar_factors.each_with_index do |sf, i|
-          if i > 0
+        s.factors.each do |f|
+          if f.is_a?(Sy::Fraction)
             raise error
           end
-          
-          if sf.is_a?(Sy::Power)
-            if !sf.base.is_a?(Sy::Variable) or !sf.exponent.is_a?(Sy::Number)
+
+          if f == -1
+            c *= -1
+          elsif f.is_number?
+            c *= f.value
+          else
+            if !var.nil?
               raise error
             end
 
-            var = sf.base
-          else
-            if !sf.is_a?(Sy::Variable)
+            var = f.base
+            if !var.is_a?(Sy::Variable)
               raise error
             end
 
-            var = sf
+            if !f.exponent.is_number?
+              raise error
+            end
+            d = f.exponent.value
           end
         end
 
-        if @var.nil?
-          @var = var
-        elsif @var != var
-          raise error
-        end
-      end
-
-      terms = {}
-      max_degree = 0
-      
-      e.terms.each do |s|
-        d = 0
-        s.scalar_factors.each do |term|
-          if term.is_a?(Sy::Power)
-            d = term.exponent.value
-          else
-            d = 1
+        if !var.nil?
+          if @var.nil?
+            @var = var
+          elsif @var != var
+            raise error
           end
         end
-
-        coeff = s.sign*s.coefficient
 
         if terms.key?(d)
-          terms[d] += coeff
+          terms[d] += c
         else
-          terms[d] = coeff
+          terms[d] = c
         end
 
         if d > max_degree

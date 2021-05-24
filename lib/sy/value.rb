@@ -1,4 +1,3 @@
-
 require 'sy/operation'
 require 'sy/operation/match'
 require 'sy/operation/evaluation'
@@ -14,14 +13,20 @@ module Sy
     include Operation::Evaluation
     include Operation::Normalization
     include Operation::DistributiveLaw
-    include Operation::TrigReduction
     include Operation::Differential
     include Operation::Integration
     include Operation::Exterior
     
     @@class_order = [
-      'Sy::Operator',
-      'Sy::Function',
+      'Sy::Number',
+      'Sy::ConstantSymbol',
+      'Sy::Variable',
+      'Sy::Minus',
+      'Sy::Power',
+      'Sy::Wedge',
+      'Sy::Fraction',
+      'Sy::Product',
+      'Sy::Sum',
       'Sy::Function::Abs',
       'Sy::Function::Arccos',
       'Sy::Function::Arcosh',
@@ -51,15 +56,8 @@ module Sy
       'Sy::Function::Sqrt',
       'Sy::Function::Tan',
       'Sy::Function::Tanh',
-      'Sy::Sum',
-      'Sy::Product',
-      'Sy::Fraction',
-      'Sy::Wedge',
-      'Sy::Power',
-      'Sy::Minus',
-      'Sy::Variable',
-      'Sy::ConstantSymbol',
-      'Sy::Number',
+      'Sy::Function',
+      'Sy::Operator',
     ]
 
     @@class_order_hash = {}
@@ -100,8 +98,8 @@ module Sy
       return self
     end
 
-    # Needed for value objects to be hashable. Subclasses should override this to return a
-    # value which tends to be different for unequal objects.
+    # Needed for value objects to be hashable. Subclasses should override
+    # this to return a value which tends to be different for unequal objects.
     def hash()
       return 1
     end
@@ -115,7 +113,8 @@ module Sy
     # Sorting/ordering operator. The ordering is used by the normalization to
     # order the parts of a sum, product etc.
     def <=>(other)
-      return @@class_order_hash[self.class.name] <=> @@class_order_hash[other.class.name]
+      return @@class_order_hash[self.class.name] <=>
+        @@class_order_hash[other.class.name]
     end
 
     def <(other)
@@ -154,11 +153,27 @@ module Sy
       
       return (is_positive? == false and is_zero? == false)
     end
+
+    def is_number?()
+      return false
+    end
+
+    def is_negative_number?()
+      return false
+    end
     
     def is_zero?()
       return
     end
 
+    def is_divisor_factor?()
+      return false
+    end
+
+    def is_unit_quaternion?()
+      return false
+    end
+    
     # Returns true if this is a function declaration, a operator declaration or
     # a variable assignment
     def is_definition?()
@@ -612,6 +627,10 @@ module Sy
       if o.is_a?(Sy::Fraction) and o.dividend == 1.to_m
         return self/o.divisor
       end
+
+      if self.type.is_subtype?(:tensor) and o.type.is_subtype?(:tensor)
+        return self.wedge(o)
+      end
       
       return self.mul(o)
     end
@@ -671,6 +690,11 @@ module Sy
         return :NaN.to_m
       end
 
+      # n**1 = n
+      if o == 1
+        return self
+      end
+      
       if self.is_a?(Sy::Power)
         return self.base**(self.exponent*o)
       end
@@ -721,8 +745,8 @@ module Sy
       return false
     end
 
-    # Value is a scalar, i.e. has no vector parts, down to non-sum and non-product
-    # functions and operators.
+    # Value is a scalar, i.e. has no vector parts, down to non-sum and
+    # non-product functions and operators.
     def is_scalar?()
       return true
     end
@@ -745,6 +769,22 @@ module Sy
       return 1.to_m
     end
     
+    # Return the constant factor of a product
+    def coefficient()
+      return 1
+    end
+
+    # Return constant factor of divisor
+    def div_coefficient()
+      return 1
+    end
+
+    # Return vector factors in an array
+    # Defaults to nothing for non-vectors and non-wedge products
+    def vector_factors_REMOVE()
+      return [].to_enum
+    end
+    
     # Returns the absolute scalar factors of a product in an array.
     # Defaults to self for non-products.
     def scalar_factors()
@@ -757,7 +797,12 @@ module Sy
     def div_factors()
       return [].to_enum
     end
-    
+
+    # Return factors in enumerator
+    def factors()
+      return [self].to_enum
+    end
+
     # Return the scalar factors and division factors as an expression.
     def scalar_factors_exp()
       ret = 1.to_m
@@ -779,7 +824,7 @@ module Sy
 
     # Return vector factors as an expression
     def vector_factors_exp()
-      w = vector_factors.inject(:wedge)
+      w = vector_factors_REMOVE.inject(:wedge)
       if (w.nil?)
         return 1.to_m
       else
@@ -787,26 +832,16 @@ module Sy
       end
     end
 
-    # Return the constant factor of a product
-    def coefficient()
-      return 1
-    end
-
-    # Return constant factor of divisor
-    def div_coefficient()
-      return 1
-    end
-
-    # Return vector factors in an array
-    # Defaults to nothing for non-vectors and non-wedge products
-    def vector_factors()
-      return [].to_enum
-    end
-    
     # Returns the accumulated sign of a product.
     # Defaults to 1 for positive non-sum expressions.
     def sign()
       return 1
+    end
+
+    # Simple reduction rules, allows sign to change. Returns
+    # (reduced exp, sign, changed). Defaults to no change
+    def reduce_modulo_sign
+      return self, 1, false
     end
 
     # By default, assume an unknown expression to be scalar

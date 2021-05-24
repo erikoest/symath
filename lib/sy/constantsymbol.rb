@@ -5,7 +5,7 @@ module Sy
   class ConstantSymbol < Constant
     attr_reader :value
 
-    @@symbols = [:pi, :e, :i, :phi, :oo, :NaN].to_set
+    @@symbols = [:pi, :e, :i, :j, :k, :phi, :oo, :NaN].to_set
 
     @@ltx_symbol = {
       :pi  => '\pi',
@@ -15,6 +15,8 @@ module Sy
       :oo  => '\infty',
     };
 
+    @@unit_quaternions = [:i, :j, :k].to_set
+    
     def self.builtin_constants()
       return @@symbols
     end
@@ -41,6 +43,33 @@ module Sy
       return false
     end
     
+    def is_unit_quaternion?()
+      return @@unit_quaternions.member?(@name.to_sym)
+    end
+
+    def calc_unit_quaternions(q)
+      # Calculation map for unit quaternions
+      qmap = {
+        :i => {
+          :i => -1.to_m,
+          :j => :k.to_m,
+          :k => -:j.to_m,
+        },
+        :j => {
+          :i => -:k.to_m,
+          :j => -1.to_m,
+          :k => :i.to_m,
+        },
+        :k => {
+          :i => :j.to_m,
+          :j => -:i.to_m,
+          :k => -1.to_m,
+        },
+      }
+    
+      return qmap[@name.to_sym][q.name.to_sym]
+    end
+    
     def match(other, varmap)
       if self == other then
         return varmap
@@ -54,6 +83,8 @@ module Sy
         return 'real'.to_t
       elsif @name == :i
         return 'imaginary'.to_t
+      elsif is_unit_quaternion?
+        return 'quaternion'.to_t
       else
         return 'unknown'.to_t
       end

@@ -22,6 +22,17 @@ module Sy
       return dividend.is_scalar?()
     end
 
+    def factors()
+      return Enumerator.new do |f|
+        dividend.factors.each { |d1| f << d1 }
+        divisor.factors.each { |d2|
+          if d2 != 1
+            f << d2**-1
+          end
+        }
+      end
+    end
+    
     def scalar_factors()
       return Enumerator.new do |f|
         dividend.scalar_factors.each { |d1| f << d1 }
@@ -30,15 +41,16 @@ module Sy
     end
 
     def div_factors()
+      # FIXME: Error if any of the div_factors are non-scalar
       return Enumerator.new do |d|
         dividend.div_factors.each { |d1| d << d1 }
-        divisor.scalar_factors.each { |d2| d << d2 }
+        divisor.factors.each { |d2| d << d2 }
       end
     end
 
-    def vector_factors()
+    def vector_factors_REMOVE()
       return Enumerator.new do |f|
-        dividend.vector_factors.each { |d1| f << d1 }
+        dividend.vector_factors_REMOVE.each { |d1| f << d1 }
       end
     end
     

@@ -14,12 +14,12 @@ module Sy
   end
 
   describe Sy::Value, ', comparison' do
-    it '900 > :x' do
-      expect(900.to_m).to be > :x.to_m
+    it '900 < :x' do
+      expect(900.to_m).to be < :x.to_m
     end
 
-    it 'sin(:x) < :x' do
-      expect(fn(:sin, :x)).to be < :x.to_m
+    it 'sin(:x) > :x' do
+      expect(fn(:sin, :x)).to be > :x.to_m
     end
 
     it 'cos(:x) < sin(:x)' do
@@ -45,8 +45,8 @@ module Sy
 
   describe Sy::Value, ', sorting' do
     it '[sin(:x), 100, :x, :y*:z] sorts to [sin(:x), :y*:z, :x, 100]' do
-      expect([fn(:sin, :x), 100.to_m, :x.to_m, :y.to_m*:z].sort).to be ==
-        [fn(:sin, :x), :y.to_m*:z, :x.to_m, 100.to_m]
+      expect([fn(:sin, :x), 100.to_m, :x.to_m, :y.to_m*:z, ].sort).to be ==
+        [100.to_m, :x.to_m, :y.to_m*:z, fn(:sin, :x)]
     end
   end
 

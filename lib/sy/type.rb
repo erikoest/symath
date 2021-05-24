@@ -10,34 +10,42 @@ module Sy
     # Type hierarchy with generic types at the top level and more specific
     # types further down.
     @@hierarchy = {
-      # Scalar types
-      :scalar => {
-        :complex => {
-          :real => {
-            :rational => {
-              :integer => {
-                :natural => 1
+      # Operators
+      :operator => {
+        # Linear operators
+        :linop => {
+          # Matrices
+          :matrix => {
+            :column => 1,
+            :row => 1,
+          },
+          # Vector types (one dimension param)
+          :tensor => {
+            :nvector => {
+              :vector => 1,
+            },
+            :nform => {
+              :covector => {
+                :dform => 1,
+              },
+            },
+          },
+          # Scalar types
+          :quaternion => {
+            :scalar => {
+              :complex => {
+                :real => {
+                  :rational => {
+                    :integer => {
+                      :natural => 1
+                    }
+                  }
+                },
+                :imaginary => 1,
               }
             }
-          },
-          :imaginary => 1,
-        },
-      },
-      # Vector types (one dimension param)
-      :tensor => {
-        :nvector => {
-          :vector => 1,
-        },
-        :nform => {
-          :covector => {
-            :dform => 1,
           }
-        },
-      },
-      # Matrices
-      :matrix => {
-        :column => 1,
-        :row => 1,
+        }
       }
     }
 
@@ -76,15 +84,16 @@ module Sy
 
     # Hash of simple types, for faster instansiations.
     @@types = {
-      :natural   => Sy::Type.new(:natural),
-      :integer   => Sy::Type.new(:integer),
-      :rational  => Sy::Type.new(:rational),
-      :real      => Sy::Type.new(:real),
-      :complex   => Sy::Type.new(:complex),
-      :imaginary => Sy::Type.new(:imaginary),
-      :vector    => Sy::Type.new(:vector, indexes: ['u']),
-      :covector  => Sy::Type.new(:covector, indexes: ['l']),
-      :dform     => Sy::Type.new(:dform, indexes: ['l']),
+      :natural    => Sy::Type.new(:natural),
+      :integer    => Sy::Type.new(:integer),
+      :rational   => Sy::Type.new(:rational),
+      :real       => Sy::Type.new(:real),
+      :complex    => Sy::Type.new(:complex),
+      :imaginary  => Sy::Type.new(:imaginary),
+      :quaternion => Sy::Type.new(:quaternion),
+      :vector     => Sy::Type.new(:vector, indexes: ['u']),
+      :covector   => Sy::Type.new(:covector, indexes: ['l']),
+      :dform      => Sy::Type.new(:dform, indexes: ['l']),
     }
 
     # Check if a type is a subtype of another
@@ -113,7 +122,8 @@ module Sy
         return self
       elsif is_subtype?(other)
         return other
-      elsif is_subtype?(@@types[:complex]) and other.is_subtype?(@@types[:complex])
+      elsif is_subtype?(@@types[:complex]) and
+           other.is_subtype?(@@types[:complex])
         return  @@types[:complex]
       else
         raise 'No common type for ' + to_s + ' and ' + other.to_s
@@ -122,8 +132,8 @@ module Sy
 
     # Determine the type of a sum
     def sum(other)
-      if is_subtype?('scalar') and
-        other.is_subtype?('scalar')
+      if is_subtype?('quaternion') and
+        other.is_subtype?('quaternion')
         return common_parent(other)
       elsif self == other
         return self
@@ -243,21 +253,21 @@ module Sy
 end
 
 class String
-  def to_t(*args)
+  def to_t(**args)
     if args.empty? and Sy::Type.types.key?(self.to_sym)
       return Sy::Type.types[self.to_sym]
     end
 
-    return Sy::Type.new(self, *args)
+    return Sy::Type.new(self, **args)
   end
 end
 
 class Symbol
-  def to_t(*args)
+  def to_t(**args)
     if args.empty? and Sy::Type.types.key?(self)
       return Sy::Type.types[self]
     end
 
-    return Sy::Type.new(self, *args)
+    return Sy::Type.new(self, **args)
   end
 end

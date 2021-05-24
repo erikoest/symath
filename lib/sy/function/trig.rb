@@ -42,17 +42,13 @@ module Sy
 
     def reduce_check_factors()
       pi = :pi.to_m
-    
-      args[0].scalar_factors.each do |f|
+      
+      args[0].factors.each do |f|
         return false if (pi.nil?)
         return false if f != pi
         pi = nil
       end
-        
-      args[0].div_factors.each do |e|
-        return false
-      end
-    
+
       return true
     end
 

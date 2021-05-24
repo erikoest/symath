@@ -6,7 +6,9 @@ module Sy
     def reduce
       i = 1.to_m
       arg = self.args[0]
-      
+
+      # Real: sqrt(-n) = NaN
+      # Complex: sqrt(-n) = i*sqrt(n)
       if arg.is_negative?
         if Sy.setting(:complex_arithmetic)
           i = :i.to_m
@@ -15,12 +17,16 @@ module Sy
           return :NaN.to_m
         end
       end
-        
-      if arg.is_a?(Sy::Number)
+
+      if arg.is_number?
+        # sqrt(n*n) = n
+        # sqrt(-n*n) = i*n
         if (Math.sqrt(arg.value) % 1).zero?
           return i*Math.sqrt(arg.value).to_i
         end
       elsif arg.is_a?(Sy::Power)
+        # sqrt(n**(2*a)) = n^a
+        # sqrt(-n**(2*a)) = i*n**a
         if arg.exponent.coefficient.even?
           return i*arg.base**(arg.exponent/2)
         end
