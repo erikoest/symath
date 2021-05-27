@@ -10,12 +10,12 @@ module Sy
   
   describe Sy::Operation::DistributiveLaw, ', expand' do
     sums = {
-      x*(1 + 3*y)                           => 3*(x*y) + x,
+      x*(1 + 3*y)                           => 3*x*y + x,
       -x*(-y - 3)                           => x*y + 3*x,
-      -x*(x - 3)                            => 3*x - x**2,
+      -x*(x - 3)                            => - x**2 + 3*x,
       (a + b)*c                             => b*c + a*c,
       (fn(:sin, x) + y)*(fn(:cos, x) + y)   =>
-        fn(:cos, x)*fn(:sin, x) + y*fn(:sin, x) + y*fn(:cos, x) + y**2,
+        fn(:cos, x)*fn(:sin, x) + y**2 + y*fn(:sin, x) + y*fn(:cos, x),
       3*x*(2*x - 1)*(4*x + 3)*(3*x**3 + 1)  =>
         72*x**6 + 18*x**5 - 27*x**4 + 24*x**3 + 6*x**2 - 9*x,
     }
@@ -51,7 +51,7 @@ module Sy
   describe Sy::Operation::DistributiveLaw, ', factorization' do
     poly = {
       6*x**2 + 24*x**3 - 27*x**4 + 18*x**5 + 72*x**6 - 9*x =>
-        3*x*(2*x - 1)*(4*x + 3)*(3*x**3 + 1),
+        3*x*(2*x - 1)*(3*x**3 + 1)*(4*x + 3),
       :x**4/:b - 1/(:b*4)                                  =>
         (2*x**2 + 1)*(2*x**2 - 1)/(4*b),
     }

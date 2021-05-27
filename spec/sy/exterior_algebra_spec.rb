@@ -23,7 +23,7 @@ module Sy
 
   describe Sy::Curl do
     curl = {
-      op(:curl, -x2*x1v + x1*x2*x2v + x3*x3v) => (x2 + 1)*x3v
+      op(:curl, -x2*x1v + x1*x2*x2v + x3*x3v) => x3v + x2*x3v
     }
 
     curl.each do |from, to|

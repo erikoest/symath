@@ -39,12 +39,22 @@ module Sy::Operation::Exterior
     if is_sum_exp?
       return act_subexpressions('hodge')
     else
+      # FIXME: If expression is a product of sums, expand the product first
+      # (distributive law), then hodge op on the new sum.
+      
       # Replace nvectors and nforms with their hodge dual
-      s = scalar_factors_exp
-      c = coefficient.to_m
-      dc = div_coefficient.to_m
-      h = Sy::Variable.hodge_dual(vector_factors_exp)
-      return sign.to_m*c*s*h/dc
+      s = []
+      v = []
+      factors.each do |f|
+        if f.type.is_vector? or f.type.is_dform?
+          v.push f
+        else
+          s.push f
+        end
+      end
+      
+      h = Sy::Variable.hodge_dual(v.inject(1.to_m, :*))
+      return s.inject(1.to_m, :*)*h
     end
   end
 end

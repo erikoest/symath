@@ -504,9 +504,9 @@ module Sy
         return self - o.argument
       end
 
-      if self.is_a?(Sy::Minus)
-        return o - self.argument
-      end
+#      if self.is_a?(Sy::Minus)
+#        return - self.argument
+#      end
       
       s = scalar_factors_exp
       w = vector_factors_exp
@@ -629,6 +629,15 @@ module Sy
       end
 
       if self.type.is_subtype?(:tensor) and o.type.is_subtype?(:tensor)
+        # Expand expression if any of the parts are sum
+        if o.is_sum_exp?
+          return o.terms.map { |f| self.*(f) }.inject(:+)
+        end
+
+        if self.is_sum_exp?
+          return terms.map { |f| f.wedge(o) }.inject(:+)
+        end
+        
         return self.wedge(o)
       end
       
@@ -703,31 +712,9 @@ module Sy
     end
 
     def ^(other)
-      o = other.to_m
-
-      if !Sy.setting(:compose_with_simplify)
-        return self.wedge(o)
-      end
-      
-      return self if o == 1
-      return o if self == 1
-
-      w = vector_factors_exp
-      ow = o.vector_factors_exp
-
-      if ow == 1
-        # Ordinary multiplication
-        return self*o
-      else
-        # Other is a vector. If self is a product, assume vector part
-        # is in the second argument, and apply the wedge to it.
-        # Hack!
-        if self.is_a?(Sy::Product) and !self.is_a?(Sy::Wedge)
-          return factor1*(factor2^o)
-        else
-          return self.wedge(o)
-        end
-      end
+      # Identical with *. We apply * or ^ depending on what
+      # the arguments are.
+      return self*other
     end
 
     ##

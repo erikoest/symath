@@ -122,7 +122,8 @@ module Sy::Operation::Differential
   # Apply wedge product or ordinary product between two expressions,
   # depending on whether or not they have vector parts.
   def _diff_wedge(exp1, exp2)
-    # FIXME: Insert wedge instead of * if factors are vectors?
+    # The product operator will determine whether this is a scalar
+    # or a wedge product.
     return (exp1.factors.to_a + exp2.factors.to_a).inject(:*)
   end
 end

@@ -137,6 +137,9 @@ module Sy
         return common_parent(other)
       elsif self == other
         return self
+      elsif self.is_subtype?('tensor') or other.is_subtype?('tensor')
+        # FIXME: Hack. This is probably not true. 
+        return self
       else
         raise 'Types ' + to_s + ' and ' + other.to_s + ' cannot be summed.'
       end

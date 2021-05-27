@@ -153,38 +153,33 @@ module Sy::Operation::Integration
   def int_product(var)
     vu = var.undiff
     vset = [vu].to_set
-    
-    divc = div_coefficient.to_m
-    diva = []
 
-    # Filter out constant divisions factors, add them to the coefficient
-    div_factors.each do |d|
-      if d.is_constant?(vset)
-        divc *= d
-      else
-        diva.push(d)
-      end
-    end
-
-    prodc = coefficient.to_m
+    prodc = 1.to_m
     proda = []
-
-    # Filter out constant product factors, add them to the coefficient
-    scalar_factors.each do |f|
+    divc = 1.to_m
+    diva = []
+    
+    factors.each do |f|
       if f.is_constant?(vset)
         prodc *= f
-      else
-        proda.push(f)
+        next
       end
-    end
 
-    # We don't know how to integrate vectors
-    vector_factors.each do |v|
-      int_failure
-    end
+      if f.is_divisor_factor?
+        if f.base.is_number?
+          divc *= (f.base.value**f.exponent.value).to_m
+          next
+        end
 
-    if sign < 0
-      prodc -= prodc
+        diva.push f.base**f.exponent.argument
+        next
+      end
+
+      if !f.type.is_subtype?(:scalar)
+        int_failure
+      end
+
+      proda.push f
     end
 
     prodc /= divc
@@ -200,6 +195,9 @@ module Sy::Operation::Integration
     end
 
     # c*exp
+    puts prodc.to_s
+    puts prodc.type.to_s
+    
     if proda.length == 1 and diva.length == 0
       return prodc*proda[0].anti_derivative(var)
     end
@@ -237,21 +235,30 @@ module Sy::Operation::Integration
 
     # Split exp into a constant part and (hopefully) a single factor
     # which equals to var
-    divc = arg.div_coefficient.to_m
-
-    arg.div_factors.each do |d|
-      if !d.is_constant?(vset)
-        # Non-constant divisor. Arg is not linear.
-        return
-      end
-      divc *= d
-    end
-
-    prodc = arg.coefficient.to_m
+    prodc = 1.to_m
+    divc = 1.to_m
     has_var = false
 
-    arg.scalar_factors.each do |f|
-      # Constant factor with respect to var
+    arg.factors.each do |f|
+      if f.is_divisor_factor?
+        if !f.type.is_subtype?(:scalar)
+          return
+        end
+
+        if f.base.is_number?
+          divc *= (f.base.value**f.exponent.value).to_m
+          next
+        end
+
+        if !f.base.is_constant?(vset)
+          # Non-constant divisor. Arg is not linear.
+          return
+        end
+
+        divc *= f.base**f.exponent.argument
+        next
+      end
+      
       if f.is_constant?(vset)
         prodc *= f
         next
@@ -267,20 +274,11 @@ module Sy::Operation::Integration
         has_var = true
         next
       end
-
+      
       # Factor is a function of var. Return negative
       return
     end
-
-    # We don't know how to integrate vectors
-    arg.vector_factors.each do |v|
-      return
-    end
-
-    if arg.sign < 0
-      prodc -= prodc
-    end
-
+    
     return [prodc/divc, c2]
   end
 

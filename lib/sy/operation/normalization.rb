@@ -14,8 +14,6 @@ module Sy::Operation::Normalization
   #   products arguments in a sum are sorted
   #   subtractive elements are put after the additive elements
   #
-  #   vector parts are factorized out of sums
-  #
   #   integer sums are calculated
   #   integer products are calculated
   #
@@ -62,52 +60,51 @@ module Sy::Operation::Normalization
     end
 
     # Collect equal elements into integer products
-    # Vector parts are factorized out
     
     # Hash: product[vector part][scalar part]
     products = {}
+    
+    terms.each do |t|
+      c = 1
+      p = []
 
-    terms.each do |e|
-      w = e.vector_factors_exp
-      if !products.key?(w)
-        products[w] = {}
-      end
-      
-      s = e.scalar_factors_exp
-      c = e.coefficient*e.sign
-      
-      if products[w].key?(s)
-        products[w][s] += c
-      else
-        products[w][s] = c
-      end
-    end
-    
-    terms2 = []
-    
-    products.keys.sort.reverse.each do |w|
-      # For each vector product, put scalar parts back into a sorted array
-      terms3 = []
-      
-      products[w].keys.sort.reverse.each do |k|
-        if products[w][k] != 0
-          terms3.push(products[w][k].to_m*k)
+      t.factors.each do |f|
+        if f == -1
+          c *= -1
+          next
+        elsif f.is_number?
+          c *= f.value
+        else
+          p.push f
         end
       end
-      
-      next if terms3.empty?
-      
-      terms2.push(terms3.inject(:+)*w)
+
+      if products.key?(p)
+        products[p] += c
+      else
+        products[p] = c
+      end
     end
 
-    if terms2.empty?
+    if products.empty?
       return 0.to_m
     end
 
-    ret = 0.to_m
+    terms2 = []
+    products.keys.sort.each do |p|
+      p.unshift products[p]
 
-    terms2.each { |s| ret += s }
+      p = p.inject(1.to_m, :*)
+      
+      if !Sy.setting(:fraction_exponent_form)
+        p = p.product_on_fraction_form
+      end
 
+      terms2.push p
+    end
+    
+    ret = terms2.reverse.inject(:+)
+    
     return change_or_nil(ret)
   end
   
@@ -117,7 +114,7 @@ module Sy::Operation::Normalization
       f = f.normalize
     end
 
-    e = e.reverse.inject() { |tmp, e| e*tmp }
+    e = e.inject(:*)
 
     if e.is_prod_exp?
       e = e.order_product
@@ -130,12 +127,13 @@ module Sy::Operation::Normalization
     if !Sy.setting(:fraction_exponent_form)
       e = e.product_on_fraction_form
     end
-    
+
     return change_or_nil(e)
   end
 
   def normalize_power()
-    e, sign, changed = self.reduce_modulo_sign
+    norm = base.normalize.power(exponent.normalize)
+    e, sign, changed = norm.reduce_modulo_sign
     if changed
       return sign == 1 ? e : -e
     end
@@ -215,7 +213,7 @@ module Sy::Operation::Normalization
         else
           # Attach the combined expression onto the previous product
           # exp and continue
-          prev.factor2 = ex
+          prev.factor1 = ex
         end
 
         if !ex.is_a?(Sy::Product)
@@ -227,7 +225,7 @@ module Sy::Operation::Normalization
         sign *= sign2
 
         prev = ex
-        ex = ex.factor2
+        ex = ex.factor1
       end
     end
 
@@ -243,34 +241,33 @@ module Sy::Operation::Normalization
   # and ordered so that the first argument is the constand and the second
   # argument is the divisor constant.
   def reduce_constant_factors()
-    c = 1
-    dc = 1
+    c = nil
+    dc = nil
 
-    # Get constant
-    if factor1.is_number?
-      c = factor1.value
-      ex = factor2
-    else
-      ex = self
-    end
+    ret = []
 
-    # Get divisor constant
-    if ex.is_a?(Sy::Product)
-      if ex.factor1.is_divisor_factor?
-        if ex.factor1.base.is_number?
-          dc = ex.factor1.base.value**ex.factor1.exponent.argument.value
-          ex = ex.factor2
+    self.factors.each do |f|
+      if c.nil?
+        c = 1
+        if f.is_number?
+          c = f.value
+          next
         end
       end
-    else
-      if ex.is_divisor_factor?
-        if ex.base.is_number?
-          dc = ex.base.value**ex.exponent.argument.value
-          ex = 1.to_m
+
+      if dc.nil?
+        dc = 1
+        if f.is_divisor_factor?
+          if f.base.is_number?
+            dc = f.base.value**f.exponent.argument.value
+            next
+          end
         end
       end
-    end
 
+      ret.push f
+    end
+    
     # First examine the coefficients
     if c == 0 and dc > 0
       return 0.to_m
@@ -283,28 +280,32 @@ module Sy::Operation::Normalization
       dc /= gcd
     end
 
-    if (dc != 1)
-      ex = dc.to_m**-1*ex
+    if dc != 1
+      ret.unshift dc.to_m**-1
     end
 
-    if (c != 1)
-      ex = c*ex
+    if c != 1
+      ret.unshift c.to_m
     end
 
-    return ex
+    if ret.empty?
+      return 1.to_m
+    else
+      return ret.inject(:*)
+    end
   end
 
   # Return result of the two factors multiplied if it simplifies
   # the expression.
   # Returns (new_exp, sign, changed)
   def combine_factors
-    f1 = factor1
-    if factor2.is_a?(Sy::Product)
-      f2 = factor2.factor1
+    if factor1.is_a?(Sy::Product)
+      f1 = factor1.factor2
     else
-      f2 = factor2
+      f1 = factor1
     end
-    
+    f2 = factor2
+
     # Natural numbers are calculated
     if f1.is_number? and f2.is_number?
       return replace_combined_factors((f1.value*f2.value).to_m), 1, true
@@ -348,9 +349,8 @@ module Sy::Operation::Normalization
 
   # Replace factor1 and factor2 with e. Return new combined expression
   def replace_combined_factors(e)
-    if factor2.is_a?(Sy::Product)
-      factor1 = e
-      return e*factor2.factor2
+    if factor1.is_a?(Sy::Product)
+      return factor1.factor1*e
     else
       return e
     end
@@ -358,21 +358,21 @@ module Sy::Operation::Normalization
 
   # Reduce first and second factor. Return sign and changed
   def reduce_factors_modulo_sign()
-    f1, sign1, changed1 = factor1.reduce_modulo_sign
-    if changed1
-      factor1 = f1
-    end
-      
-    if factor2.is_a?(Sy::Product)
-      f2, sign2, changed2 = factor2.factor1.reduce_modulo_sign
-      if changed2
-        factor2.factor1 = f2
+    if factor1.is_a?(Sy::Product)
+      f1, sign1, changed1 = factor1.factor2.reduce_modulo_sign
+      if changed1
+        self.factor1.factor2 = f1
       end
     else
-      f2, sign2, changed2 = factor2.reduce_modulo_sign
-      if changed2
-        factor2 = f2
+      f1, sign1, changed1 = factor1.reduce_modulo_sign
+      if changed1
+        self.factor1 = f1
       end
+    end
+
+    f2, sign2, changed2 = factor2.reduce_modulo_sign
+    if changed2
+      self.factor2 = f2
     end
 
     return sign1*sign2, (changed1 or changed2)
@@ -381,9 +381,9 @@ module Sy::Operation::Normalization
   # Compare first and second element in product. Swap if they can and
   # should be swapped. Return (sign, changed).
   def compare_factors_and_swap()
-    f1 = factor1
-    f2 = factor2.is_a?(Sy::Product) ? factor2.factor1 : factor2
-    
+    f1 = factor1.is_a?(Sy::Product) ? factor1.factor2 : factor1
+    f2 = factor2
+
     if !f1.type.is_subtype?(:linop) or !f2.type.is_subtype?(:linop)
       # Non-linear operator cannot be swapped
       return 1, false
@@ -440,13 +440,13 @@ module Sy::Operation::Normalization
 
   # Swap first and second argument in product
   def swap_factors()
-    f1 = self.factor1
-    if self.factor2.is_a?(Sy::Product)
-      self.factor1 = self.factor2.factor1
-      self.factor2.factor1 = f1
+    f2 = self.factor2
+    if self.factor1.is_a?(Sy::Product)
+      self.factor2 = self.factor1.factor2
+      self.factor1.factor2 = f2
     else
-      self.factor1 = self.factor2
-      self.factor2 = f1
+      self.factor2 = self.factor1
+      self.factor1 = f2
     end
   end
 end

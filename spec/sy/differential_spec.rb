@@ -8,10 +8,11 @@ module Sy
   dy = :y.to_m('dform')
   z = :z
   
+  Sy.setting(:expl_parentheses, true)
   describe Sy::Operation::Differential, ', simple polynomials' do
     poly = {
       op(:diff, 3*x**2)                      => 6*x*dx,
-      op(:diff, x + 3*x**2 + 4*y + 10)       => (6*x + 1)*dx,
+      op(:diff, x + 3*x**2 + 4*y + 10)       => 6*x*dx + dx,
       op(:diff, 3*x + 2*y**3 + 5*z**4, x, y) => 6*y**2*dy + 3*dx,
     }
 
@@ -25,7 +26,7 @@ module Sy
   describe Sy::Operation::Differential, ', exponential functions' do
     exp = {
       op(:diff, fn('exp', x**2))       => 2*x*fn(:exp, x**2)*dx,
-      op(:diff, fn('ln', 3*x + x**2))  => (2*x + 3)/(x**2 + 3*x)*dx,
+      op(:diff, fn('ln', 3*x + x**2))  => (2*x*dx + 3*dx)/(3*x + x**2),
     }
 
     exp.each do |from, to|

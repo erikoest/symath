@@ -18,7 +18,7 @@ module Sy
     def is_divisor_factor?()
       return exponent.is_negative_number?
     end
-    
+
     # Simple reduction rules, allows sign to change. Returns
     # (reduced exp, sign, changed).
     def reduce_modulo_sign
@@ -27,6 +27,11 @@ module Sy
         return base, 1, true
       end
 
+      # Power of 0 reduces to 0
+      if base == 0 and exponent.is_finite? and exponent != 0
+        return 0.to_m, 1, true
+      end
+      
       # Number power of number reduces to number
       if base.is_number? and exponent.is_number?
         return (base.value ** exponent.value).to_m, 1, true

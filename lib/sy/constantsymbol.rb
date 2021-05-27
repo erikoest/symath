@@ -79,13 +79,15 @@ module Sy
     end
 
     def type()
-      if @name == 'e' or @name == 'pi' or @name == 'phi'
+      n = @name.to_sym
+      if n == :e or n == :pi or n == :phi
         return 'real'.to_t
-      elsif @name == :i
+      elsif n == :i
         return 'imaginary'.to_t
       elsif is_unit_quaternion?
         return 'quaternion'.to_t
       else
+        puts "GOT UNKNOWN TYPE: " + n.to_s
         return 'unknown'.to_t
       end
     end
