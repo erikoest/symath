@@ -20,7 +20,7 @@ module Sy
       1.to_m.add(3) =>
         4.to_m,
       3.to_m.div(4).add(5.to_m.add(2).div(34)) =>
-        7.to_m/34 + 3.to_m/4,
+        3.to_m/4 + 7.to_m/34,
       x.add(x) =>
         2*x,
       x.sub(x) =>
@@ -30,7 +30,7 @@ module Sy
       2.to_m.power(3).add(3.to_m.power(2)) =>
         17.to_m,
       3.to_m.power(-4).add(2.to_m.power(-5)) =>
-        1.to_m/32 + 1.to_m/81,
+        1.to_m/81 + 1.to_m/32,
     }
 
     sums.each do |from, to|
@@ -55,7 +55,7 @@ module Sy
       14175.to_m.div(9000) =>
         63.to_m/40,
       fn(:cos, x).mul(y) =>
-        fn(:cos, x)*y,
+        y*fn(:cos, x),
     }
 
     products.each do |from, to|
@@ -87,9 +87,9 @@ module Sy
       dy.wedge(dx).wedge(dz) =>
         - (dx^dy^dz),
       fn(:sin, x).mul(dy).wedge(dx) =>
-        - (fn(:sin, x)*(dx^dy)),
+        - ((fn(:sin, x)*dx)^dy),
       x.power(3).wedge(dy).mul(:e.to_m.power(4)).wedge(dz).wedge(dx) =>
-        x**3*:e**4*(dx^dy^dz),
+        (((:e**4*x**3*dx)^dy)^dz),
       dx.add(x.power(1).wedge(dx)) =>
         (x + 1)*dx,
       (dx.wedge(fn(:ln, a.mul(x)))).add((x.wedge(1)).div(a.mul(x)).wedge((0.to_m.wedge(x)).add(a.wedge(dx)))).sub(dx) =>

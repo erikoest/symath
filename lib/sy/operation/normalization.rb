@@ -134,11 +134,9 @@ module Sy::Operation::Normalization
   def normalize_power()
     norm = base.normalize.power(exponent.normalize)
     e, sign, changed = norm.reduce_modulo_sign
-    if changed
-      return sign == 1 ? e : -e
-    end
+    e = -1 if sign == -1
 
-    return nil
+    return change_or_nil(e)
   end
 
   def normalize_matrix()
@@ -243,18 +241,9 @@ module Sy::Operation::Normalization
   def reduce_constant_factors()
     c = nil
     dc = nil
-
     ret = []
 
     self.factors.each do |f|
-      if c.nil?
-        c = 1
-        if f.is_number?
-          c = f.value
-          next
-        end
-      end
-
       if dc.nil?
         dc = 1
         if f.is_divisor_factor?
@@ -265,9 +254,17 @@ module Sy::Operation::Normalization
         end
       end
 
+      if c.nil?
+        c = 1
+        if f.is_number?
+          c = f.value
+          next
+        end
+      end
+
       ret.push f
     end
-    
+
     # First examine the coefficients
     if c == 0 and dc > 0
       return 0.to_m
@@ -424,7 +421,12 @@ module Sy::Operation::Normalization
         swap_factors
         return 1, true
       end
-        
+
+      # Normalize as power factors so all factors with the same base
+      # end up at the same place and can be combined.
+      f1 = f1.power(1) if !f1.is_a?(Sy::Power)
+      f2 = f2.power(1) if !f2.is_a?(Sy::Power)
+      
       # Order scalar factors
       if f2 < f1
         swap_factors

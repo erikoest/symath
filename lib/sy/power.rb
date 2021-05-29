@@ -32,9 +32,19 @@ module Sy
         return 0.to_m, 1, true
       end
       
+      if base != 0 and exponent == 0
+        return 1.to_m, 1, true
+      end
+
       # Number power of number reduces to number
-      if base.is_number? and exponent.is_number?
-        return (base.value ** exponent.value).to_m, 1, true
+      if base.is_number?
+        if exponent.is_number?
+          return (base.value ** exponent.value).to_m, 1, true
+        end
+
+        if exponent.is_negative_number? and exponent.argument.value > 1
+          return (base.value ** exponent.argument.value).to_m.power(-1), 1, true
+        end
       end
 
       # p**q**r reduces to p**(q*r)
