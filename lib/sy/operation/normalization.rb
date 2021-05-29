@@ -110,6 +110,7 @@ module Sy::Operation::Normalization
   
   def normalize_product()
     # Flatten the expression and order it
+
     e = factors.map do |f|
       f = f.normalize
     end
@@ -245,7 +246,6 @@ module Sy::Operation::Normalization
 
     self.factors.each do |f|
       if dc.nil?
-        dc = 1
         if f.is_divisor_factor?
           if f.base.is_number?
             dc = f.base.value**f.exponent.argument.value
@@ -255,12 +255,14 @@ module Sy::Operation::Normalization
       end
 
       if c.nil?
-        c = 1
         if f.is_number?
           c = f.value
           next
         end
       end
+
+      c = 1 if c.nil?
+      dc = 1 if dc.nil?
 
       ret.push f
     end

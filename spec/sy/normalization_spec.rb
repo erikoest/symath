@@ -91,7 +91,7 @@ module Sy
       x.power(3).wedge(dy).mul(:e.to_m.power(4)).wedge(dz).wedge(dx) =>
         (((:e**4*x**3*dx)^dy)^dz),
       dx.add(x.power(1).wedge(dx)) =>
-        (x + 1)*dx,
+        x*dx + dx,
       (dx.wedge(fn(:ln, a.mul(x)))).add((x.wedge(1)).div(a.mul(x)).wedge((0.to_m.wedge(x)).add(a.wedge(dx)))).sub(dx) =>
         fn(:ln, a*x)*dx,
     }

@@ -79,7 +79,11 @@ module Sy
       divisor_str = (divisor.is_sum_exp? or divisor.is_prod_exp?) ?
                       '(' + divisor.to_s + ')' :
                       divisor.to_s
-      return dividend_str + '/' + divisor_str
+      if Sy.setting(:expl_parentheses)
+        return '('.to_s + dividend_str + '/' + divisor_str + ')'.to_s
+      else
+        return dividend_str + '/' + divisor_str
+      end
     end
 
     def to_latex()

@@ -499,29 +499,43 @@ module Sy
       return self if o == 0
       return o if self == 0
 
-      # Is this really a subtraction
-      if o.is_a?(Sy::Minus)
-        return self - o.argument
+      sc = 1
+      sf = []
+      oc = 1
+      of = []
+
+      factors.each do |f|
+        if f == -1
+          sc *= -1
+        elsif f.is_number?
+          sc *= f.value
+        else
+          sf.push f
+        end
       end
-
-#      if self.is_a?(Sy::Minus)
-#        return - self.argument
-#      end
       
-      s = scalar_factors_exp
-      w = vector_factors_exp
-      if s == o.scalar_factors_exp and
-        w == o.vector_factors_exp
-        ret = (coefficient + o.coefficient).to_m
-        if s != 1.to_m
-          ret *= s
+      o.factors.each do |f|
+        if f == -1
+          oc *= -1
+        elsif f.is_number?
+          oc *= f.value
+        else
+          of.push f
+        end
+      end
+      
+      sc += oc
+
+      if sf == of
+        if sc == 0
+          return 0.to_m
         end
 
-        if w != 1.to_m
-          ret = ret.mul(w)
+        if sc != 1
+          sf.unshift sc.to_m
         end
-        
-        return ret
+
+        return sf.empty? ? 1.to_m : sf.inject(:*)
       end
 
       return self.add(o)
@@ -542,33 +556,7 @@ module Sy
         return self.sub_inf(o)
       end
       
-      return self if o == 0
-      return -o if self == 0
-
-      # Is this really an addition?
-      if o.is_a?(Sy::Minus)
-        return self + o.argument
-      end
-      
-      s = scalar_factors_exp
-      w = vector_factors_exp
-
-      if s == o.scalar_factors_exp and
-        w == o.vector_factors_exp        
-        ret = (coefficient - o.coefficient).to_m
-        return 0.to_m if ret == 0
-        if s != 1.to_m
-          ret = ret.mul(s)
-        end
-
-        if w != 1.to_m
-          ret = ret.mul(w)
-        end
-
-        return ret
-      end
-
-      return self.sub(o)
+      return self + -1.to_m*o
     end
 
     def -@()

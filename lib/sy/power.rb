@@ -22,6 +22,11 @@ module Sy
     # Simple reduction rules, allows sign to change. Returns
     # (reduced exp, sign, changed).
     def reduce_modulo_sign
+      # a to the power of 1 reduces to a
+      if exponent == 1
+        return base, 1, true
+      end
+      
       # Powers of 1 reduces to 1
       if base == 1 and exponent.is_finite?
         return base, 1, true
@@ -49,7 +54,7 @@ module Sy
 
       # p**q**r reduces to p**(q*r)
       if base.is_a?(Sy::Power)
-        return base.base.power(base.exponent.mul(exponent), 1, true)
+        return base.base.power(base.exponent.mul(exponent)), 1, true
       end
       
       # Reduce power of vectors and dforms to zero
