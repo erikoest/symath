@@ -42,22 +42,41 @@ module Sy
 
     def reduce_check_factors()
       pi = :pi.to_m
-      
+      c = 1
+      dc = 1
+
+      # Check that factors are only constant, divisor constant and pi.
+      # Note: This code is similar to 'reduce_constant_factors'. Refactor?
       args[0].factors.each do |f|
-        return false if (pi.nil?)
-        return false if f != pi
+        if f.is_divisor_factor?
+          if f.base.is_number?
+            dc *= f.base.value**f.exponent.argument.value
+            next
+          end
+        end
+
+        if f.is_negative_number?
+          c *= - f.argument.value
+          next
+        end
+
+        if f.is_number?
+          c *= f.value
+          next
+        end
+
+        return nil if (pi.nil?)
+        return nil if f != pi
         pi = nil
       end
 
-      return true
+      return c, dc
     end
 
     def reduce_sin_and_cos(off)
-      return self unless reduce_check_factors
-    
-      c = args[0].coefficient
-      dc = args[0].div_coefficient
-    
+      c, dc = reduce_check_factors
+      return self if c.nil?
+
       # Divisor is divisible by 6
       if 6 % dc == 0
         return @@trig_reductions[:sin_div6][(off*3 + c*6/dc) % 12]
@@ -72,10 +91,8 @@ module Sy
     end
 
     def reduce_tan_and_cot(off, sign)
-      return self unless reduce_check_factors
-    
-      c = args[0].coefficient
-      dc = args[0].div_coefficient
+      c, dc = reduce_check_factors
+      return self if c.nil?
 
       # Divisor is divisible by 6
       if 6 % dc == 0
@@ -91,10 +108,8 @@ module Sy
     end
 
     def reduce_sec_and_csc(off)
-      return self unless reduce_check_factors
-    
-      c = args[0].coefficient
-      dc = args[0].div_coefficient
+      c, dc = reduce_check_factors
+      return self if c.nil?
     
       # Divisor is divisible by 6
       if 6 % dc == 0
