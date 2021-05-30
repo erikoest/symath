@@ -51,31 +51,11 @@ module Sy
       return argument.is_scalar?()
     end
 
-    def scalar_factors()
-      return argument.scalar_factors
-    end
-
-    def div_factors()
-      return argument.div_factors
-    end
-
-    def vector_factors_REMOVE()
-      return argument.vector_factors_REMOVE
-    end
-    
     def factors()
       return Enumerator.new do |f|
         f << -1.to_m
         argument.factors.each { |f1| f << f1 }
       end
-    end
-
-    def coefficient()
-      return argument.coefficient
-    end
-    
-    def div_coefficient()
-      return argument.div_coefficient
     end
 
     def sign()

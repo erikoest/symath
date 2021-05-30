@@ -32,36 +32,7 @@ module Sy
         }
       end
     end
-    
-    def scalar_factors()
-      return Enumerator.new do |f|
-        dividend.scalar_factors.each { |d1| f << d1 }
-        divisor.div_factors.each { |d2| f << d2 }
-      end
-    end
 
-    def div_factors()
-      # FIXME: Error if any of the div_factors are non-scalar
-      return Enumerator.new do |d|
-        dividend.div_factors.each { |d1| d << d1 }
-        divisor.factors.each { |d2| d << d2 }
-      end
-    end
-
-    def vector_factors_REMOVE()
-      return Enumerator.new do |f|
-        dividend.vector_factors_REMOVE.each { |d1| f << d1 }
-      end
-    end
-    
-    def coefficient()
-      return dividend.coefficient
-    end
-
-    def div_coefficient()
-      return dividend.div_coefficient*divisor.coefficient
-    end
-    
     def sign()
       return dividend.sign*divisor.sign
     end

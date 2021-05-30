@@ -30,16 +30,6 @@ module Sy
       return value() == 0
     end
 
-    # Scalar factor is empty because the numeric value is counted as
-    # coefficient
-    def scalar_factors()
-      return []
-    end
-
-    def coefficient()
-      return self.value
-    end
-
     def type()
       return :natural.to_t
     end

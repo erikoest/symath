@@ -213,22 +213,6 @@ module Sy
       return type.is_scalar?()
     end
 
-    def scalar_factors()
-      if @type.is_scalar?
-        return [self].to_enum
-      else
-        return [].to_enum
-      end
-    end
-
-    def vector_factors_REMOVE()
-      if @type.is_vector? or @type.is_dform?
-        return [self].to_enum
-      else
-        return [].to_enum
-      end
-    end
-
     def is_constant?(vars = nil)
       return false if vars.nil?
       return !(vars.member?(self))

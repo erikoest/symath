@@ -97,12 +97,10 @@ module Sy::Operation::DistributiveLaw
 
   def has_fractional_terms?()
     terms.each do |t|
-      t.div_factors.each do |f|
-        return true
-      end
-
-      if t.div_coefficient != 1
-        return true
+      t.factors.each do |f|
+        if f.is_divisor_factor?
+          return true
+        end
       end
     end
 
@@ -120,21 +118,55 @@ module Sy::Operation::DistributiveLaw
     vectors = []
     
     terms.each_with_index do |t, i|
-      coeffs.push(t.coefficient)
-      dcoeffs.push(t.div_coefficient)
-      vectors.push(t.vector_factors_exp)
-      t.vector_factors.each do |v|
-        if !vfactors[v] = []
-          vfactors[v] = []
+      c = 1
+      dc = 1
+      vf = 1.to_m
+      
+      t.factors.each do |f|
+        # Sign
+        if f == -1
+          c *= -1
+          next
         end
 
-        vfactors[v][i] = 1
-      end
-      
-      t.scalar_factors.each do |f|
+        # Constant
+        if f.is_number?
+          c *= f.value
+          next
+        end
+
+        if f.is_divisor_factor?
+          # Divisor constant
+          if f.base.is_number?
+            dc *= f.base.value**f.exponent.argument.value
+            next
+          end
+
+          # Divisor factor
+          ex = f.base
+
+          if !sfactors.key?(ex)
+            sfactors[ex] = []
+          end
+
+          if sfactors[ex][i].nil?
+            sfactors[ex][i] = - f.exponent.argument.value
+          else
+            sfactors[ex][i] -= f.exponent.argument.value
+          end
+          next
+        end
+
+        # Vector factor
+        if f.type.is_subtype?(:tensor)
+          vf *= f
+          next
+        end
+
+        # Scalar factor
         if f.exponent.is_number?
           ex = f.base
-          n = f.exponent
+          n = f.exponent.value
         else
           ex = f
           n = 1
@@ -144,28 +176,12 @@ module Sy::Operation::DistributiveLaw
           sfactors[ex] = []
         end
       
-        sfactors[ex][i] = n.value
+        sfactors[ex][i] = n.value        
       end
-
-      t.div_factors.each do |d|
-        if d.exponent.is_number?
-          ex = d.base
-          n = d.exponent
-        else
-          ex = d
-          n = 1
-        end
-
-        if !sfactors.key?(ex)
-          sfactors[ex] = []
-        end
-
-        if sfactors[ex][i].nil?
-          sfactors[ex][i] = -n.value
-        else
-          sfactors[ex][i] -= n.value
-        end
-      end
+      
+      coeffs.push(c)
+      dcoeffs.push(dc)
+      vectors.push(vf)
     end
 
     # If there is only one term, there is nothing to factorize

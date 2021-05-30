@@ -27,7 +27,16 @@ module Sy
       elsif arg.is_a?(Sy::Power)
         # sqrt(n**(2*a)) = n^a
         # sqrt(-n**(2*a)) = i*n**a
-        if arg.exponent.coefficient.even?
+
+        # Find coefficient of exponent
+        c = 1
+        arg.exponent.factors.each do |ef|
+          if ef.is_number?
+            c *= ef.value
+          end
+        end
+        
+        if c.even?
           return i*arg.base**(arg.exponent/2)
         end
       end

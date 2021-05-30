@@ -744,67 +744,9 @@ module Sy
       return 1.to_m
     end
     
-    # Return the constant factor of a product
-    def coefficient()
-      return 1
-    end
-
-    # Return constant factor of divisor
-    def div_coefficient()
-      return 1
-    end
-
-    # Return vector factors in an array
-    # Defaults to nothing for non-vectors and non-wedge products
-    def vector_factors_REMOVE()
-      return [].to_enum
-    end
-    
-    # Returns the absolute scalar factors of a product in an array.
-    # Defaults to self for non-products.
-    def scalar_factors()
-      return [self].to_enum
-    end
-
-    # Returns the absolute factors of a divisor in an array (including vector
-    # components.
-    # Defaults to nothing for non-fractions.
-    def div_factors()
-      return [].to_enum
-    end
-
     # Return factors in enumerator
     def factors()
       return [self].to_enum
-    end
-
-    # Return the scalar factors and division factors as an expression.
-    def scalar_factors_exp()
-      ret = 1.to_m
-      scalar_factors.each do |f|
-        ret *= f
-      end
-
-      d = div_coefficient.to_m
-      div_factors.each do |f|
-        d *= f
-      end
-      
-      if d != 1.to_m
-        ret= ret.div(d)
-      end
-      
-      return ret
-    end
-
-    # Return vector factors as an expression
-    def vector_factors_exp()
-      w = vector_factors_REMOVE.inject(:wedge)
-      if (w.nil?)
-        return 1.to_m
-      else
-        return w
-      end
     end
 
     # Returns the accumulated sign of a product.

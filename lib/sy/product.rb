@@ -38,41 +38,11 @@ module Sy
       return (factor1.is_scalar? and factor2.is_scalar?)
     end
 
-    def scalar_factors()
-      return Enumerator.new do |f|
-        factor1.scalar_factors.each { |f1| f << f1 }
-        factor2.scalar_factors.each { |f2| f << f2 }
-      end
-    end
-
-    def div_factors()
-      return Enumerator.new do |d|
-        factor1.div_factors.each { |d1| d << d1 }
-        factor2.div_factors.each { |d2| d << d2 }
-      end
-    end
-
-    # TODO: Error if both factors have vector components
-    def vector_factors_REMOVE()
-      return Enumerator.new do |f|
-        factor1.vector_factors_REMOVE.each { |f1| f << f1 }
-        factor2.vector_factors_REMOVE.each { |f2| f << f2 }
-      end
-    end
-
     def factors()
       return Enumerator.new do |f|
         factor1.factors.each { |f1| f << f1 }
         factor2.factors.each { |f2| f << f2 }
       end
-    end
-    
-    def coefficient()
-      return factor1.coefficient*factor2.coefficient
-    end
-
-    def div_coefficient()
-      return factor1.div_coefficient*factor2.div_coefficient
     end
     
     def sign()
