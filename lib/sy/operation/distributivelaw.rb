@@ -22,13 +22,22 @@ module Sy::Operation::DistributiveLaw
       end
     end
 
-    if is_a?(Sy::Product)
-      if (factor1.is_sum_exp? and factor1.arity > 1) or
-         (factor2.is_sum_exp? and factor2.arity > 1)
-        return expand_recurse(factor1, factor2)
+    if is_a?(Sy::Power) or is_a?(Sy::Product)
+      ret = 1.to_m
+
+      factors.each do |f|
+        if f.is_a?(Sy::Power)
+          if f.exponent.is_number?
+            f.exponent.value.times { ret = expand_product(ret, f.base) }
+          else
+            ret = expand_product(ret, f)
+          end
+        else
+          ret = expand_product(ret, f)
+        end
       end
 
-      return
+      return change_or_nil(ret)
     end
 
     changed = false
@@ -53,7 +62,7 @@ module Sy::Operation::DistributiveLaw
     return
   end
 
-  def expand_recurse(exp1, exp2)
+  def expand_product(exp1, exp2)
     sign = 1.to_m
 
     if exp1.is_a?(Sy::Minus)
@@ -66,33 +75,15 @@ module Sy::Operation::DistributiveLaw
       sign = -sign
     end
 
-    if exp1.is_sum_exp? and exp1.arity > 1
-      ret = 0.to_m
+    ret = 0.to_m
       
-      exp1.terms.each do |t|
-        ret += sign*expand_recurse(t, exp2)
+    exp1.terms.each do |t1|
+      exp2.terms.each do |t2|
+        ret += sign*t1*t2
       end
-      return ret
-    end
-      
-    if exp2.is_sum_exp? and exp2.arity > 1
-      ret = 0.to_m
-      
-      exp2.terms.each do |t|
-        ret += sign*expand_recurse(exp1, t)
-      end
-      return ret
     end
 
-    if exp1.is_a?(Sy::Product)
-      exp1 = expand_recurse(exp1.factor1, exp1.factor2)
-    end
-
-    if exp2.is_a?(Sy::Product)
-      exp2 = expand_recurse(exp2.factor1, exp2.factor2)
-    end
-    
-    return sign*exp1*exp2
+    return ret
   end
 
   def has_fractional_terms?()
