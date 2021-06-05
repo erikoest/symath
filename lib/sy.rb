@@ -234,6 +234,12 @@ module Sy
     end
   end
 
+  @@parser = Sy::Parser.new
+
+  def self.parse(str)
+    return @@parser.parse(str)
+  end
+
   # Calculate basis vectors on startup
   Sy::Variable.recalc_basis_vectors
 
@@ -242,4 +248,10 @@ module Sy
   Sy::Operation::Differential.initialize
   Sy::Operation::Integration.initialize
   Sy::Function::Trig.initialize
+end
+
+class String
+  def to_mexp()
+    return Sy.parse(self)
+  end
 end

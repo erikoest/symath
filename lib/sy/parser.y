@@ -72,8 +72,8 @@ module Sy
       'normalize',
       'expand',
       'factorize',
-      'factorize_simple'
-      'combine_fractions'
+      'factorize_simple',
+      'combine_fractions',
     ]
 
     until str.empty?
