@@ -66,9 +66,9 @@ module Sy::Operation::Match
             next
           end
         end
-      
+
         # Set of matches is empty. Return negative
-        return if m0.nil?
+        next if m0.nil?
 
         # For each possible first argument match, we build new lists of free
         # and bound variables and try to match the rest of the remaining list

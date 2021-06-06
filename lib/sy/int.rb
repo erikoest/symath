@@ -29,13 +29,14 @@ module Sy
 
     def evaluate()
       if a.nil?
-        return args[0].anti_derivative(var) + :C.to_m
+        ret = args[0].anti_derivative(var)
+        return ret.nil? ? nil : ret + :C.to_m
       else
         int = args[0].anti_derivative(var)
         return op(:bounds, int, var.undiff, a, b)
       end
     end
-    
+
     def to_s()
       ret = @name.to_s + '(' + @args.map { |a| a.to_s }.join(',')
       if !@var.nil?

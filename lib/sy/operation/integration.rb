@@ -83,7 +83,7 @@ module Sy::Operation::Integration
                                            fn(:cos, fn(:ln, :a)))/2,
     }
   end
-  
+
   def anti_derivative(var)
     begin
       raise 'Var is not a differential' if !var.is_diff?
@@ -133,8 +133,9 @@ module Sy::Operation::Integration
         (c1, c2) = get_linear_constants(mi[a], var)
         next if c1.nil?
 
-        # We have found a match, and the argument is a linear function. Substitute
-        # the argument into the free variable of the pattern function.
+        # We have found a match, and the argument is a linear function.
+        # Substitute the argument into the free variable of the pattern
+        # function.
         ret = f_int.deep_clone
         ret.replace({ a => mi[a] })
         return c1.inv*ret
@@ -166,8 +167,8 @@ module Sy::Operation::Integration
       end
 
       if f.is_divisor_factor?
-        if f.base.is_number?
-          divc *= (f.base.value**f.exponent.value).to_m
+        if f.base.is_constant?(vset)
+          divc *= f.base**f.exponent.value.to_m
           next
         end
 
@@ -195,14 +196,12 @@ module Sy::Operation::Integration
     end
 
     # c*exp
-    puts prodc.to_s
-    puts prodc.type.to_s
-    
     if proda.length == 1 and diva.length == 0
       return prodc*proda[0].anti_derivative(var)
     end
 
-    int_pattern(var)
+    exp = proda.inject(1.to_m, :*)/diva.inject(1.to_m, :*)
+    return prodc*exp.int_pattern(var)
   end
 
   def get_linear_constants(arg, var)
