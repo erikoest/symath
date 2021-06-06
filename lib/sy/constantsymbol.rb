@@ -23,7 +23,7 @@ module Sy
     
     def initialize(name, value = nil)
       raise 'Not a known symbol: ' + name.to_s if !@@symbols.member?(name.to_sym)
-      super(name)
+      super(name.to_sym)
       @value = value
     end
 
