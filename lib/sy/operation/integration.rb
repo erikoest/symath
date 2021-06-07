@@ -54,6 +54,9 @@ module Sy::Operation::Integration
     }
 
     @@patterns = {
+      # Polynomial functions
+      (1 - :a**2)**(-1.to_m/2)   => fn(:arcsin, :a),
+      (1 + :a**2)**-1            => fn(:arctan, :a),
       # Logarithmic functions
       fn(:ln, :a)**2             => :a*fn(:ln, :a)**2 - 2*:a*fn(:ln, :a) + 2*:a,
       1/(:a*fn(:ln, :a))         => fn(:ln, fn(:abs, fn(:ln, :a))),
@@ -298,7 +301,7 @@ module Sy::Operation::Integration
       end
     end
 
-    (1.to_m/self).int_failure
+    (self**-1).int_pattern(var)
   end
 
   def int_function(var)

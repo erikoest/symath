@@ -17,8 +17,10 @@ module Sy
       op(:int, y/x, dx)                   => y*fn(:ln, fn(:abs, x)) + capC,
       op(:int, pi/x**e, dx)               => capC + pi*x**(- e + 1)/(- e + 1),
       op(:int, 30*y*a**(2*b*x), dx)       => 15*a**(2*b*x)*y/(b*fn(:ln, a)) + capC,
-      op(:int, 12*fn(:sin, x)*fn(:cos, x), dx)      => 6*fn(:sin, x)**2 + capC,
-      op(:int, 12*b*fn(:cos, x)*fn(:sin, x), dx)      => 6*b*fn(:sin, x)**2 + capC,
+      op(:int, 12*fn(:sin, x)*fn(:cos, x), dx)   => 6*fn(:sin, x)**2 + capC,
+      op(:int, 12*b*fn(:cos, x)*fn(:sin, x), dx) => 6*b*fn(:sin, x)**2 + capC,
+      op(:int, (1 + x**2)**-1, dx)               => fn(:arctan, x) + capC,
+      op(:int, (1 - x**2)**(-1.to_m/2), dx)      => fn(:arcsin, x) + capC,
     }
 
     poly.each do |from, to|
