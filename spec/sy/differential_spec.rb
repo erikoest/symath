@@ -8,7 +8,15 @@ module Sy
   dy = :y.to_m('dform')
   z = :z
   
-  Sy.setting(:expl_parentheses, true)
+  describe Sy::Operation::Differential, ', error conditions' do
+    it 'raises error on diff(x, dx)' do
+      expect { op(:diff, x, dx) }.to raise_error('Var is not allowed to be differential, got dx')
+    end
+    it 'raises error on diff(x, pi)' do
+      expect { op(:diff, x, :pi.to_m) }.to raise_error('Expected variable, got Sy::ConstantSymbol')
+    end
+  end
+
   describe Sy::Operation::Differential, ', simple polynomials' do
     poly = {
       op(:diff, 3*x**2)                      => 6*x*dx,

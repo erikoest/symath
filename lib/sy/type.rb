@@ -241,7 +241,7 @@ module Sy
 
     def to_s()
       if !@dimn.nil?
-        return @name.to_s + '[' + @dimm + 'x' + @dimm + ']'
+        return @name.to_s + '[' + @dimm.to_s + 'x' + @dimn.to_s + ']'
       elsif !@indexes.nil?
         return @name.to_s + '[' + @indexes.join('') + ']'
       else
