@@ -9,17 +9,17 @@ module Sy
   x2v = :x2.to_m('vector')
   x3v = :x3.to_m('vector')
   
-#  describe Sy::Grad do
-#    grad = {
-#      op(:grad, x1 - x1*x2 + x3**2) => (1 - x2)*x1v - x1*x2v + 2*x3*x3v
-#    }
+  describe Sy::Grad do
+    grad = {
+      op(:grad, x1 - x1*x2 + x3**2) => x1v + 2*x3*x3v - x2*x1v - x1*x2v
+    }
 
-#    grad.each do |from, to|
-#      it "evaluates '#{from.to_s}' into '#{to.to_s}'" do
-#        expect(from.evaluate.normalize).to be_equal_to to
-#      end
-#    end
-#  end
+    grad.each do |from, to|
+      it "evaluates '#{from.to_s}' into '#{to.to_s}'" do
+        expect(from.evaluate.normalize).to be_equal_to to
+      end
+    end
+  end
 
   describe Sy::Curl do
     curl = {
@@ -30,6 +30,29 @@ module Sy
       it "evaluates '#{from.to_s}' into '#{to.to_s}'" do
         expect(from.evaluate.normalize).to be_equal_to to
       end
+    end
+
+    it 'raises error on other dimensions than 3' do
+      # Note: Changing basis dim raises an error because metric tensor
+      # is no longer compatible with the basis. Must find a solution to
+      # this.
+      begin
+        Sy.assign_variable(:basis.to_m, [:x1, :x2].to_m)
+      rescue
+      end
+      Sy.assign_variable(:g.to_m, [[1, 0], [0, 1]].to_m)
+
+      expect { op(:curl, -x2*x1v).evaluate }.to raise_error(RuntimeError,
+        'Curl is only defined for 3 dimensions')
+
+      expect { op(:div, -x2*x1v).evaluate }.to raise_error(RuntimeError,
+        'Div is only defined for 3 dimensions')
+
+      begin
+        Sy.assign_variable(:basis.to_m, [:x1, :x2, :x3].to_m)
+      rescue
+      end
+      Sy.assign_variable(:g.to_m, [[1, 0, 0], [0, 1, 0], [0, 0, 1]].to_m)
     end
   end
 

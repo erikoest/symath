@@ -69,13 +69,8 @@ module Sy
       
       # q**n for some unit quaternion
       # Exponent is 1 or not a number
-      # FIXME: Why not replace e**1 with e?
       if !exponent.is_number? or exponent == 1
         return self, 1, false
-      end
-
-      if exponent == 0
-        return 1.to_m, 1, true
       end
 
       # e is on the form q**n for some integer n >= 2
@@ -83,7 +78,7 @@ module Sy
       
       if x.odd?
         ret = base
-        x -= 1.to_m
+        x -= 1
       else
         ret = 1.to_m
       end
@@ -93,7 +88,7 @@ module Sy
       else
         return ret, 1, true
       end
-    end    
+    end
 
     def to_s()
       if base.is_sum_exp? or base.is_prod_exp? or base.is_a?(Sy::Power)

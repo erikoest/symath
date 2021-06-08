@@ -41,7 +41,7 @@ module Sy
     end
 
     def reduce_check_factors()
-      pi = :pi.to_m
+      gotpi = false
       c = 1
       dc = 1
 
@@ -65,10 +65,12 @@ module Sy
           next
         end
 
-        return nil if (pi.nil?)
-        return nil if f != pi
-        pi = nil
+        return nil if gotpi
+        return nil if f != :pi
+        gotpi = true
       end
+
+      return nil if !gotpi and c != 0
 
       return c, dc
     end

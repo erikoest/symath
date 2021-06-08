@@ -71,6 +71,14 @@ module Sy
         x**6,
       x.power(2).power(y) =>
         x**(2*y),
+      :i.to_m.power(3) =>
+        -1,
+      :j.to_m.power(6) =>
+        -1,
+      :k.to_m.power(4) =>
+        1,
+      :i.to_m.power(x) =>
+        :i**x,
     }
 
     powers.each do |from, to|
