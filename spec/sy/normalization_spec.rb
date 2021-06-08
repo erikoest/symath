@@ -102,4 +102,132 @@ module Sy
       end
     end
   end
+
+  describe Sy::Operation::Normalization, ', reduce square roots' do
+    it 'normalizes sqrt(-4) to 2*i' do
+      Sy::setting(:complex_arithmetic, true)
+      expect(fn(:sqrt, -4.to_m).normalize).to be_equal_to 2.to_m*:i
+      Sy::setting(:complex_arithmetic, false)
+    end
+    it 'normalizes sqrt(-7) to i*sqrt(7)' do
+      Sy::setting(:complex_arithmetic, true)
+      expect(fn(:sqrt, -7.to_m).normalize).to be_equal_to fn(:sqrt, 7)*:i
+      Sy::setting(:complex_arithmetic, false)
+    end
+    it 'normalizes sqrt(-7) to NaN' do
+      expect(fn(:sqrt, -7.to_m).normalize).to be_equal_to :NaN
+    end
+    it 'normalizes sqrt(a**(2*b)) to a**b' do
+      expect(fn(:sqrt, a**(2*b)).normalize).to be_equal_to a**b
+    end
+    it 'normalizes sqrt(-a**(2*b)) to a**b*i' do
+      Sy::setting(:complex_arithmetic, true)
+      expect(fn(:sqrt, -a**(2*b)).normalize).to be_equal_to a**b*:i
+      Sy::setting(:complex_arithmetic, false)
+    end
+    it 'normalizes sqrt(-a**(2*b)) to NaN' do
+      expect(fn(:sqrt, -a**(2*b)).normalize).to be_equal_to :NaN
+    end
+  end
+
+  describe Sy::Operation::Normalization, ', reduce exp' do
+    it 'normalizes e**0 to 1' do
+      expect(fn(:exp, 0).normalize).to be_equal_to 1
+    end
+    it 'normalizes e**1 to e' do
+      expect(fn(:exp, 1).normalize).to be_equal_to :e
+    end
+    it 'normalizes e**oo to NaN' do
+      Sy::setting(:complex_arithmetic, true)
+      expect(fn(:exp, :oo).normalize).to be_equal_to :NaN
+      Sy::setting(:complex_arithmetic, false)
+    end
+    it 'normalizes e**-oo to NaN' do
+      Sy::setting(:complex_arithmetic, true)
+      expect(fn(:exp, -:oo).normalize).to be_equal_to :NaN
+      Sy::setting(:complex_arithmetic, false)
+    end
+    it 'normalizes e**oo to oo' do
+      expect(fn(:exp, :oo).normalize).to be_equal_to :oo
+    end
+    it 'normalizes e**-oo to 0' do
+      expect(fn(:exp, -:oo).normalize).to be_equal_to 0
+    end
+    it 'does not normalize e**:a' do
+      expect(fn(:exp, :a).normalize).to be_equal_to fn(:exp, :a)
+    end
+  end
+
+  describe Sy::Operation::Normalization, ', reduce ln' do
+    it 'normalizes ln(1) to 0' do
+      expect(fn(:ln, 1).normalize).to be_equal_to 0
+    end
+    it 'normalizes ln(e) to 1' do
+      expect(fn(:ln, :e).normalize).to be_equal_to 1
+    end
+    it 'normalizes ln(0) to -oo' do
+      expect(fn(:ln, 0).normalize).to be_equal_to -:oo
+    end
+    it 'normalizes ln(oo) to oo' do
+      expect(fn(:ln, :oo).normalize).to be_equal_to :oo
+    end
+    it 'normalizes ln(-10) to NaN' do
+      expect(fn(:ln, -10).normalize).to be_equal_to :NaN
+    end
+
+    it 'normalizes ln(-1) to pi*i' do
+      Sy::setting(:complex_arithmetic, true)
+      expect(fn(:ln, -1).normalize).to be_equal_to :pi.to_m*:i
+      Sy::setting(:complex_arithmetic, false)
+    end
+    it 'normalizes ln(-e) to 1 + pi*i' do
+      Sy::setting(:complex_arithmetic, true)
+      expect(fn(:ln, -:e).normalize).to be_equal_to :pi.to_m*:i + 1
+      Sy::setting(:complex_arithmetic, false)
+    end
+    it 'normalizes ln(i) to pi*i/2' do
+      Sy::setting(:complex_arithmetic, true)
+      expect(fn(:ln, :i).normalize).to be_equal_to :pi.to_m*:i/2
+      Sy::setting(:complex_arithmetic, false)
+    end
+    it 'normalizes ln(i*e) to 1 + pi*i/2' do
+      Sy::setting(:complex_arithmetic, true)
+      expect(fn(:ln, :i.to_m*:e).normalize).to be_equal_to :pi.to_m*:i/2 + 1
+      Sy::setting(:complex_arithmetic, false)
+    end
+    it 'normalizes ln(-i) to -pi*i/2' do
+      Sy::setting(:complex_arithmetic, true)
+      expect(fn(:ln, -:i).normalize).to be_equal_to -:pi.to_m*:i/2
+      Sy::setting(:complex_arithmetic, false)
+    end
+    it 'normalizes ln(-i*e) to 1 - pi*i/2' do
+      Sy::setting(:complex_arithmetic, true)
+      expect(fn(:ln, -:i.to_m*:e).normalize).to be_equal_to -:pi.to_m*:i/2 + 1
+      Sy::setting(:complex_arithmetic, false)
+    end
+  end
+
+  describe Sy::Operation::Normalization, ', reduce factorial' do
+    it 'normalizes 5! to 120' do
+      expect(fn(:fact, 5).normalize).to be_equal_to 120
+    end
+    it 'does not normalize a!' do
+      expect(fn(:fact, :a).normalize).to be_equal_to fn(:fact, :a)
+    end
+  end
+
+  describe Sy::Operation::Normalization, ', reduce abs' do
+    it 'normalizes abs(-10) to 10' do
+      expect(fn(:abs, -10).normalize).to be_equal_to 10
+    end
+    it 'normalizes abs(20) to 20' do
+      expect(fn(:abs, 20).normalize).to be_equal_to 20
+    end
+    it 'normalizes abs(0) to 0' do
+      expect(fn(:abs, 0).normalize).to be_equal_to 0
+    end
+    it 'does not normalize abs(a)' do
+      expect(fn(:abs, :a).normalize).to be_equal_to fn(:abs, :a)
+    end
+  end
 end

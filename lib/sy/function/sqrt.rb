@@ -9,7 +9,7 @@ module Sy
 
       # Real: sqrt(-n) = NaN
       # Complex: sqrt(-n) = i*sqrt(n)
-      if arg.is_negative?
+      if arg.is_a?(Sy::Minus)
         if Sy.setting(:complex_arithmetic)
           i = :i.to_m
           arg = -arg

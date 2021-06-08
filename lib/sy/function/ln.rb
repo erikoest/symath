@@ -16,23 +16,23 @@ module Sy
           return :oo.to_m
         end
 
-        if args[0].is_negative?
+        if args[0].is_a?(Sy::Minus)
           return :NaN.to_m
         end
       else
         case args[0]
         when -1
-          return :pi.to:m*:i
+          return :pi.to_m*:i
         when -:e.to_m
-          return 1.to_m + :pi.to_m*:pi
+          return 1.to_m + :pi.to_m*:i
         when :i.to_m
           return :pi.to_m*:i/2
-        when :i.to_m*:e
-          return 1 + :pi.to_m*:i/2
+        when :e.to_m*:i
+          return 1.to_m + :pi.to_m*:i/2
         when -:i.to_m
           return -:pi.to_m*:i/2
-        when -:i.to_m*:e
-          return 1 - :pi.to_m*:i/2
+        when -:e.to_m*:i
+          return 1.to_m - :pi.to_m*:i/2
         end
       end
       
