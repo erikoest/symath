@@ -45,10 +45,6 @@ module Sy
       end
     end
     
-    def sign()
-      return factor1.sign*factor2.sign
-    end
-    
     def type()
       return factor1.type.product(factor2.type)
     end

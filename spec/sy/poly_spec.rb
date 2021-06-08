@@ -14,10 +14,6 @@ module Sy
   describe Sy::Poly::DUP do
     # Map expression to dup
     def d(exp)
-      if exp.is_a?(Array)
-        return exp.map { |i| Sy::Poly::DUP.new(i) }
-      end
-      
       return Sy::Poly::DUP.new(exp)
     end
 
