@@ -96,7 +96,7 @@ module Sy
       if @@ltx_symbol.key?(@name)
         return @@ltx_symbol[@name]
       else
-        return @name
+        return @name.to_s
       end
     end
   end

@@ -138,7 +138,7 @@ module Sy
       :curl   => 'Sy::Curl',
       :div    => 'Sy::Div',
       :laplacian => 'Sy::Laplacian',
-      :codiff => 'Sy::Codiff',        
+      :codiff => 'Sy::CoDiff',        
     }
 
     def self.is_builtin?(name)

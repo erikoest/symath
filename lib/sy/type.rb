@@ -225,7 +225,7 @@ module Sy
     def index_str()
       return @indexes.map do |i|
         if i == 'u'
-          ''''
+          '\''
         elsif i == 'l'
           '.'
         end
