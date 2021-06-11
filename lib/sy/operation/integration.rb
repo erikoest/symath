@@ -94,7 +94,11 @@ module Sy::Operation::Integration
       if is_constant?([var.undiff].to_set)
         return int_constant(var)
       end
-    
+
+      if self.is_a?(Sy::Minus)
+        return - self.argument.anti_derivative(var)
+      end
+
       if is_sum_exp?
         return int_sum(var)
       end

@@ -8,6 +8,10 @@ module Sy
   x1v = :x1.to_m('vector')
   x2v = :x2.to_m('vector')
   x3v = :x3.to_m('vector')
+
+  dx1 = :x1.to_m('dform')
+  dx2 = :x2.to_m('dform')
+  dx3 = :x3.to_m('dform')
   
   describe Sy::Grad do
     grad = {
@@ -75,6 +79,18 @@ module Sy
     
     div.each do |from, to|
       it "evaluates '#{from.to_s}' into '#{to.to_s}'" do
+        expect(from.evaluate.normalize).to be_equal_to to
+      end
+    end
+  end
+
+  describe Sy::CoDiff do
+    codiff = {
+      op(:codiff, x1**2*(dx1^dx3) + x2**2*(dx3^dx1) + x3**2*(dx1^dx2)) => 2*x1*dx3
+    }
+
+    codiff.each do |from, to|
+      it "evaluates '#{from.to_s} into '#{to.to_s}'" do
         expect(from.evaluate.normalize).to be_equal_to to
       end
     end

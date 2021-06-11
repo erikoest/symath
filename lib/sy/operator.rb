@@ -152,7 +152,7 @@ module Sy
       end
 
       clazz = Object.const_get(@@builtin_operators[name])
-      return clazz.new(*args.map { |a| a.to_m })
+      return clazz.new(*args.map { |a| a.nil? ? a : a.to_m })
     end
   end
 end
