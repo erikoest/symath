@@ -88,38 +88,29 @@ module Sy::Operation::Integration
   end
 
   def anti_derivative(var)
-    begin
-      raise 'Var is not a differential' if !var.is_diff?
-    
-      if is_constant?([var.undiff].to_set)
-        return int_constant(var)
-      end
+    raise 'Var is not a differential' if !var.is_diff?
 
-      if self.is_a?(Sy::Minus)
-        return - self.argument.anti_derivative(var)
-      end
-
-      if is_sum_exp?
-        return int_sum(var)
-      end
-
-      if is_prod_exp?
-        return int_product(var)
-      end
-
-      if is_a?(Sy::Function) and @@functions.key?(name.to_sym)
-        return int_function(var)
-      end
-
-      return int_power(var)
-    rescue IntegrationError => e
-      puts e.to_s
-      # puts e.backtrace.join("\n")
+    if is_constant?([var.undiff].to_set)
+      return int_constant(var)
     end
 
-    # Expression is not an integral, or the integration
-    # routine failed.
-    return
+    if self.is_a?(Sy::Minus)
+      return - self.argument.anti_derivative(var)
+    end
+
+    if is_sum_exp?
+      return int_sum(var)
+    end
+
+    if is_prod_exp?
+      return int_product(var)
+    end
+
+    if is_a?(Sy::Function) and @@functions.key?(name.to_sym)
+      return int_function(var)
+    end
+
+    return int_power(var)
   end
     
   def int_failure()    
@@ -164,37 +155,26 @@ module Sy::Operation::Integration
 
     prodc = 1.to_m
     proda = []
-    divc = 1.to_m
     diva = []
     
     factors.each do |f|
+      puts "F: ", f.to_s
+      puts "F type: ", f.type.to_s
+      if !f.type.is_subtype?(:scalar)
+        int_failure
+      end
+
       if f.is_constant?(vset)
         prodc *= f
         next
       end
 
       if f.is_divisor_factor?
-        if f.base.is_constant?(vset)
-          divc *= f.base**f.exponent.value.to_m
-          next
-        end
-
         diva.push f.base**f.exponent.argument
         next
       end
 
-      if !f.type.is_subtype?(:scalar)
-        int_failure
-      end
-
       proda.push f
-    end
-
-    prodc /= divc
-
-    # This should never happen here. We have already checked for constant
-    if proda.length + diva.length == 0
-      int_failure
     end
 
     # c/exp
@@ -212,14 +192,15 @@ module Sy::Operation::Integration
   end
 
   def get_linear_constants(arg, var)
+    puts "Lin: " + arg.to_s
     # Check that arg is on the form c1*var + c2. Return the two constants.
     vu = var.undiff
     vset = [vu].to_set
     c2 = 0.to_m
-    
+
     if arg.is_sum_exp?
       varterm = nil
-      
+
       arg.terms.each do |t|
         if t.is_constant?(vset)
           c2 += t
@@ -242,29 +223,13 @@ module Sy::Operation::Integration
     # Split exp into a constant part and (hopefully) a single factor
     # which equals to var
     prodc = 1.to_m
-    divc = 1.to_m
     has_var = false
 
     arg.factors.each do |f|
-      if f.is_divisor_factor?
-        if !f.type.is_subtype?(:scalar)
-          return
-        end
-
-        if f.base.is_number?
-          divc *= (f.base.value**f.exponent.value).to_m
-          next
-        end
-
-        if !f.base.is_constant?(vset)
-          # Non-constant divisor. Arg is not linear.
-          return
-        end
-
-        divc *= f.base**f.exponent.argument
-        next
+      if !f.type.is_subtype?(:scalar)
+        return
       end
-      
+
       if f.is_constant?(vset)
         prodc *= f
         next
@@ -274,18 +239,18 @@ module Sy::Operation::Integration
       if has_var
         return
       end
-      
+
       # Factor is var. Remember it, but continue to examine the other factors.
       if f == vu
         has_var = true
         next
       end
-      
+
       # Factor is a function of var. Return negative
       return
     end
-    
-    return [prodc/divc, c2]
+
+    return [prodc, c2]
   end
 
   def int_inv(var)

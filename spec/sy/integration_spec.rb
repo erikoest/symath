@@ -13,19 +13,23 @@ module Sy
     capC = :C
 
     poly = {
-      op(:int, x + 3*x**2 + 4*y + 10, dx) => x**3 + x**2/2 + 4*x*y + 10*x + capC,
-      op(:int, y/x, dx)                   => y*fn(:ln, fn(:abs, x)) + capC,
-      op(:int, pi/x**e, dx)               => capC + pi*x**(- e + 1)/(- e + 1),
-      op(:int, 30*y*a**(2*b*x), dx)       => 15*a**(2*b*x)*y/(b*fn(:ln, a)) + capC,
-      op(:int, 12*fn(:sin, x)*fn(:cos, x), dx)   => 6*fn(:sin, x)**2 + capC,
-      op(:int, 12*b*fn(:cos, x)*fn(:sin, x), dx) => 6*b*fn(:sin, x)**2 + capC,
-      op(:int, (1 + x**2)**-1, dx)               => fn(:arctan, x) + capC,
-      op(:int, (1 - x**2)**(-1.to_m/2), dx)      => fn(:arcsin, x) + capC,
+      x + 3*x**2 + 4*y + 10 => x**3 + x**2/2 + 4*x*y + 10*x + capC,
+      y/x                   => y*fn(:ln, fn(:abs, x)) + capC,
+      pi/x**e               => capC + pi*x**(- e + 1)/(- e + 1),
+      30*y*a**(2*b*x)       => 15*a**(2*b*x)*y/(b*fn(:ln, a)) + capC,
+      12*fn(:sin, x)*fn(:cos, x)   => 6*fn(:sin, x)**2 + capC,
+      12*b*fn(:cos, x)*fn(:sin, x) => 6*b*fn(:sin, x)**2 + capC,
+      (1 + x**2)**-1               => fn(:arctan, x) + capC,
+      1/(1 + x**2)                 => fn(:arctan, x) + capC,
+      1/x**2                       => 1/(-x) + capC,
+      (1 - x**2)**(-1.to_m/2)      => fn(:arcsin, x) + capC,
+      fn(:sin, x)           => -fn(:cos, x) + capC,
+      fn(:sin, 2*x + 3)     => -fn(:cos, 2*x + 3)/2 + capC,
     }
 
     poly.each do |from, to|
       it "integrates '#{from.to_s}' into '#{to.to_s}'" do
-        expect(from.evaluate.normalize).to be_equal_to to
+        expect(op(:int, from, dx).evaluate.normalize).to be_equal_to to
       end
     end
 
@@ -38,6 +42,22 @@ module Sy
       it "integrates '#{from.to_s}' into '#{to.to_s}'" do
         expect(from.evaluate.evaluate.normalize).to be_equal_to to
       end
+    end
+
+    fails = [
+      fn(:sin, x)*fn(:tan, x),
+      dx*x,
+      fn(:sin, 2*dx*x),
+      fn(:sin, fn(:sin, x)),
+      fn(:sin, x.to_m.mul(x)),
+      fn(:sin, x.to_m.add(x)),
+      x.to_m**fn(:sin, x),
+    ]
+
+    fails.each do |f|
+        it "fails to integrate '#{f.to_s}'" do
+          expect { op(:int, f, dx).evaluate }.to raise_error("Cannot find an antiderivative for expression #{f.to_s}")
+        end
     end
 
     it "raises error on int(x/2, 2.to_m)" do
