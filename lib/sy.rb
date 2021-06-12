@@ -222,6 +222,15 @@ module Sy
     end
   end
 
+  def self.set_metric(g, basis = nil)
+    @@variable_assignments[:g.to_m] = g
+    if !basis.nil?
+      @@variable_assignments[:basis.to_m] = basis
+    end
+
+    Sy::Variable.recalc_basis_vectors
+  end
+
   def self.clear_variable(var)
     @@variable_assignments.delete(var.to_m)
   end

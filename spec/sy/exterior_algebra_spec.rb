@@ -37,14 +37,7 @@ module Sy
     end
 
     it 'raises error on other dimensions than 3' do
-      # Note: Changing basis dim raises an error because metric tensor
-      # is no longer compatible with the basis. Must find a solution to
-      # this.
-      begin
-        Sy.assign_variable(:basis.to_m, [:x1, :x2].to_m)
-      rescue
-      end
-      Sy.assign_variable(:g.to_m, [[1, 0], [0, 1]].to_m)
+      Sy.set_metric([[1, 0], [0, 1]].to_m, [:x1, :x2].to_m)
 
       expect { op(:curl, -x2*x1v).evaluate }.to raise_error(RuntimeError,
         'Curl is only defined for 3 dimensions')
@@ -52,11 +45,8 @@ module Sy
       expect { op(:div, -x2*x1v).evaluate }.to raise_error(RuntimeError,
         'Div is only defined for 3 dimensions')
 
-      begin
-        Sy.assign_variable(:basis.to_m, [:x1, :x2, :x3].to_m)
-      rescue
-      end
-      Sy.assign_variable(:g.to_m, [[1, 0, 0], [0, 1, 0], [0, 0, 1]].to_m)
+      Sy.set_metric([[1, 0, 0], [0, 1, 0], [0, 0, 1]].to_m,
+        [:x1, :x2, :x3].to_m)
     end
   end
 
