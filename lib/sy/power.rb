@@ -41,6 +41,15 @@ module Sy
         return 1.to_m, 1, true
       end
 
+      # Reduce negative number
+      if base.is_a?(Sy::Minus) and exponent.is_number?
+        exp, sign, changed = (base.argument**exponent).reduce_modulo_sign
+        if exponent.value.odd?
+          sign *= -1
+        end
+        return exp, sign, true
+      end
+
       # Number power of number reduces to number
       if base.is_number?
         if exponent.is_number?

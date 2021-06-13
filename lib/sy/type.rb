@@ -111,7 +111,7 @@ module Sy
       return true if @name == other.name
 
       # This is a subtype of other
-      return true if @@subtype[@name].key?(other.name)
+      return true if @@subtype.key?(@name) and @@subtype[@name].key?(other.name)
 
       # Fallback to false
       return false

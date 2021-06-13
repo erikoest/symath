@@ -86,10 +86,6 @@ module Sy::Operation::Normalization
       end
     end
 
-    if products.empty?
-      return 0.to_m
-    end
-
     terms2 = []
     products.keys.sort.each do |p|
       p.unshift products[p]
@@ -110,7 +106,6 @@ module Sy::Operation::Normalization
   
   def normalize_product()
     # Flatten the expression and order it
-
     e = factors.map do |f|
       f = f.normalize
     end
@@ -135,7 +130,7 @@ module Sy::Operation::Normalization
   def normalize_power()
     norm = base.normalize.power(exponent.normalize)
     e, sign, changed = norm.reduce_modulo_sign
-    e = -1 if sign == -1
+    e *= -1 if sign == -1
 
     return change_or_nil(e)
   end
@@ -197,7 +192,7 @@ module Sy::Operation::Normalization
       prev = nil
 
       while ex.is_a?(Sy::Product)
-        sign2, changed = ex.reduce_factors_modulo_sign
+        sign2, changed = ex.reduce_factor_modulo_sign
         done = false if changed
         sign *= sign2
 
@@ -287,11 +282,7 @@ module Sy::Operation::Normalization
       ret.unshift c.to_m
     end
 
-    if ret.empty?
-      return 1.to_m
-    else
-      return ret.inject(:*)
-    end
+    return ret.inject(:*)
   end
 
   # Return result of the two factors multiplied if it simplifies
@@ -355,26 +346,21 @@ module Sy::Operation::Normalization
     end
   end
 
-  # Reduce first and second factor. Return sign and changed
-  def reduce_factors_modulo_sign()
+  # Reduce first factor. Return sign and changed
+  def reduce_factor_modulo_sign()
     if factor1.is_a?(Sy::Product)
-      f1, sign1, changed1 = factor1.factor2.reduce_modulo_sign
-      if changed1
-        self.factor1.factor2 = f1
+      f, sign, changed = factor1.factor2.reduce_modulo_sign
+      if changed
+        self.factor1.factor2 = f
       end
     else
-      f1, sign1, changed1 = factor1.reduce_modulo_sign
-      if changed1
-        self.factor1 = f1
+      f, sign, changed = factor1.reduce_modulo_sign
+      if changed
+        self.factor1 = f
       end
     end
 
-    f2, sign2, changed2 = factor2.reduce_modulo_sign
-    if changed2
-      self.factor2 = f2
-    end
-
-    return sign1*sign2, (changed1 or changed2)
+    return sign, changed
   end
 
   # Compare first and second element in product. Swap if they can and

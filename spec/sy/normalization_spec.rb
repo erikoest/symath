@@ -31,6 +31,8 @@ module Sy
         17.to_m,
       3.to_m.power(-4).add(2.to_m.power(-5)) =>
         1.to_m/81 + 1.to_m/32,
+      0.to_m.add(0.to_m) =>
+        0.to_m,
     }
 
     sums.each do |from, to|
@@ -42,6 +44,8 @@ module Sy
 
   describe Sy::Operation::Normalization, ', normalize product' do
     products = {
+      2.to_m.mul(4.to_m**-1) =>
+        1.to_m/2,
       x.mul(x) =>
         x**2,
       x.mul(-x) =>
@@ -56,6 +60,9 @@ module Sy
         63.to_m/40,
       fn(:cos, x).mul(y) =>
         y*fn(:cos, x),
+      :i.to_m*:j.to_m*:k.to_m => -1,
+      :i.to_m*:k.to_m*:j.to_m => 1,
+      dx.mul(x).mul(dx) => 0,
     }
 
     products.each do |from, to|
@@ -67,12 +74,16 @@ module Sy
 
   describe Sy::Operation::Normalization, ', normalize power' do
     powers = {
+      (-2.to_m).power(2)*(-2.to_m).power(2) =>
+        16,
+      (-2.to_m).power(3) =>
+        -8,
       x.power(2).power(3) =>
         x**6,
       x.power(2).power(y) =>
         x**(2*y),
       :i.to_m.power(3) =>
-        -1,
+        -:i,
       :j.to_m.power(6) =>
         -1,
       :k.to_m.power(4) =>
@@ -236,6 +247,13 @@ module Sy
     end
     it 'does not normalize abs(a)' do
       expect(fn(:abs, :a).normalize).to be_equal_to fn(:abs, :a)
+    end
+  end
+
+  describe Sy::Operation::Normalization, ', reduce non-linear op' do
+    op1 = :op1.to_m(Sy::Type.new('operator'))
+    it 'cannot normalize x*op1*x (op1 is non-linear)' do
+      expect(x.mul(op1.mul(x)).normalize).to be_equal_to x*op1*x
     end
   end
 end
