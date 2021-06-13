@@ -11,12 +11,14 @@ module Sy
   dy = :y.to_m(:dform)
   dz = :z.to_m(:dform)
 
+  op1 = :op1.to_m(Sy::Type.new('operator'))
+
   # NB: We must always use the compositional operators when creating
   # the input expressions to the normalizer tests since we don't want
   # the expressions to be simplified before we send it to the
   # normalizer.
-  describe Sy::Operation::Normalization, ', normalize sum' do
-    sums = {
+  norm = {
+    'sums' => {
       1.to_m.add(3) =>
         4.to_m,
       3.to_m.div(4).add(5.to_m.add(2).div(34)) =>
@@ -33,17 +35,9 @@ module Sy
         1.to_m/81 + 1.to_m/32,
       0.to_m.add(0.to_m) =>
         0.to_m,
-    }
+    },
 
-    sums.each do |from, to|
-      it "normalizes '#{from.to_s}' to '#{to.to_s}'" do
-        expect(from.normalize).to be_equal_to to
-      end
-    end
-  end
-
-  describe Sy::Operation::Normalization, ', normalize product' do
-    products = {
+    'products' => {
       2.to_m.mul(4.to_m**-1) =>
         1.to_m/2,
       x.mul(x) =>
@@ -63,44 +57,20 @@ module Sy
       :i.to_m*:j.to_m*:k.to_m => -1,
       :i.to_m*:k.to_m*:j.to_m => 1,
       dx.mul(x).mul(dx) => 0,
-    }
+    },
 
-    products.each do |from, to|
-      it "normalizes '#{from.to_s}' to '#{to.to_s}'" do
-        expect(from.normalize).to be_equal_to to
-      end
-    end
-  end
+    'powers' => {
+      (-2.to_m).power(2)*(-2.to_m).power(2) => 16,
+      (-2.to_m).power(3)                    => -8,
+      x.power(2).power(3)                   => x**6,
+      x.power(2).power(y)                   => x**(2*y),
+      :i.to_m.power(3)                      => -:i,
+      :j.to_m.power(6)                      => -1,
+      :k.to_m.power(4)                      => 1,
+      :i.to_m.power(x)                      => :i**x,
+    },
 
-  describe Sy::Operation::Normalization, ', normalize power' do
-    powers = {
-      (-2.to_m).power(2)*(-2.to_m).power(2) =>
-        16,
-      (-2.to_m).power(3) =>
-        -8,
-      x.power(2).power(3) =>
-        x**6,
-      x.power(2).power(y) =>
-        x**(2*y),
-      :i.to_m.power(3) =>
-        -:i,
-      :j.to_m.power(6) =>
-        -1,
-      :k.to_m.power(4) =>
-        1,
-      :i.to_m.power(x) =>
-        :i**x,
-    }
-
-    powers.each do |from, to|
-      it "normalizes '#{from.to_s}' to '#{to.to_s}'" do
-        expect(from.normalize).to be_equal_to to
-      end
-    end
-  end
-
-  describe Sy::Operation::Normalization, ', normalize wedge products' do
-    wedges = {
+    'wedge products' => {
       dx.wedge(dx) =>
          0.to_m,
       dy.wedge(dx).wedge(dz) =>
@@ -113,147 +83,118 @@ module Sy
         x*dx + dx,
       (dx.wedge(fn(:ln, a.mul(x)))).add((x.wedge(1)).div(a.mul(x)).wedge((0.to_m.wedge(x)).add(a.wedge(dx)))).sub(dx) =>
         fn(:ln, a*x)*dx,
-    }
+    },
 
-    wedges.each do |from, to|
-      it "normalizes '#{from.to_s}' to '#{to.to_s}'" do
-        expect(from.normalize).to be_equal_to to
+    'square roots' => {
+      fn(:sqrt, -7.to_m)   => :NaN,
+      fn(:sqrt, a**(2*b))  => a**b,
+      fn(:sqrt, -a**(2*b)) => :NaN,
+    },
+
+    'exp' => {
+      fn(:exp, 0)     => 1,
+      fn(:exp, 1)     => :e,
+      fn(:exp, :oo)   => :oo,
+      fn(:exp, -:oo)  => 0,
+      fn(:exp, :a)    => fn(:exp, :a),
+      fn(:exp, -:NaN) => :NaN,
+    },
+
+    'ln' => {
+      fn(:ln, 1)   => 0,
+      fn(:ln, :e)  => 1,
+      fn(:ln, 0)   => -:oo,
+      fn(:ln, :oo) => :oo,
+      fn(:ln, -10) => :NaN,
+    },
+
+    'factorial' => {
+      fn(:fact, 5)  => 120,
+      fn(:fact, :a) => fn(:fact, :a),
+    },
+
+    'abs' => {
+      fn(:abs, -10)  => 10,
+      fn(:abs, 20)   => 20,
+      fn(:abs, 0)    => 0,
+      fn(:abs, :a)   => fn(:abs, :a),
+      fn(:abs, :NaN) => :NaN,
+    },
+
+    'various' => {
+      x.mul(op1.mul(x)) => x*op1*x,
+    },
+  }
+
+  norm.keys.sort.each do |k|
+    describe Sy::Operation::Normalization, ", normalize '#{k}'" do
+
+      norm[k].each do |from, to|
+        it "normalizes '#{from.to_s}' to '#{to.to_s}'" do
+          expect(from.normalize).to be_equal_to to
+        end
       end
     end
   end
 
-  describe Sy::Operation::Normalization, ', reduce square roots' do
-    it 'normalizes sqrt(-4) to 2*i' do
-      Sy::setting(:complex_arithmetic, true)
-      expect(fn(:sqrt, -4.to_m).normalize).to be_equal_to 2.to_m*:i
-      Sy::setting(:complex_arithmetic, false)
-    end
-    it 'normalizes sqrt(-7) to i*sqrt(7)' do
-      Sy::setting(:complex_arithmetic, true)
-      expect(fn(:sqrt, -7.to_m).normalize).to be_equal_to fn(:sqrt, 7)*:i
-      Sy::setting(:complex_arithmetic, false)
-    end
-    it 'normalizes sqrt(-7) to NaN' do
-      expect(fn(:sqrt, -7.to_m).normalize).to be_equal_to :NaN
-    end
-    it 'normalizes sqrt(a**(2*b)) to a**b' do
-      expect(fn(:sqrt, a**(2*b)).normalize).to be_equal_to a**b
-    end
-    it 'normalizes sqrt(-a**(2*b)) to a**b*i' do
-      Sy::setting(:complex_arithmetic, true)
-      expect(fn(:sqrt, -a**(2*b)).normalize).to be_equal_to a**b*:i
-      Sy::setting(:complex_arithmetic, false)
-    end
-    it 'normalizes sqrt(-a**(2*b)) to NaN' do
-      expect(fn(:sqrt, -a**(2*b)).normalize).to be_equal_to :NaN
+  complex = {
+    'square roots' => {
+      fn(:sqrt, -4.to_m)   => 2.to_m*:i,
+      fn(:sqrt, -7.to_m)   => fn(:sqrt, 7)*:i,
+      fn(:sqrt, -a**(2*b)) => a**b*:i,
+    },
+
+    'exp' => {
+      fn(:exp, :oo)  => :NaN,
+      fn(:exp, -:oo) => :NaN,
+    },
+
+    'ln' => {
+      fn(:ln, -1)          => :pi.to_m*:i,
+      fn(:ln, -:e)         => :pi.to_m*:i + 1,
+      fn(:ln, :i)          => :pi.to_m*:i/2,
+      fn(:ln, :i.to_m*:e)  => :pi.to_m*:i/2 + 1,
+      fn(:ln, -:i)         => -:pi.to_m*:i/2,
+      fn(:ln, -:i.to_m*:e) => -:pi.to_m*:i/2 + 1,
+    },
+  }
+
+  complex.keys.sort.each do |k|
+    describe Sy::Operation::Normalization, ", normalize '#{k}'" do
+
+      complex[k].each do |from, to|
+        it "with complex arithmetic, normalizes '#{from.to_s}' to '#{to.to_s}'" do
+          Sy::setting(:complex_arithmetic, true)
+          expect(from.normalize).to be_equal_to to
+          Sy::setting(:complex_arithmetic, false)
+        end
+      end
     end
   end
 
-  describe Sy::Operation::Normalization, ', reduce exp' do
-    it 'normalizes e**0 to 1' do
-      expect(fn(:exp, 0).normalize).to be_equal_to 1
-    end
-    it 'normalizes e**1 to e' do
-      expect(fn(:exp, 1).normalize).to be_equal_to :e
-    end
-    it 'normalizes e**oo to NaN' do
-      Sy::setting(:complex_arithmetic, true)
-      expect(fn(:exp, :oo).normalize).to be_equal_to :NaN
-      Sy::setting(:complex_arithmetic, false)
-    end
-    it 'normalizes e**-oo to NaN' do
-      Sy::setting(:complex_arithmetic, true)
-      expect(fn(:exp, -:oo).normalize).to be_equal_to :NaN
-      Sy::setting(:complex_arithmetic, false)
-    end
-    it 'normalizes e**oo to oo' do
-      expect(fn(:exp, :oo).normalize).to be_equal_to :oo
-    end
-    it 'normalizes e**-oo to 0' do
-      expect(fn(:exp, -:oo).normalize).to be_equal_to 0
-    end
-    it 'does not normalize e**:a' do
-      expect(fn(:exp, :a).normalize).to be_equal_to fn(:exp, :a)
+  reductions = {
+    fn(:abs, Sy::Minus.new(:NaN.to_m)) => :NaN,
+  }
+
+  describe Sy::Operation::Normalization, ', reductions' do
+    reductions.each do |from, to|
+      it "reduces '#{from.to_s} to '#{to.to_s}'" do
+        expect(from.reduce).to be_equal_to to
+      end
     end
   end
 
-  describe Sy::Operation::Normalization, ', reduce ln' do
-    it 'normalizes ln(1) to 0' do
-      expect(fn(:ln, 1).normalize).to be_equal_to 0
-    end
-    it 'normalizes ln(e) to 1' do
-      expect(fn(:ln, :e).normalize).to be_equal_to 1
-    end
-    it 'normalizes ln(0) to -oo' do
-      expect(fn(:ln, 0).normalize).to be_equal_to -:oo
-    end
-    it 'normalizes ln(oo) to oo' do
-      expect(fn(:ln, :oo).normalize).to be_equal_to :oo
-    end
-    it 'normalizes ln(-10) to NaN' do
-      expect(fn(:ln, -10).normalize).to be_equal_to :NaN
-    end
+  complex_reductions = {
+    fn(:abs, Sy::Minus.new(:oo)) => :oo,
+  }
 
-    it 'normalizes ln(-1) to pi*i' do
-      Sy::setting(:complex_arithmetic, true)
-      expect(fn(:ln, -1).normalize).to be_equal_to :pi.to_m*:i
-      Sy::setting(:complex_arithmetic, false)
-    end
-    it 'normalizes ln(-e) to 1 + pi*i' do
-      Sy::setting(:complex_arithmetic, true)
-      expect(fn(:ln, -:e).normalize).to be_equal_to :pi.to_m*:i + 1
-      Sy::setting(:complex_arithmetic, false)
-    end
-    it 'normalizes ln(i) to pi*i/2' do
-      Sy::setting(:complex_arithmetic, true)
-      expect(fn(:ln, :i).normalize).to be_equal_to :pi.to_m*:i/2
-      Sy::setting(:complex_arithmetic, false)
-    end
-    it 'normalizes ln(i*e) to 1 + pi*i/2' do
-      Sy::setting(:complex_arithmetic, true)
-      expect(fn(:ln, :i.to_m*:e).normalize).to be_equal_to :pi.to_m*:i/2 + 1
-      Sy::setting(:complex_arithmetic, false)
-    end
-    it 'normalizes ln(-i) to -pi*i/2' do
-      Sy::setting(:complex_arithmetic, true)
-      expect(fn(:ln, -:i).normalize).to be_equal_to -:pi.to_m*:i/2
-      Sy::setting(:complex_arithmetic, false)
-    end
-    it 'normalizes ln(-i*e) to 1 - pi*i/2' do
-      Sy::setting(:complex_arithmetic, true)
-      expect(fn(:ln, -:i.to_m*:e).normalize).to be_equal_to -:pi.to_m*:i/2 + 1
-      Sy::setting(:complex_arithmetic, false)
-    end
-  end
-
-  describe Sy::Operation::Normalization, ', reduce factorial' do
-    it 'normalizes 5! to 120' do
-      expect(fn(:fact, 5).normalize).to be_equal_to 120
-    end
-    it 'does not normalize a!' do
-      expect(fn(:fact, :a).normalize).to be_equal_to fn(:fact, :a)
-    end
-  end
-
-  describe Sy::Operation::Normalization, ', reduce abs' do
-    it 'normalizes abs(-10) to 10' do
-      expect(fn(:abs, -10).normalize).to be_equal_to 10
-    end
-    it 'normalizes abs(20) to 20' do
-      expect(fn(:abs, 20).normalize).to be_equal_to 20
-    end
-    it 'normalizes abs(0) to 0' do
-      expect(fn(:abs, 0).normalize).to be_equal_to 0
-    end
-    it 'does not normalize abs(a)' do
-      expect(fn(:abs, :a).normalize).to be_equal_to fn(:abs, :a)
-    end
-  end
-
-  describe Sy::Operation::Normalization, ', reduce non-linear op' do
-    op1 = :op1.to_m(Sy::Type.new('operator'))
-    it 'cannot normalize x*op1*x (op1 is non-linear)' do
-      expect(x.mul(op1.mul(x)).normalize).to be_equal_to x*op1*x
+  describe Sy::Operation::Normalization, ', complex reductions' do
+    reductions.each do |from, to|
+      it "with complex arithmetic, reduces '#{from.to_s} to '#{to.to_s}'" do
+        Sy::setting(:complex_arithmetic, true)
+        expect(from.reduce).to be_equal_to to
+        Sy::setting(:complex_arithmetic, false)
+      end
     end
   end
 end

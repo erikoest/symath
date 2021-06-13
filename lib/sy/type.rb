@@ -10,6 +10,8 @@ module Sy
     # Type hierarchy with generic types at the top level and more specific
     # types further down.
     @@hierarchy = {
+      # Non numbers
+      :nonfinite => 1,
       # Operators
       :operator => {
         # Linear operators

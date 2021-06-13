@@ -20,6 +20,7 @@ module Sy
     # NaN
     it 'oo + oo == NaN'   do expect(oo + oo).to be == nan end
     it 'oo - oo == NaN'   do expect(oo - oo).to be == nan end
+    it 'NaN - NaN == NaN' do expect(nan - nan).to be == nan end
 
     # Infinite sum
     it 'oo + 1 == oo'     do expect(oo + 1).to be == oo end

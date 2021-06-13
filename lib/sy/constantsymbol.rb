@@ -36,13 +36,13 @@ module Sy
     end
 
     def is_positive?()
-      return !is_zero?
+      return (!is_zero? and !is_nan?)
     end
     
     def is_zero?()
       return false
     end
-    
+
     def is_unit_quaternion?()
       return @@unit_quaternions.member?(@name.to_sym)
     end
@@ -87,11 +87,10 @@ module Sy
       elsif is_unit_quaternion?
         return 'quaternion'.to_t
       else
-        puts "GOT UNKNOWN TYPE: " + n.to_s
-        return 'unknown'.to_t
+        return 'nonfinite'.to_t
       end
     end
-    
+
     def to_latex()
       if @@ltx_symbol.key?(@name)
         return @@ltx_symbol[@name]

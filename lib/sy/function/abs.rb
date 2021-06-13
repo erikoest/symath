@@ -3,7 +3,9 @@ require 'sy/function'
 module Sy
   class Function::Abs < Function
     def reduce()
-      if args[0].is_negative?
+      if args[0].is_nan?
+        return :NaN.to_m
+      elsif args[0].is_negative?
         return - args[0]
       elsif args[0].is_positive? or args[0].is_zero?
         return args[0]

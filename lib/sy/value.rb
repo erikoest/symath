@@ -138,6 +138,7 @@ module Sy
       return
     end
 
+    # Note: Returning nil here means neither true or false, but unknown.
     def is_finite?()
       return
     end
@@ -148,9 +149,9 @@ module Sy
 
     def is_negative?()
       if is_nan?
-        return :NaN.to_m
+        return false
       end
-      
+
       return (is_positive? == false and is_zero? == false)
     end
 
@@ -284,7 +285,7 @@ module Sy
             return :NaN.to_m
           end
         end
-        
+
         # oo + n = n + oo = oo + oo = oo
         if self.is_finite? == false
           return self
