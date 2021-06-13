@@ -47,10 +47,6 @@ module Sy
       return true
     end
 
-    def is_scalar?()
-      return argument.is_scalar?()
-    end
-
     def factors()
       return Enumerator.new do |f|
         f << -1.to_m

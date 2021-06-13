@@ -34,10 +34,6 @@ module Sy
       return true
     end
 
-    def is_scalar?()
-      return (factor1.is_scalar? and factor2.is_scalar?)
-    end
-
     def factors()
       return Enumerator.new do |f|
         factor1.factors.each { |f1| f << f1 }

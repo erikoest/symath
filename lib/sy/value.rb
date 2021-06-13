@@ -720,12 +720,6 @@ module Sy
       return false
     end
 
-    # Value is a scalar, i.e. has no vector parts, down to non-sum and
-    # non-product functions and operators.
-    def is_scalar?()
-      return true
-    end
-    
     # Returns the terms of a sum in an array.
     # Defaults to self for non-sums.
     def terms()

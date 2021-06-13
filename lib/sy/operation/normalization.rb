@@ -149,7 +149,7 @@ module Sy::Operation::Normalization
     divf = 1.to_m
     
     factors.each do |f|
-      if f.is_scalar?
+      if f.type.is_scalar?
         if f.is_divisor_factor?
           divf *= f.base**f.exponent.argument
         else

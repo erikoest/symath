@@ -18,10 +18,6 @@ module Sy
       return true
     end
 
-    def is_scalar?()
-      return dividend.is_scalar?()
-    end
-
     def factors()
       return Enumerator.new do |f|
         dividend.factors.each { |d1| f << d1 }

@@ -26,10 +26,6 @@ module Sy
       return true
     end
 
-    def is_scalar?()
-      return (term1.is_scalar? and term2.is_scalar?)
-    end
-    
     # Return all terms in the sum
     def terms()
       return Enumerator.new do |s|
