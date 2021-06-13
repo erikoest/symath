@@ -2,6 +2,9 @@ require 'sy/operation'
 require 'set'
 
 module Sy::Operation::Differential
+  class DifferentialError < StandardError
+  end
+
   include Sy::Operation
 
   # The diff() method provided in this operation module calculates the
@@ -71,10 +74,6 @@ module Sy::Operation::Differential
       return diff_product(vars)
     end
 
-    if is_a?(Sy::Wedge)
-      return diff_product(vars)
-    end
-      
     if is_a?(Sy::Fraction)
       return diff_fraction(vars)
     end
@@ -86,8 +85,12 @@ module Sy::Operation::Differential
     if is_a?(Sy::Function)
       return diff_function(vars)
     end
-      
-    raise 'Cannot calculate derivative of expression ' + to_s
+
+    diff_failure
+  end
+
+  def diff_failure()
+    raise DifferentialError, 'Cannot calculate differential of expression ' + to_s
   end
 
   # For simplicity, just use wedge products all the time. They will be
@@ -115,7 +118,7 @@ module Sy::Operation::Differential
       d.replace({ :a.to_m => args[0] })
       return _diff_wedge(d, args[0].diff(vars))
     else
-      raise 'Cannot calculate differential of expression ' + to_s
+      diff_failure
     end
   end
   
