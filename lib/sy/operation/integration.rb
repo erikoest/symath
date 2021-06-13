@@ -158,8 +158,6 @@ module Sy::Operation::Integration
     diva = []
     
     factors.each do |f|
-      puts "F: ", f.to_s
-      puts "F type: ", f.type.to_s
       if !f.type.is_subtype?(:scalar)
         int_failure
       end
@@ -192,7 +190,6 @@ module Sy::Operation::Integration
   end
 
   def get_linear_constants(arg, var)
-    puts "Lin: " + arg.to_s
     # Check that arg is on the form c1*var + c2. Return the two constants.
     vu = var.undiff
     vset = [vu].to_set
