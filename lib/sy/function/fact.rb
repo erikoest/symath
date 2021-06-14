@@ -13,7 +13,11 @@ module Sy
     end
 
     def to_s()
-      return args[0].to_s + '!'.to_s
+      if (args[0].is_a?(Sy::Variable) or args[0].is_a?(Sy::ConstantSymbol))
+        return args[0].to_s + '!'.to_s
+      else
+        return '('.to_s + args[0].to_s + ')!'.to_s
+      end
     end
     
     def to_latex()

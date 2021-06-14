@@ -20,6 +20,7 @@ rule
      | exp '/' exp     { result = val[0].div(val[2]) }
      | exp '^' exp     { result = val[0].wedge(val[2]) }
      | exp '**' exp    { result = val[0].power(val[2]) }
+     | '(' exp ')' '!' { result = function('fact', [val[1]]) }
      | '(' exp ')'     { result = val[1] }
      | '-' exp =UMINUS { result = val[1].neg }
      | func
@@ -27,9 +28,12 @@ rule
   func: NAME '(' ')'      { result = function(val[0], []) }
       | NAME '(' args ')' { result = function(val[0], val[2]) }
       | '#' '(' exp ')'   { result = function('sharp', [val[2]]) }
+      | '#' func          { result = function('sharp', [val[1]]) }
       | '|' exp '|'       { result = function('abs', [val[1]]) }
       | NUMBER            { result = val[0].to_i.to_m }
+      | NUMBER '!'        { result = function('fact', [val[0].to_i.to_m]) }
       | NAME              { result = named_node(val[0]) }
+      | NAME '!'          { result = function('fact', [named_node(val[0])]) }
 
   args: args ',' exp { result = val[0].push(val[2]) }
       | exp          { result = [val[0]] }
@@ -45,8 +49,11 @@ module Sy
     args = subnodes
 
     # If name is a built-in operator, create it rather than a function
-    name = 'lower' if name.eql?('b')
-      
+    name = 'flat' if name.eql?('b')
+    if name.include? "'"
+      raise ParseError, "\nparse error on function name '#{name}'"
+    end
+
     if Sy::Operator.is_builtin?(name.to_sym)
       return op(name, *args)
     else
@@ -59,6 +66,11 @@ module Sy
     if name.length >= 2 and name.match(/^d/)
       name = name[1..-1]
       return name.to_m('dform')
+    end
+
+    if name.match(/\'$/)
+      name = name[0..-2]
+      return name.to_m('vector')
     end
 
     return name.to_m
@@ -83,7 +95,7 @@ module Sy
       when *cmd
         # command
         @q.push [:CMD, $&]
-      when /\A[A-Za-z_]+[A-Za-z_0-9]*/
+      when /\A[A-Za-z_]+[A-Za-z_0-9]*\'?/
         # name (char + (char|num))
         @q.push [:NAME, $&]
       when /\A\d+(\.\d+)?/
