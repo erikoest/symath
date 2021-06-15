@@ -53,6 +53,17 @@ module Sy
     def initialize(name, args)
       @name = name
       @args = args
+
+      # Create ruby method for the function if the method name is not
+      # already taken.
+      if !self.kind_of?(Sy::Constant) and
+        !Object.private_method_defined?(name) and
+        !Object.method_defined?(name)
+        clazz = self.class
+        Object.define_method :"#{name}" do |*args|
+          return clazz.new("#{name}", args.map { |a| a.to_m })
+        end
+      end
     end
 
     def to_s()
