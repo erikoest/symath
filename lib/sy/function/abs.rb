@@ -5,7 +5,9 @@ module Sy
     def reduce()
       if args[0].is_nan?
         return :NaN.to_m
-      elsif args[0].is_negative?
+      # Corner case, -oo is positive with complex arithmetic, so we need a specific check
+      # for that.
+      elsif args[0].is_negative? or args[0] == -:oo
         return - args[0]
       elsif args[0].is_positive? or args[0].is_zero?
         return args[0]

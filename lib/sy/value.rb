@@ -134,11 +134,11 @@ module Sy
     end
 
     # Default properties for operators
+    # Note: Returning nil here means neither true or false, but unknown.
     def is_nan?()
       return
     end
 
-    # Note: Returning nil here means neither true or false, but unknown.
     def is_finite?()
       return
     end

@@ -131,7 +131,9 @@ module Sy
 
       norm[k].each do |from, to|
         it "normalizes '#{from.to_s}' to '#{to.to_s}'" do
+          Sy::setting(:complex_arithmetic, false)
           expect(from.normalize).to be_equal_to to
+          Sy::setting(:complex_arithmetic, true)
         end
       end
     end
@@ -164,9 +166,7 @@ module Sy
 
       complex[k].each do |from, to|
         it "with complex arithmetic, normalizes '#{from.to_s}' to '#{to.to_s}'" do
-          Sy::setting(:complex_arithmetic, true)
           expect(from.normalize).to be_equal_to to
-          Sy::setting(:complex_arithmetic, false)
         end
       end
     end
@@ -174,26 +174,27 @@ module Sy
 
   reductions = {
     fn(:abs, Sy::Minus.new(:NaN.to_m)) => :NaN,
+    fn(:abs, -fn(:myfunc, x))           => fn(:abs, -fn(:myfunc, x)),
   }
 
   describe Sy::Operation::Normalization, ', reductions' do
     reductions.each do |from, to|
       it "reduces '#{from.to_s} to '#{to.to_s}'" do
+        Sy::setting(:complex_arithmetic, false)
         expect(from.reduce).to be_equal_to to
+        Sy::setting(:complex_arithmetic, true)
       end
     end
   end
 
   complex_reductions = {
-    fn(:abs, Sy::Minus.new(:oo)) => :oo,
+    fn(:abs, Sy::Minus.new(:oo.to_m)) => :oo,
   }
 
   describe Sy::Operation::Normalization, ', complex reductions' do
-    reductions.each do |from, to|
+    complex_reductions.each do |from, to|
       it "with complex arithmetic, reduces '#{from.to_s} to '#{to.to_s}'" do
-        Sy::setting(:complex_arithmetic, true)
         expect(from.reduce).to be_equal_to to
-        Sy::setting(:complex_arithmetic, false)
       end
     end
   end
