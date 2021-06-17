@@ -192,8 +192,20 @@ module Sy::Operation::Normalization
       prev = nil
 
       while ex.is_a?(Sy::Product)
-        sign2, changed = ex.reduce_factor_modulo_sign
-        done = false if changed
+        if factor1.is_a?(Sy::Product)
+          f, sign2, changed = factor1.factor2.reduce_modulo_sign
+          if changed
+            self.factor1.factor2 = f
+            done = false
+          end
+        else
+          f, sign2, changed = factor1.reduce_modulo_sign
+          if changed
+            self.factor1 = f
+            done = false
+          end
+        end
+
         sign *= sign2
 
         ex, sign2, changed = ex.combine_factors
@@ -344,23 +356,6 @@ module Sy::Operation::Normalization
     else
       return e
     end
-  end
-
-  # Reduce first factor. Return sign and changed
-  def reduce_factor_modulo_sign()
-    if factor1.is_a?(Sy::Product)
-      f, sign, changed = factor1.factor2.reduce_modulo_sign
-      if changed
-        self.factor1.factor2 = f
-      end
-    else
-      f, sign, changed = factor1.reduce_modulo_sign
-      if changed
-        self.factor1 = f
-      end
-    end
-
-    return sign, changed
   end
 
   # Compare first and second element in product. Swap if they can and

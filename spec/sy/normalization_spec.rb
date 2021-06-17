@@ -42,7 +42,8 @@ module Sy
         1.to_m/2,
       x.mul(x) =>
         x**2,
-      x.mul(-y) => -x*y
+      x.mul(-y) =>
+        - x*y,
       x.mul(-x) =>
         - x**2,
       x.mul(x.power(2)) =>
