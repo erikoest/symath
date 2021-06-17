@@ -77,7 +77,7 @@ module Sy
       expect(op(:bounds, a, b, 1, 2).to_latex).to be ==
         '\left[a\right]^{2}_{1}'
     end
-    
+
     # Common functions
     it 'factorial to latex' do
       expect(fn(:fact, :a).to_latex).to be == 'a!'
@@ -88,7 +88,7 @@ module Sy
     it 'abs to latex' do
       expect(fn(:abs, :a).to_latex).to be == '\lverta\rvert'
     end
-    
+
     # Named operator
     it 'fn to latex' do
       expect(fn(:f, :a, :b).to_latex).to be == 'f(a,b)'
@@ -97,7 +97,7 @@ module Sy
     it 'op to latex' do
       expect(op(:op, :a, :b).to_latex).to be == '\operatorname{op}(a,b)'
     end
-    
+
     # Exterior algebra
     it 'wedge to latex' do
       expect((xv^yv).to_latex).to be == '\vec{x}\wedge\vec{y}'
