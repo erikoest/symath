@@ -64,10 +64,6 @@ module Sy
       end
     end
 
-    def order()
-      return -arguent.order
-    end
-    
     def reduce_constant_factors()
       return -argument.reduce_constant_factors
     end
