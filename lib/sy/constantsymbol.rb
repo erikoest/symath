@@ -17,10 +17,6 @@ module Sy
 
     @@unit_quaternions = [:i, :j, :k].to_set
     
-    def self.builtin_constants()
-      return @@symbols
-    end
-    
     def initialize(name, value = nil)
       raise 'Not a known symbol: ' + name.to_s if !@@symbols.member?(name.to_sym)
       super(name.to_sym)
@@ -30,7 +26,7 @@ module Sy
     def is_nan?()
       return @name == :NaN
     end
-    
+
     def is_finite?()
       return (@name != :oo and @name != :NaN)
     end
@@ -70,14 +66,6 @@ module Sy
       return qmap[@name.to_sym][q.name.to_sym]
     end
     
-    def match(other, varmap)
-      if self == other then
-        return varmap
-      end
-
-      return
-    end
-
     def type()
       n = @name.to_sym
       if n == :e or n == :pi or n == :phi
