@@ -53,7 +53,7 @@ module Sy::Operation::Match
         remain1 = (all - s).map { |i| args1[i] }
 
         if n == 1
-          m0 = select1[0].match(args2[0], fv, bv)
+          m0 = select1[0].match(args2[0], freevars, boundvars)
         else
           if args2[0].is_a?(Sy::Variable) and freevars.include?(args2[0])
             # Register match.
@@ -101,13 +101,12 @@ module Sy::Operation::Match
   # found if each of the free variables can be replaced with subexpressions
   # making the expression equal to self. In that case, a hash is returned
   # mapping each of the variables to the corresponding subexpression. If no
-  # match is found, nil is returned. An optional fixvar hash contains a map
-  # of variables to expressions which are required to match exactly.
+  # match is found, nil is returned. An optional boundvars hash contains a
+  # map of variables to expressions which are required to match exactly.
   def match(exp, freevars, boundvars = {})
-    # Traverse self and exp in parallel. Match subexpressions recrsively,
+    # Traverse self and exp in parallel. Match subexpressions recursively,
     # and match end nodes one by one. The two value nodes are compared for
     # equality and each argument are matched recursively.
-
     # Constant: Just match nodes by exact comparison
     if exp.is_a?(Sy::Constant)
       # Node is a constant. Exact match is required
