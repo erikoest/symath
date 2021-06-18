@@ -58,9 +58,6 @@ module Sy::Operation::Match
           if args2[0].is_a?(Sy::Variable) and freevars.include?(args2[0])
             # Register match.
             m0 = [{ args2[0] => build_assoc_op(select1, opclass) }]
-          elsif args2[0].class == opclass
-            m0 = match_assoc(select1, args2[0].args_assoc, freevars,
-                             boundvars, opclass)
           else
             # No match. Skip to the next argument combination
             next
@@ -159,6 +156,8 @@ module Sy::Operation::Match
       return m.map { |r| boundvars.merge(r) }
     end
 
+    # :nocov:
     raise 'Don\'t know how to compare value type ' + exp.class.to_s
+    # :nocov:
   end
 end
