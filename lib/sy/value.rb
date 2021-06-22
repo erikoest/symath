@@ -65,7 +65,7 @@ module Sy
     @@class_order.each_with_index do |e, i|
       @@class_order_hash[e] = i
     end
-    
+
     def deep_clone()
       return Marshal.load(Marshal.dump(self))
     end
@@ -75,7 +75,7 @@ module Sy
     def hash()
       return 1
     end
-    
+
     # Equality operator. Two expressions are considered equal if they are
     # structurally equal and have the same variable names
     def ==(other)

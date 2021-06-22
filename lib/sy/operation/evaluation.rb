@@ -3,7 +3,8 @@ require 'sy/operation'
 module Sy::Operation::Evaluation
   # This operation provides the method eval which evaluates operators
   # and formulaic functions in the expression.
-  
+
+  # FIXME: Rename to recursive_eval?
   def eval()
     res = deep_clone
     

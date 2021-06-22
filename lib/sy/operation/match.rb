@@ -157,6 +157,7 @@ module Sy::Operation::Match
     end
 
     # :nocov:
+    # All value types should be covered at this point, but one never knows.
     raise 'Don\'t know how to compare value type ' + exp.class.to_s
     # :nocov:
   end
