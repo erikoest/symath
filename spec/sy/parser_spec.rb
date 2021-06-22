@@ -14,6 +14,7 @@ module Sy
 
   describe Sy::Parser do
     parse = {
+      ''              => nil,
       '2'             => 2,
       'x'             => x.to_m,
       'x + y + z + 2' => x + y + z + 2,

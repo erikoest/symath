@@ -19,5 +19,11 @@ module Sy
     it 'g(1) does not evaluate' do
       expect(ex_g.evaluate).to be_equal_to ex_g
     end
+
+    ex2_f = fn(:f, 2, :pi)
+
+    it 'f(2, pi) evaluates to pi**3 + 6' do
+      expect(ex2_f.eval.normalize).to be_equal_to :pi.to_m**3 + 6
+    end
   end
 end
