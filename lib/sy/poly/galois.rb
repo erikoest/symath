@@ -12,11 +12,6 @@ module Sy
         return
       end
 
-      if args.key?(:gl)
-        init_from_gl(args[:gl])
-        return
-      end
-
       if args.key?(:arr)
         init_from_array(args[:arr], args[:p], args[:var])
         return
@@ -29,12 +24,6 @@ module Sy
       @arr = dup.arr.map { |t| t % p }
       @p = p
       @var = dup.var
-    end
-
-    def init_from_gl(gl)
-      @arr = gl.arr
-      @p = gl.p
-      @var = gl.var
     end
 
     def init_from_array(arr, p, var)
@@ -452,17 +441,6 @@ module Sy
       end
 
       return h
-    end
-
-    # Return true if f is square free
-    def sqf?()
-      (x, f) = monic
-
-      if f.zero?
-        return true
-      else
-        return f.gcd(f.diff).arr == [1]
-      end
     end
 
     # Sum two polynomials

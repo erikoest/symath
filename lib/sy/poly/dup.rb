@@ -15,22 +15,12 @@ module Sy
         return
       end
 
-      if args.key?(:dup)
-        init_from_dup(args[:dup])
-        return
-      end
-
       if args.key?(:arr)
         init_from_array(args[:arr], args[:var])
         return
       end
 
       raise 'Bad arguments for Poly::DUP constructor'
-    end
-
-    def init_from_dup(dup)
-      @arr = dup.arr
-      @var = dup.var
     end
 
     def init_from_array(arr, var)
@@ -640,16 +630,6 @@ module Sy
       return @arr.map { |e| e.abs }.inject(:+)
     end
 
-    # Divide coefficients by lc
-    def monic()
-      if zero?
-        return self.clone
-      end
-
-      c = lc
-      return [c, exquo_ground(c)]
-    end
-
     # Sum two polynomials
     def add(g)
       ret = @arr.clone
@@ -747,37 +727,6 @@ module Sy
       return new_dup(ret).strip!
     end
 
-    def sqr(g)
-      df = degree
-      h = []
-
-      (0..2*df).each do |i|
-        c = 0
-
-        jmin = [0, i - df].max
-        jmax = [i, df].min
-
-        n = jmax - jmin + 1
-
-        jmax = jmin + n/2 - 2
-
-        (jmin..jmax).each do |j|
-          c += self[j]*self[u - j]
-        end
-
-        c += c
-
-        if n.odd?
-          elem = self[jmax + 1]
-          c += elem**2
-        end
-
-        h << c
-      end
-
-      return new_dup(h).strip!
-    end
-    
     # Compute pseudo remainder of self / g
     def pseudo_rem(g)
       df = self.degree
@@ -869,28 +818,6 @@ module Sy
       ret = @arr.map { |t| t.to_i/c.to_i }
 
       return new_dup(ret).strip!
-    end
-
-    def exquo_ground(c)
-      if c == 0
-        raise 'Division by zero'
-      end
-
-      if self.zero?
-        return zero
-      end
-
-      ret = @arr.map do |t|
-        t2 = t/c
-        if c*t2 != t
-          raise 'Exact quotient of exp ' + @arr.inspect +
-                ' with ' + c.to_s + ' failed'
-        end
-        
-        t2
-      end
-      
-      return new_dup(ret)
     end
 
     def max_norm()

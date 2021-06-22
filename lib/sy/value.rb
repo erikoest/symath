@@ -70,34 +70,6 @@ module Sy
       return Marshal.load(Marshal.dump(self))
     end
 
-    def seek(path, start = 0, stop = nil)
-      if path.path.length < start
-        raise 'Path start out of range'
-      end
-      
-      if path.path.length == start
-        return self
-      end
-
-      if !self.is_a?(Sy::Operator)
-        raise 'Path not found in expression.'
-      end
-
-      sube = self.args[path.path[start]]
-      return sube.seek(path, start + 1)
-    end
-
-    def replace_subex(path, subex)
-      if path.length == 0
-        return subex
-      end
-
-      argpos = path.pop;
-      self.seek(path).args[argpos] = subex
-
-      return self
-    end
-
     # Needed for value objects to be hashable. Subclasses should override
     # this to return a value which tends to be different for unequal objects.
     def hash()
