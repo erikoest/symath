@@ -12,6 +12,7 @@ module Sy
     xc = :x.to_m('covector')
     t = :t.to_m(Sy::Type.new('tensor', indexes: ['u', 'l']))
     m = :m.to_m(Sy::Type.new('matrix', dimm: 2, dimn: 3))
+    mx = [[1, 2, 3], [4, 5, 6]].to_m
 
     # Constant symbols
     it 'pi to s' do expect(:pi.to_m.to_s).to be == 'pi' end
@@ -119,6 +120,11 @@ module Sy
     end
     it 'sharp to string' do
       expect(op(:sharp, :a).to_string).to be == '#(a)'
+    end
+
+    # Matrix
+    it 'matrix to string' do
+      expect(mx.to_s).to be == '[1, 2, 3; 4, 5, 6]'
     end
   end
 end
