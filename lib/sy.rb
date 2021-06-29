@@ -31,7 +31,6 @@ require 'sy/diff'
 require 'sy/poly'
 require 'sy/poly/dup'
 require 'sy/poly/galois'
-require 'sy/path'
 
 module Sy
   @@global_settings = {
