@@ -3,10 +3,6 @@ require 'sy'
 
 module Sy
   describe Sy::Value, ', adding non-finite values (complex)' do
-    before do
-      Sy.setting(:complex_arithmetic, true)
-    end
-  
     oo = :oo.to_m
     nan = :NaN.to_m
     x = :x.to_m
@@ -63,13 +59,17 @@ module Sy
     it '1 - oo == -oo'   do expect(1 - oo).to be == -oo end
     it '-oo + 1 == -oo'  do expect(-oo + 1).to be == -oo end
     it '-oo - oo == -oo' do expect(-oo - oo).to be == -oo end
+    it 'NaN is not negative' do expect(nan.is_negative?).to be == false end
+
+    # Power
+    it '0**0 == NaN' do expect(0.to_m**0).to be == nan end
+
+    after do
+      Sy.setting(:complex_arithmetic, true)
+    end
   end
 
   describe Sy::Value, ', multiplying non-finite values (complex)' do
-    before do
-      Sy.setting(:complex_arithmetic, true)
-    end
-
     oo = :oo.to_m
     nan = :NaN.to_m
     x = :x.to_m
@@ -123,13 +123,13 @@ module Sy
     # Oposite sign
     it 'oo*-oo = -oo'   do expect(oo*(-oo)).to be == -oo end
     it '-oo*oo = -oo'   do expect((-oo)*oo).to be == -oo end
+
+    after do
+      Sy.setting(:complex_arithmetic, true)
+    end
   end
 
   describe Sy::Value, ', dividing non-finite values (complex)' do
-    before do
-      Sy.setting(:complex_arithmetic, true)
-    end
-    
     oo = :oo.to_m
     nan = :NaN.to_m
     x = :x.to_m
@@ -209,6 +209,10 @@ module Sy
     it 'oo/-10 == -oo'  do expect(oo/(-10)).to be == -oo end
     it '-oo/10 == -oo'  do expect((-oo)/10).to be == -oo end
     it '-oo/-10 == oo'  do expect((-oo)/(-10)).to be == oo end
+
+    after do
+      Sy.setting(:complex_arithmetic, true)
+    end
   end
 
   describe Sy::Value, ', power and non-finite values (complex)' do
@@ -216,10 +220,6 @@ module Sy
     nan = :NaN.to_m
     x = :x.to_m
 
-    before do
-      Sy.setting(:complex_arithmetic, true)
-    end
-    
     # Undetermined
     it 'oo**x == oo**x' do expect(oo**x).to be == oo.power(x) end
     it 'x**oo == x**oo' do expect(x**oo).to be == x.power(oo) end
@@ -291,5 +291,10 @@ module Sy
     it 'oo**10 == oo'   do expect(oo**10).to be == oo end
     it '10**oo == oo'   do expect(10**oo).to be == oo end
     it 'oo*oo == oo'    do expect(oo**oo).to be == oo end
+    it '(-10.to_m)**oo == NaN' do expect((-10)**oo).to be == nan end
+
+    after do
+      Sy.setting(:complex_arithmetic, true)
+    end
   end
 end

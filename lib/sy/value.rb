@@ -70,18 +70,6 @@ module Sy
       return Marshal.load(Marshal.dump(self))
     end
 
-    # Needed for value objects to be hashable. Subclasses should override
-    # this to return a value which tends to be different for unequal objects.
-    def hash()
-      return 1
-    end
-
-    # Equality operator. Two expressions are considered equal if they are
-    # structurally equal and have the same variable names
-    def ==(other)
-      return false
-    end
-
     # Sorting/ordering operator. The ordering is used by the normalization to
     # order the parts of a sum, product etc.
     def <=>(other)
@@ -174,28 +162,11 @@ module Sy
       return true
     end
 
-    # Return true if value is constant relative to changes in any of the given
-    # set of variables. If no variable set is given, returns true if
-    # expression is always constant.
-    def is_constant?(vars = nil)
-      return true
-    end
-
-    # Return all free variables found in the expression
-    def variables()
-      return []
-    end
-
-    # Replaces map of variables with expressions. Overridden by subclasses
-    def replace(map)
-      return self
-    end
-
     # Reduce expression if possible. Defaults to no reduction
     def reduce()
       return self
     end
-    
+
     ##
     # Compositional math operator methods. No reductions are performed.
     ##
@@ -269,7 +240,9 @@ module Sy
         end
       end
 
+      # :nocov:
       raise 'Internal error'
+      # :nocov:
     end
 
     # Sub infinite values
@@ -316,7 +289,9 @@ module Sy
         end
       end
 
+      # :nocov:
       raise 'Internal error'
+      # :nocov:
     end
     
     # Multiply infinite values
@@ -350,7 +325,9 @@ module Sy
         end
       end
       
+      # :nocov:
       raise 'Internal error'
+      # :nocov:
     end
 
     # Divide infinite values
@@ -397,7 +374,9 @@ module Sy
         end
       end
 
+      # :nocov:
       raise 'Internal error'
+      # :nocov:
     end
 
     # Power of infinite values
@@ -445,7 +424,7 @@ module Sy
 
         # -n**oo => NaN
         if self.is_finite? and self.is_negative?
-          return NaN.to_m
+          return :NaN.to_m
         end
         
         # The only remaining possibilities:
@@ -486,7 +465,7 @@ module Sy
           sf.push f
         end
       end
-      
+
       o.factors.each do |f|
         if f == -1
           oc *= -1
@@ -800,19 +779,11 @@ end
 
 class Symbol
   def +(other)
-    if other.class.method_defined?(:to_m)
-      return self.to_m + other.to_m
-    else
-      return super(other)
-    end
+    return self.to_m + other.to_m
   end
 
   def -(other)
-    if other.class.method_defined?(:to_m)
-      return self.to_m - other.to_m
-    else
-      return super(other)
-    end
+    return self.to_m - other.to_m
   end
 
   def -@()
@@ -820,35 +791,19 @@ class Symbol
   end
 
   def *(other)
-    if other.class.method_defined?(:to_m)
-      return self.to_m*other.to_m
-    else
-      return super(other)
-    end
+    return self.to_m*other.to_m
   end
 
   def /(other)
-    if other.class.method_defined?(:to_m)
-      return self.to_m/other.to_m
-    else
-      return super(other)
-    end
+    return self.to_m/other.to_m
   end
 
   def **(other)
-    if other.class.method_defined?(:to_m)
-      return self.to_m**other.to_m
-    else
-      return super(other)
-    end
+    return self.to_m**other.to_m
   end
 
   def ^(other)
-    if other.class.method_defined?(:to_m)
-      return self.to_m^other.to_m
-    else
-      return super(other)
-    end
+    return self.to_m^other.to_m
   end
 end
 
