@@ -49,6 +49,14 @@ module Sy
     def arity
       return @args.length
     end
+
+    @@skip_method_def = {
+      :+ => true,
+      :- => true,
+      :* => true,
+      :/ => true,
+      :** => true,
+    }
     
     def initialize(name, args)
       @name = name
@@ -58,7 +66,8 @@ module Sy
       # already taken.
       if !self.kind_of?(Sy::Constant) and
         !Object.private_method_defined?(name) and
-        !Object.method_defined?(name)
+        !Object.method_defined?(name) and
+        !@@skip_method_def[name.to_sym]
         clazz = self.class
         Object.define_method :"#{name}" do |*args|
           return clazz.new("#{name}", args.map { |a| a.to_m })
