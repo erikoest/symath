@@ -41,6 +41,17 @@ module Sy
       end
     end
     
+    def evaluate
+      if factor1.is_a?(Sy::Matrix)
+        return factor1.matrix_mul(factor2)
+      elsif factor2.is_a?(Sy::Matrix) and
+           factor1.is_scalar
+        return factor2.matrix_mul(factor1)
+      end
+
+      return self
+    end
+
     def type()
       return factor1.type.product(factor2.type)
     end

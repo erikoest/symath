@@ -34,6 +34,14 @@ module Sy
       end
     end
 
+    def evaluate
+      if term1.type.is_matrix?
+        return term1.matrix_add(term2)
+      end
+
+      return self
+    end
+
     def type()
       return term1.type.sum(term2.type)
     end

@@ -118,8 +118,8 @@ module Sy
       v = brow.map { |bb| bb.name.to_m('vector') }
       d = brow.map { |bb| bb.name.to_m('dform') }
 
-      flat = (g*Sy::Matrix.new(d).transpose).normalize.col(0)
-      sharp = (g.inverse*Sy::Matrix.new(v).transpose).normalize.col(0)
+      flat = (g*Sy::Matrix.new(d).transpose).evaluate.normalize.col(0)
+      sharp = (g.inverse*Sy::Matrix.new(v).transpose).evaluate.normalize.col(0)
 
       @@flat_map = (0..dim - 1).map { |i| [v[i], flat[i]] }.to_h
       @@sharp_map = (0..dim - 1).map { |i| [d[i], sharp[i]] }.to_h

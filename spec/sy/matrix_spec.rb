@@ -10,20 +10,20 @@ module Sy
     s2 = [[3, 4], [-4, 4]].to_m
     
     it 'product of matrices' do
-      expect((m23*m32).normalize.to_s).to be == '[- 3, - 4; - 12, - 7]'
+      expect((m23*m32).evaluate.normalize.to_s).to be == '[- 3, - 4; - 12, - 7]'
     end
 
     it 'product of scalar and matrix' do
-      expect((m23*2).normalize.to_s).to be == '[2, 4, 6; 8, 10, 12]'
-      expect((2*m23).normalize.to_s).to be == '[2, 4, 6; 8, 10, 12]'
+      expect((m23*2).evaluate.normalize.to_s).to be == '[2, 4, 6; 8, 10, 12]'
+      expect((2*m23).evaluate.normalize.to_s).to be == '[2, 4, 6; 8, 10, 12]'
     end
 
     it 'sum of matrices' do
-      expect((s1 + s2).normalize.to_s).to be == '[4, 6; - 5, 2]'
+      expect((s1 + s2).evaluate.normalize.to_s).to be == '[4, 6; - 5, 2]'
     end
 
     it 'subtraction of matrices' do
-      expect((s1 - s2).normalize.to_s).to be == '[- 2, - 2; 3, - 6]'
+      expect((s1 - s2).evaluate.normalize.to_s).to be == '[- 2, - 2; 3, - 6]'
     end
 
     it 'trace of matrices' do

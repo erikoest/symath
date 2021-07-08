@@ -97,7 +97,7 @@ module Sy
       return false if self.class.name != o.class.name
       return false if name.to_s != o.name.to_s
       return false if arity != o.arity
-      return args.eql?(o.args)
+      return args == o.args
     end
 
     def <=>(other)

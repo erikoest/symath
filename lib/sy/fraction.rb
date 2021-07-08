@@ -29,6 +29,14 @@ module Sy
       end
     end
 
+    def evaluate
+      if dividend.is_a?(Sy::Matrix)
+        return dividend.matrix_div(divisor)
+      end
+
+      return self
+    end
+
     def type()
       if dividend.type.is_subtype?('rational')
         return 'rational'.to_t

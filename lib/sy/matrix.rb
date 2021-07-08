@@ -28,10 +28,33 @@ module Sy
       end
     end
 
-    # FIXME:
     def hash()
+      return [0,0].hash
     end
     
+    def <=>(other)
+      if self.class.name != other.class.name
+        return super(other)
+      end
+
+      if nrows != other.nrows
+        return nrows <=> other.nrows
+      end
+
+      if ncols != other.ncols
+        return ncols <=> other.ncols
+      end
+
+      (0..nrows).to_a.each do |i|
+        (0..ncols).to_a.each do |j|
+          cmp = (self[i,j] <=> other[i,j])
+          return cmp if cmp != 0
+        end
+      end
+
+      return 0
+    end
+
     def row(i)
       return @elements[i]
     end
@@ -48,7 +71,7 @@ module Sy
       return @ncols == @nrows
     end
 
-    def *(other)
+    def matrix_mul(other)
       if !other.is_a?(Sy::Matrix)
         data = (0..@nrows - 1).map do |r|
           (0..@ncols - 1).map { |c| self[r, c]*other }
@@ -70,7 +93,11 @@ module Sy
       return Sy::Matrix.new(data)
     end
 
-    def /(other)
+    def *(other)
+      return self.mul(other)
+    end
+
+    def matrix_div(other)
       raise 'Cannot divide matrix by matrix' if other.is_a?(Sy::Matrix)
 
       data = (0..@nrows - 1).map do |r|
@@ -80,7 +107,15 @@ module Sy
       return Sy::Matrix.new(data)
     end
 
-    def +(other)
+    def /(other)
+      return self.div(other)
+    end
+
+    def matrix_add(other)
+      if other.is_a?(Sy::Minus) and other.argument.is_a?(Sy::Matrix)
+        return self.matrix_sub(other.argument)
+      end
+
       raise 'Invalid dimensions' if @ncols != other.ncols or @nrows != other.nrows
 
       data = (0..@nrows - 1).map do |r|
@@ -92,7 +127,11 @@ module Sy
       return Sy::Matrix.new(data)
     end
 
-    def -(other)
+    def +(other)
+      return self.add(other)
+    end
+
+    def matrix_sub(other)
       raise 'Invalid dimensions' if @ncols != other.ncols or @nrows != other.nrows
 
       data = (0..@nrows - 1).map do |r|
@@ -103,7 +142,11 @@ module Sy
 
       return Sy::Matrix.new(data)
     end
-    
+
+    def -(other)
+      return self.sub(other)
+    end
+
     def transpose()
       return Sy::Matrix.new(@elements.transpose)
     end
@@ -111,7 +154,7 @@ module Sy
     def inverse()
       raise 'Matrix is not square' if !is_square?
 
-      return adjugate/determinant
+      return adjugate.matrix_div(determinant)
     end
 
     # The adjugate of a matrix is the transpose of the cofactor matrix
@@ -194,6 +237,10 @@ module Sy
       # This will in many cases look rather messy, but we don't have the option
       # to format the matrix over multiple lines.
       return '[' + @elements.map { |r| r.map { |c| c.to_s }.join(', ') }.join('; ') + ']'
+    end
+
+    def type()
+      return Sy::Type.new('matrix', dimn: nrows, dimm: ncols)
     end
   end
 end

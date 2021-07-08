@@ -186,6 +186,10 @@ module Sy
       return is_subtype?('nvector')
     end
 
+    def is_matrix?()
+      return ([:matrix, :colum, :row].include?(@name))
+    end
+
     # True if type is a pseudovector. We use the notion of a pseudovector
     # both for N-1 dimensional nvectors and nforms (N being the dimensionality
     # of the default vector space)
