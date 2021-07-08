@@ -13,6 +13,9 @@ module Sy
 
   op1 = :op1.to_m(Sy::Type.new('operator'))
 
+  m23 = [[1, 2, 3], [4, 5, 6]].to_m
+  m32 = [[-1, 3], [-4, -5], [2, 1]].to_m
+
   # NB: We must always use the compositional operators when creating
   # the input expressions to the normalizer tests since we don't want
   # the expressions to be simplified before we send it to the
@@ -124,7 +127,11 @@ module Sy
     },
 
     'various' => {
-      x.mul(op1.mul(x)) => x*op1*x,
+      x.mul(op1.mul(x)) => x*(op1*x),
+    },
+
+    'matrix' => {
+      m23*m32 => m23*m32,
     },
   }
 

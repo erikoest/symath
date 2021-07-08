@@ -156,15 +156,26 @@ module Sy::Operation::Normalization
           fact *= f
         end
       else
-        ret.push(fact/divf, f)
-        fact = 1.to_m
+        if divf != 1
+          fact = fact/divf
+        end
+        if fact != 1
+          ret.push fact
+        end
+
+        fact = f
         divf = 1.to_m
       end
     end
 
-    ret.push fact/divf
-    
-    return ret.inject(:*)
+    if divf != 1
+      fact = fact/divf
+    end
+    if fact != 1
+      ret.push fact
+    end
+
+    return ret.empty? ? 1.to_m : ret.inject(:*)
   end
   
   # Order the factors first by type, then, for commutative and anti-

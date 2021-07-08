@@ -29,11 +29,12 @@ module Sy
       end
     end
 
-    def evaluate
+    def evaluate()
       if dividend.is_a?(Sy::Matrix)
         return dividend.matrix_div(divisor)
       end
 
+      # TODO: Expand product of sums
       return self
     end
 

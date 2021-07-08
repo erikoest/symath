@@ -28,8 +28,16 @@ module Sy
       end
     end
 
+    def is_commutative?()
+      return false
+    end
+
+    def is_associative?()
+      return false
+    end
+
     def hash()
-      return [0,0].hash
+      return [0, 0].hash
     end
     
     def <=>(other)
@@ -45,9 +53,9 @@ module Sy
         return ncols <=> other.ncols
       end
 
-      (0..nrows).to_a.each do |i|
-        (0..ncols).to_a.each do |j|
-          cmp = (self[i,j] <=> other[i,j])
+      (0..nrows - 1).each do |i|
+        (0..ncols - 1).each do |j|
+          cmp = (self[i, j] <=> other[i, j])
           return cmp if cmp != 0
         end
       end
@@ -94,7 +102,7 @@ module Sy
     end
 
     def *(other)
-      return self.mul(other)
+      return mul(other)
     end
 
     def matrix_div(other)
@@ -108,7 +116,7 @@ module Sy
     end
 
     def /(other)
-      return self.div(other)
+      return div(other)
     end
 
     def matrix_add(other)
@@ -128,7 +136,7 @@ module Sy
     end
 
     def +(other)
-      return self.add(other)
+      return add(other)
     end
 
     def matrix_sub(other)
@@ -144,7 +152,7 @@ module Sy
     end
 
     def -(other)
-      return self.sub(other)
+      return sub(other)
     end
 
     def transpose()
@@ -172,8 +180,9 @@ module Sy
       return minor((0..@nrows - 1).to_a, (0..@ncols - 1).to_a)
     end
 
-    # The minor is the determinant of a submatrix. The submatrix is given by the rows and cols
-    # which are arrays of indexes to the rows and columns to be included
+    # The minor is the determinant of a submatrix. The submatrix is given by
+    # the rows and cols which are arrays of indexes to the rows and columns
+    # to be included
     def minor(rows, cols)
       raise 'Not square' if rows.length != cols.length
 
@@ -203,8 +212,9 @@ module Sy
       return ret
     end
 
-    # The cofactor of an element is the minor given by the rows and columns not including the
-    # element, multiplied by a sign factor which alternates for each row and column
+    # The cofactor of an element is the minor given by the rows and columns
+    # not including the element, multiplied by a sign factor which alternates
+    # for each row and column
     def cofactor(r, c)
       sign = (-1)**(r + c)
       rows = (0..@nrows - 1).to_a - [r]
@@ -220,7 +230,7 @@ module Sy
     
     def ==(other)
       return false if !other.is_a?(Sy::Matrix)
-      
+
       return false if nrows != other.nrows
       return false if ncols != other.ncols
 
@@ -240,7 +250,7 @@ module Sy
     end
 
     def type()
-      return Sy::Type.new('matrix', dimn: nrows, dimm: ncols)
+      return Sy::Type.new('matrix', dimn: ncols, dimm: nrows)
     end
   end
 end

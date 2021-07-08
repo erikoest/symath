@@ -41,7 +41,7 @@ module Sy
       end
     end
     
-    def evaluate
+    def evaluate()
       if factor1.is_a?(Sy::Matrix)
         return factor1.matrix_mul(factor2)
       elsif factor2.is_a?(Sy::Matrix) and
@@ -49,6 +49,7 @@ module Sy
         return factor2.matrix_mul(factor1)
       end
 
+      # TODO: Expand product of sums
       return self
     end
 

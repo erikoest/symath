@@ -8,7 +8,7 @@ module Sy
 
     s1 = [[1, 2], [-1, -2]].to_m
     s2 = [[3, 4], [-4, 4]].to_m
-    
+
     it 'product of matrices' do
       expect((m23*m32).evaluate.normalize.to_s).to be == '[- 3, - 4; - 12, - 7]'
     end
