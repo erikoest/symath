@@ -45,7 +45,7 @@ module Sy
 
       return self
     end
-    
+
     def arity
       return @args.length
     end

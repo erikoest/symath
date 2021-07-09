@@ -12,7 +12,7 @@ module Sy
       vars = Sy.get_variable(:basis.to_m).row(0)
       
       # Grad is defined as (dF)#
-      return op(:sharp, op(:diff, args[0], *vars)).eval
+      return op(:sharp, op(:diff, args[0], *vars)).evaluate_recursive
     end
 
     def to_latex()

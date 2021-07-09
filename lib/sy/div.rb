@@ -16,7 +16,13 @@ module Sy
       vars = Sy.get_variable(:basis.to_m).row(0)
 
       # Div is defined as *d*(Fb)
-      return op(:hodge, op(:diff, op(:hodge, op(:flat, args[0])), *vars)).eval
+      return op(:hodge,
+                op(:diff,
+                   op(:hodge,
+                      op(:flat, args[0])),
+                   *vars
+                  )
+               ).evaluate_recursive
     end
 
     def to_latex()

@@ -18,7 +18,7 @@ module Sy
       n = vars.length
       k = args[0].type.degree
       sign = (-1)**(n*k + 1)
-      return sign*op(:hodge, op(:diff, op(:hodge, args[0]), *vars)).eval
+      return sign*op(:hodge, op(:diff, op(:hodge, args[0]), *vars)).evaluate_recursive
     end
 
     def to_latex()
