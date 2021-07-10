@@ -21,7 +21,7 @@ module Sy
       12*b*fn(:cos, x)*fn(:sin, x) => 6*b*fn(:sin, x)**2 + capC,
       (1 + x**2)**-1               => fn(:arctan, x) + capC,
       1/(1 + x**2)                 => fn(:arctan, x) + capC,
-      1/x**2                       => 1/(-x) + capC,
+      1/x**2                       => -1/x + capC,
       (1 - x**2)**(-1.to_m/2)      => fn(:arcsin, x) + capC,
       fn(:sin, x)           => -fn(:cos, x) + capC,
       fn(:sin, 2*x + 3)     => -fn(:cos, 2*x + 3)/2 + capC,

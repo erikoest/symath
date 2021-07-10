@@ -5,13 +5,17 @@ module Sy::Operation::Evaluation
   # and formulaic functions in the expression.
 
   def evaluate_recursive()
+    if is_a?(Sy::Matrix)
+      return self
+    end
+
     res = deep_clone
     
     # Recurse down operator arguments
     res = res.act_subexpressions('evaluate_recursive')
     res = deep_clone if res.nil?
 
-    if res.is_a?(Sy::Operator) and has_action?
+    if res.is_a?(Sy::Operator)
       res = res.evaluate
     end
 

@@ -75,6 +75,14 @@ module Sy
       return red, -sign, true
     end
 
+    def evaluate
+      if argument.is_a?(Sy::Matrix)
+        return argument.matrix_neg
+      end
+
+      return self
+    end
+
     def type()
       if argument.type.is_subtype?('integer')
         return 'integer'.to_t

@@ -45,7 +45,7 @@ module Sy
       if factor1.is_a?(Sy::Matrix)
         return factor1.matrix_mul(factor2)
       elsif factor2.is_a?(Sy::Matrix) and
-           factor1.is_scalar
+           factor1.type.is_scalar?
         return factor2.matrix_mul(factor1)
       end
 

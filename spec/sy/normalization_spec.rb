@@ -64,6 +64,10 @@ module Sy
       dx.mul(x).mul(dx) => 0,
     },
 
+    'fractions' => {
+      (-1.to_m).div(-1) => 1,
+    },
+
     'powers' => {
       (-2.to_m).power(2)*(-2.to_m).power(2) => 16,
       (-2.to_m).power(3)                    => -8,

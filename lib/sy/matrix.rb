@@ -1,7 +1,6 @@
 require 'sy/value'
 
 module Sy
-  # TODO: Should the matrix rather be designed as an operator?
   class Matrix < Value
     attr_reader :nrows, :ncols
     
@@ -33,7 +32,7 @@ module Sy
     end
 
     def is_associative?()
-      return false
+      return true
     end
 
     def hash()
@@ -101,10 +100,6 @@ module Sy
       return Sy::Matrix.new(data)
     end
 
-    def *(other)
-      return mul(other)
-    end
-
     def matrix_div(other)
       raise 'Cannot divide matrix by matrix' if other.is_a?(Sy::Matrix)
 
@@ -153,6 +148,20 @@ module Sy
 
     def -(other)
       return sub(other)
+    end
+
+    def matrix_neg()
+      data = @elements.map do |r|
+        r.map do |e|
+          - e
+        end
+      end
+
+      return Sy::Matrix.new(data)
+    end
+
+    def -@()
+      return neg
     end
 
     def transpose()

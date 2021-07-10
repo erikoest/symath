@@ -9,6 +9,10 @@ module Sy
     end
     
     def evaluate()
+      if !has_action?
+        return self
+      end
+
       f = Sy.get_function(self.name.to_sym)
       if !f.nil?
         d = f[:definition]

@@ -515,6 +515,10 @@ module Sy
       if !Sy.setting(:compose_with_simplify)
         return self.neg
       end
+
+      if self == 0
+        return self
+      end
       
       if self.is_a?(Sy::Minus)
         # - - a => a
@@ -530,7 +534,7 @@ module Sy
       if !Sy.setting(:compose_with_simplify)
         return self.mul(o)
       end
-      
+
       if is_finite?() == false or o.is_finite?() == false
         return self.mul_inf(o)
       end
@@ -551,7 +555,7 @@ module Sy
       return -(self.argument*o) if self.is_a?(Sy::Minus)
       
       if o.is_a?(Sy::Matrix)
-        return o*self
+        return self.mul(o)
       end
       
       if base == o.base

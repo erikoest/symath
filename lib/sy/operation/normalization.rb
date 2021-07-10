@@ -103,7 +103,7 @@ module Sy::Operation::Normalization
     
     return change_or_nil(ret)
   end
-  
+
   def normalize_product()
     # Flatten the expression and order it
     e = factors.map do |f|
@@ -282,14 +282,22 @@ module Sy::Operation::Normalization
       c = 1 if c.nil?
       dc = 1 if dc.nil?
 
+      # Corner case:
+      if f == (-1.to_m)**(-1)
+        f = -1.to_m
+      end
+
       ret.push f
     end
+
+    c = 1 if c.nil?
+    dc = 1 if dc.nil?
 
     # First examine the coefficients
     if c == 0 and dc > 0
       return 0.to_m
     end
-    
+
     if c > 0
       # Reduce coefficients by greatest common divisor
       gcd = c.gcd(dc)

@@ -28,6 +28,10 @@ module Sy
     end
 
     def evaluate()
+      if !has_action?
+        return self
+      end
+
       # Custom defined operators
       o = Sy.get_operator(name.to_sym)
       if !o.nil?
