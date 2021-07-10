@@ -282,11 +282,6 @@ module Sy::Operation::Normalization
       c = 1 if c.nil?
       dc = 1 if dc.nil?
 
-      # Corner case:
-      if f == (-1.to_m)**(-1)
-        f = -1.to_m
-      end
-
       ret.push f
     end
 

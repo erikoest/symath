@@ -42,12 +42,22 @@ module Sy
       end
 
       # Reduce negative number
-      if base.is_a?(Sy::Minus) and exponent.is_number?
-        exp, sign, changed = (base.argument**exponent).reduce_modulo_sign
-        if exponent.value.odd?
-          sign *= -1
+      if base.is_a?(Sy::Minus)
+        if exponent.is_number?
+          exp = exponent
+        elsif exponent.is_negative_number?
+          exp = exponent.argument
+        else
+          exp = nil
         end
-        return exp, sign, true
+
+        if !exp.nil?
+          e, sign, changed = (base.argument**exp).reduce_modulo_sign
+          if exp.value.odd?
+            sign *= -1
+          end
+          return e, sign, true
+        end
       end
 
       # Number power of number reduces to number
