@@ -99,5 +99,23 @@ module Sy
     it ':a^:b' do
       expect((:a^:b).class.to_s).to be == 'Sy::Product'
     end
+
+    it 'order of basis vectors and other vectors' do
+      x1 = :x1.to_m('vector')
+      x2 = :x2.to_m('vector')
+      a = :a.to_m('vector')
+
+      expect(x1 < x2).to be
+      expect(x1 < a).to be
+      expect(a > x1).to be
+    end
+
+    it 'variable replacement' do
+      a = :a.to_m
+      b = :b.to_m
+
+      expect(a.replace(a => (a + 2))).to be_equal_to (a + 2)
+      expect(a.replace(b => (a + 2))).to be_equal_to a
+    end
   end
 end

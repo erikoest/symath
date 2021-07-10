@@ -65,7 +65,7 @@ module Sy
     
       return qmap[@name.to_sym][q.name.to_sym]
     end
-    
+
     def type()
       n = @name.to_sym
       if n == :e or n == :pi or n == :phi

@@ -12,7 +12,10 @@ module Sy
   dx1 = :x1.to_m('dform')
   dx2 = :x2.to_m('dform')
   dx3 = :x3.to_m('dform')
-  
+
+  da = :a.to_m('dform')
+  av = :a.to_m('vector')
+
   describe Sy::Grad do
     grad = {
       op(:grad, x1 - x1*x2 + x3**2) => x1v + 2*x3*x3v - x2*x1v - x1*x2v
@@ -83,6 +86,58 @@ module Sy
       it "evaluates '#{from.to_s} into '#{to.to_s}'" do
         expect(from.evaluate.normalize).to be_equal_to to
       end
+    end
+  end
+
+  describe Sy::Hodge do
+    hodge = {
+      op(:hodge, dx1^dx2) => dx3,
+      op(:hodge, 3) => ((3*dx1)^dx2^dx3),
+      op(:hodge, dx2) => (-(dx1^dx3)),
+    }
+
+    hodge.each do |from, to|
+      it "evaluates '#{from.to_s} into '#{to.to_s}'" do
+        expect(from.evaluate.normalize).to be_equal_to to
+      end
+    end
+
+    it 'hodge error' do
+      expect { op(:hodge, da).evaluate }.to raise_error 'No hodge dual for da'
+    end
+  end
+
+  describe Sy::Sharp do
+    sharp = {
+      op(:sharp, dx1^dx2) => (x1v^x2v),
+      op(:sharp, 3*dx2) => 3*x2v,
+    }
+
+    sharp.each do |from, to|
+      it "evaluates '#{from.to_s} into '#{to.to_s}'" do
+        expect(from.evaluate.normalize).to be_equal_to to
+      end
+    end
+
+    it 'sharp error' do
+      expect { op(:sharp, da).evaluate }.to raise_error 'No vector dual for da'
+    end
+  end
+
+  describe Sy::Flat do
+    flat = {
+      op(:flat, x1v^x2v) => (dx1^dx2),
+      op(:flat, 3*x2v) => 3*dx2,
+    }
+
+    flat.each do |from, to|
+      it "evaluates '#{from.to_s} into '#{to.to_s}'" do
+        expect(from.evaluate.normalize).to be_equal_to to
+      end
+    end
+
+    it 'flat error' do
+      expect { op(:flat, av).evaluate }.to raise_error 'No dform dual for a\''
     end
   end
 end

@@ -44,28 +44,9 @@ module Sy
       b = Sy.get_variable(:basis)
       g = Sy.get_variable(:g)
 
-      # If the basis and the metric tensor are not of the required types
-      # and dimensionality, undefine all the data structures. The
-      # operators using them will then fail until both the basis and
-      # the metric tensor are defined correctly. The requirements are:
-      #   basis is a matrix
-      #   g (metric tensor) is a square matrix
-      #   basis and metric tensor g have different dimensions
-      if !b.is_a?(Sy::Matrix) or
-        !g.is_a?(Sy::Matrix) or
-        !g.is_square?
-        b.ncols != g.nrows
-        @@basis_order = nil
-        @@norm_map = nil
-        @@hodge_map = nil
-        @@sharp_map = nil
-        @@flat_map = nil
-        return
-      end
-
       brow = b.row(0)
       dim = brow.length
-      
+
       # Hash up the order of the basis vectors
       @@basis_order = (0..dim - 1).map do |i|
         [brow[i].name.to_sym, i]
@@ -82,7 +63,7 @@ module Sy
             @@hodge_map[1.to_m] = brow.map { |bb| bb.name.to_m('dform') }.inject(:^)
             next
           end
-          
+
           # Hash them to the normalized expression (including the sign).
           # Do this both for vectors and dforms.      
           norm = p.sort
@@ -125,32 +106,6 @@ module Sy
       @@sharp_map = (0..dim - 1).map { |i| [d[i], sharp[i]] }.to_h
     end
 
-    # Normalize a list of basis vectors, and combine them into a wedge product
-    def self.normalize_vectors(vectors)
-      # Empty list of vectors. Return 1
-      if vectors.length == 0
-        return 1.to_m
-      end
-
-      # Hash up indexes of original vector order
-      vhash = {}
-      vectors = vectors.each_with_index do |v, i|
-        # Double occurence of a vector gives zero result
-        if vhash.key?(v)
-          # Double vector occurence. Return 0
-          return 0.to_m
-        end
-        vhash[v] = i
-      end
-
-      # Sort vectors and calculate the sign of the wedge product as the parity
-      # of the permutation after sorting
-      sorted = vectors.sort      
-      sign = permutation_parity(sorted.map { |v| vhash[v] })
-
-      return  sign.to_m*sorted.inject(:^)
-    end
-
     # Return the hodge dual of an expression consisting only of basis vectors or basis
     # dforms
     def self.hodge_dual(exp)
@@ -187,30 +142,20 @@ module Sy
       if type.name != other.type.name
         return type.name <=> other.type.name
       end
-
       # Order basis vectors and basis dforms by basis order
       if type.is_subtype?('vector') or type.is_subtype?('dform')
         bv1 = @@basis_order.key?(@name)
         bv2 = @@basis_order.key?(other.name)
-        if !bv1 and bv2
+      if !bv1 and bv2
           return 1
-        elsif bv1 and !bv2
+       elsif bv1 and !bv2
           return -1
         elsif bv1 and bv2
           return @@basis_order[@name] <=> @@basis_order[other.name]
         end
       end
-      
+
       return @name.to_s <=> other.name.to_s
-    end
-
-    # Variables do not evaluate to anything
-    def has_action?
-      return false
-    end
-
-    def is_scalar?()
-      return type.is_scalar?()
     end
 
     def is_constant?(vars = nil)

@@ -26,7 +26,7 @@ module Sy
     # Types
     it '1234 to latex' do expect(1234.to_m.to_latex).to be == '1234' end
     it 'vector to latex' do expect(xv.to_latex).to be == '\vec{x}' end
-    it 'covector to latex' do expect(xv.to_latex).to be == '\vec{x}' end
+    it 'covector to latex' do expect(xc.to_latex).to be == '\vec{x}' end
     it 'dform to latex' do expect(da.to_latex).to be == 'da' end
     it 'tensor to latex' do expect(t.to_latex).to be == 't[\'.]' end
 
