@@ -49,8 +49,8 @@ module Sy
         return factor2.matrix_mul(factor1)
       end
 
-      # TODO: Expand product of sums
-      return self
+      # Expand product
+      return self.expand
     end
 
     def type()
