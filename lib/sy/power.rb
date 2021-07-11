@@ -41,6 +41,15 @@ module Sy
         return 1.to_m, 1, true
       end
 
+      if base == :e
+        fn = fn(:exp, exponent)
+        # FIXME: Merge functions reduce and reduce_modulo_sign
+        red = fn.reduce
+        if red != fn
+          return red, 1, true
+        end
+      end
+
       # Reduce negative number
       if base.is_a?(Sy::Minus)
         if exponent.is_number?
