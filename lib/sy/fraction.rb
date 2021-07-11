@@ -34,7 +34,6 @@ module Sy
         return dividend.matrix_div(divisor)
       end
 
-      # TODO: Expand product of sums
       return self
     end
 

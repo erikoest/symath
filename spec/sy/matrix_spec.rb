@@ -33,6 +33,10 @@ module Sy
       expect((s1 - s2).evaluate.normalize.to_s).to be == '[- 2, - 2; 3, - 6]'
     end
 
+    it 'matrix divided by scalar' do
+      expect((s2/2).evaluate.normalize.to_s).to be == '[3/2, 2; - 2, 2]'
+    end
+
     it 'trace of matrices' do
       expect(s1.trace).to be_equal_to -1
       expect(s2.trace).to be_equal_to 7

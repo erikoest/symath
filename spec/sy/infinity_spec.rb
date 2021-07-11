@@ -27,7 +27,7 @@ module Sy
   
   describe Sy::Value, ', adding non-finite values (real)' do
     before do
-      Sy.setting(:complex_arithmetic, false)      
+      Sy.setting(:complex_arithmetic, false)
     end
   
     oo = :oo.to_m
@@ -97,7 +97,7 @@ module Sy
 
   describe Sy::Value, ', multiplying non-finite values (real)' do
     before do
-      Sy.setting(:complex_arithmetic, false)      
+      Sy.setting(:complex_arithmetic, false)
     end
     
     oo = :oo.to_m

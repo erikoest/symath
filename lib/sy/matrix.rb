@@ -27,6 +27,7 @@ module Sy
       end
     end
 
+    # :nocov:
     def is_commutative?()
       return false
     end
@@ -34,34 +35,12 @@ module Sy
     def is_associative?()
       return true
     end
+    # :nocov:
 
     def hash()
       return [0, 0].hash
     end
     
-    def <=>(other)
-      if self.class.name != other.class.name
-        return super(other)
-      end
-
-      if nrows != other.nrows
-        return nrows <=> other.nrows
-      end
-
-      if ncols != other.ncols
-        return ncols <=> other.ncols
-      end
-
-      (0..nrows - 1).each do |i|
-        (0..ncols - 1).each do |j|
-          cmp = (self[i, j] <=> other[i, j])
-          return cmp if cmp != 0
-        end
-      end
-
-      return 0
-    end
-
     def row(i)
       return @elements[i]
     end

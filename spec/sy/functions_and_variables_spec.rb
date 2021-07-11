@@ -14,6 +14,12 @@ module Sy
       expect(ex_f.evaluate.normalize).to be_equal_to 136.to_m
     end
 
+    error_f = fn(:f, 3, 4, 5)
+
+    it 'f(3, 4, 5) raises error' do
+      expect { error_f.evaluate }.to raise_error 'Cannot evaluate function f(x,y) with 3 arguments'
+    end
+
     ex_g = fn(:g, 1)
 
     it 'g(1) does not evaluate' do
@@ -24,6 +30,10 @@ module Sy
 
     it 'f(2, pi) evaluates to pi**3 + 6' do
       expect(ex2_f.evaluate.normalize).to be_equal_to :pi.to_m**3 + 6
+    end
+
+    it '3/4 does not evaluate' do
+      expect((3.to_m/4).evaluate).to be_equal_to (3.to_m/4)
     end
   end
 end

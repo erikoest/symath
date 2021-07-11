@@ -77,6 +77,8 @@ module Sy
       :j.to_m.power(6)                      => -1,
       :k.to_m.power(4)                      => 1,
       :i.to_m.power(x)                      => :i**x,
+      # No simplification
+      (-4).to_m.power(x)                    => (-4)**x,
     },
 
     'wedge products' => {

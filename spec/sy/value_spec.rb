@@ -20,7 +20,7 @@ module Sy
       expect((- (- 2.to_m)).class.to_s).to be == 'Sy::Minus'
     end
 
-    it '2*4 does not simplify' do
+    it '2*2 does not simplify' do
       expect((2.to_m * 2).class.to_s).to be == 'Sy::Product'
     end
 
@@ -68,6 +68,9 @@ module Sy
       expect((4.to_m ** 1).class.to_s).to be == 'Sy::Number'
     end
 
+    it '(-4)**x does not simplify' do
+    end
+
     it '(x/y)/(z/w) simplifies to (x*w)/(y*z)' do
       expect((x.div(y)/z.div(w))).to be_equal_to (x*w)/(y*z)
     end
@@ -78,6 +81,10 @@ module Sy
 
     it '(x/y)/z simplifies to x/(y*z)' do
       expect(x.div(y)/z).to be_equal_to x/(y*z)
+    end
+
+    it '2*(1/a) simplifies to 2/a' do
+      expect(2*(1/:a)).to be_equal_to 2/:a
     end
 
     it '((x^y) + (x^b)) + ((a^b) + (a^x))' do
