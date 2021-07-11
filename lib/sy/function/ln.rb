@@ -35,7 +35,7 @@ module Sy
           return 1.to_m - :pi.to_m*:i/2
         end
       end
-      
+
       return self
     end
   end

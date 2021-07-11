@@ -30,14 +30,56 @@ module Sy
       return self
     end
 
+    # Check if expression is a constant fraction of pi and optionally
+    # i (imaginary unit)
+    def check_pi_fraction(e, im)
+      gotpi = false
+      gotim = !im
+      c = 1
+      dc = 1
+
+      # Check that factors are only constant, divisor constant and pi.
+      # Note: This code is similar to 'reduce_constant_factors'. Refactor?
+      e.factors.each do |f|
+        if f.is_divisor_factor?
+          if f.base.is_number?
+            dc *= f.base.value**f.exponent.argument.value
+            next
+          end
+        end
+
+        if f.is_negative_number?
+          c *= - f.argument.value
+          next
+        end
+
+        if f.is_number?
+          c *= f.value
+          next
+        end
+
+        if !gotpi and f == :pi
+          gotpi = true
+          next
+        end
+
+        if !gotim and f == :i
+          gotim = true
+          next
+        end
+
+        return nil
+      end
+
+      return nil if !gotpi and !gotim and c != 0
+
+      return c, dc
+    end
+
     def to_latex()
       return @name.to_s + '(' + @args.map { |a| a.to_latex }.join(',') + ')'
     end
 
-    @@function_symbols = [
-      :+, :-, :*, :/, :**, :^, :%, :!
-    ].to_set
-    
     @@builtin_functions = {
       :sin    => 'Sy::Function::Sin',
       :cos    => 'Sy::Function::Cos',
