@@ -139,6 +139,9 @@ module Sy
       raise exp.to_s + ' is not a Sy::Value'
     end
 
+    # FIXME: Check that exp does not contain an operator
+    # (functions should be composed only of other functions)
+
     @@function_definitions[definition.name.to_sym] = {
       :definition => definition,
       :expression => exp,
@@ -181,6 +184,9 @@ module Sy
     if !exp.is_a?(Sy::Value)
       raise exp.to_s + ' is not a Sy::Value'
     end
+
+    # FIXME: Check that the exp contains at least one operator
+    # (otherwise it is a function)
 
     @@operator_definitions[definition] = {
       definition => definition,
