@@ -7,18 +7,19 @@ module Sy
       super('codiff', [arg])
     end
 
-    def evaluate()
-      # Get list of variables to differentiate with respect to
+    # The co-differential is defined as: (-1)**(n*k+ 1)*d*(F)
+    # n : Dimension of the basis vector space
+    # k : Grade of input function F
+    def get_definition()
       vars = Sy.get_variable(:basis.to_m).row(0)
-
-      # Calculate the co-differential, defined as:
-      #   (-1)**(n*k+ 1)*d*(F)
-      # n : Dimension of the basis vector space
-      # k : Grade of input function F
       n = vars.length
-      k = args[0].type.degree
+      k = @args[0].type.degree
       sign = (-1)**(n*k + 1)
-      return sign*op(:hodge, op(:diff, op(:hodge, args[0]), *vars)).evaluate_recursive
+
+      return {
+        :definition => op(:codiff, :x),
+        :expression => sign*op(:hodge, op(:xd, op(:hodge, :x))),
+      }
     end
 
     def to_latex()

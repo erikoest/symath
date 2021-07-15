@@ -62,6 +62,9 @@ module Sy
     it 'differental to latex' do
       expect(op(:diff, a).to_latex).to be == '\mathrm{d}(a)'
     end
+    it 'differental to latex' do
+      expect(op(:xd, a).to_latex).to be == '\mathrm{d}(a)'
+    end
     it 'unbound integral to latex' do
       expect(op(:int, a, da).to_latex).to be == '\int a\,da'
     end

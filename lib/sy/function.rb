@@ -4,30 +4,8 @@ require 'set'
 
 module Sy
   class Function < Operator
-    def has_action?()
-      return !Sy.get_function(self.name.to_sym).nil?
-    end
-    
-    def evaluate()
-      if !has_action?
-        return self
-      end
-
-      f = Sy.get_function(self.name.to_sym)
-      if !f.nil?
-        d = f[:definition]
-        res = f[:expression].deep_clone
-        if d.args.length == self.args.length
-          map = {}
-          d.args.each_with_index do |a, i|
-            map[a] = self.args[i]
-          end
-          res.replace(map)
-          return res
-        else
-          raise "Cannot evaluate function #{d} with #{self.args.length} arguments"
-        end
-      end
+    def get_definition()
+      return Sy.get_function(self.name)
     end
 
     # Check if expression is a constant fraction of pi and optionally

@@ -6,8 +6,16 @@ module Sy
     attr_reader :name
     attr_accessor :args
 
-    def has_action?()
-      return true
+    def has_definition?()
+      return !get_definition.nil?
+    end
+
+    def get_definition()
+      return Sy.get_operator(self.name)
+    end
+
+    def get_action()
+      return
     end
 
     # Return arguments 
@@ -27,27 +35,35 @@ module Sy
       return false
     end
 
-    def evaluate()
-      if !has_action?
-        return self
-      end
+    def expand_formula()
+      d = get_definition
+      return self if d.nil?
 
-      # Custom defined operators
-      o = Sy.get_operator(name.to_sym)
-      if !o.nil?
-        d = o[:definition]
-        res = o[:expression].deep_clone
-        if res.args.length == self.args.length
-          map = {}
-          d.args.each_with_index do |a, i|
-            map[a] = self.args[i]
-          end
-          res.replace(map)
-          return res
+      dd = d[:definition]
+      res = d[:expression].deep_clone
+      if dd.args.length == self.args.length
+        map = {}
+        dd.args.each_with_index do |a, i|
+          map[a] = self.args[i]
+        end
+        res.replace(map)
+        return res
+      else
+        raise "Cannot expand #{dd} with #{self.args.length} arguments (expected #{dd.args.length})"
+      end
+    end
+
+    def evaluate()
+      if has_definition?
+        expand_formula.recurse('evaluate')
+      else
+        a = get_action
+        if a.nil?
+          return self
+        else
+          return args[0].send(a)
         end
       end
-
-      return self
     end
 
     def arity
@@ -162,7 +178,8 @@ module Sy
       :curl   => 'Sy::Curl',
       :div    => 'Sy::Div',
       :laplacian => 'Sy::Laplacian',
-      :codiff => 'Sy::CoDiff',        
+      :codiff => 'Sy::CoDiff',
+      :xd     => 'Sy::ExteriorDerivative',
     }
 
     def self.is_builtin?(name)

@@ -134,7 +134,7 @@ module Sy
     def is_unit_quaternion?()
       return false
     end
-    
+
     # Returns true if this is a function declaration, a operator declaration or
     # a variable assignment
     def is_definition?()
@@ -164,6 +164,11 @@ module Sy
 
     # Reduce expression if possible. Defaults to no reduction
     def reduce()
+      return self
+    end
+
+    # Evaluate expression. Defaults to no evaluation
+    def evaluate()
       return self
     end
 

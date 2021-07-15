@@ -7,23 +7,16 @@ module Sy
       super('curl', [arg])
     end
 
-    def evaluate()
+    # Curl is defined as (*(d(Fb)))#
+    def get_definition()
       if Sy.get_variable(:basis.to_m).row(0).length != 3
         raise 'Curl is only defined for 3 dimensions'
       end
 
-      # Get list of variables to differentiate with respect to
-      vars = Sy.get_variable(:basis.to_m).row(0)
-      
-      # Curl is defined as (*(d(Fb)))#
-      return op(:sharp,
-                op(:hodge,
-                   op(:diff,
-                      op(:flat, args[0]),
-                      *vars
-                     )
-                  )
-               ).evaluate_recursive
+      return {
+        :definition => op(:curl, :x),
+        :expression => op(:sharp, op(:hodge, op(:xd, op(:flat, args[0])))),
+      }
     end
 
     def to_latex()

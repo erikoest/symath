@@ -6,10 +6,6 @@ module Sy
       return self.name.to_i
     end
 
-    def has_action?()
-      return false
-    end
-
     def is_nan?()
       return false
     end

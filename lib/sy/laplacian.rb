@@ -7,19 +7,12 @@ module Sy
       super('laplacian', [arg])
     end
 
-    def evaluate()
-      # Get list of variables to differentiate with respect to
-      vars = Sy.get_variable(:basis.to_m).row(0)
-      
-      # The laplacian is defined as *d*dF
-      return op(:hodge,
-                op(:diff,
-                   op(:hodge,
-                      op(:diff, args[0], *vars)
-                     ),
-                   *vars
-                  )
-               ).evaluate_recursive
+    # The laplacian is defined as *d*dF
+    def get_definition()
+      return {
+        :definition => op(:laplacian, :x),
+        :expression => op(:hodge, op(:xd, op(:hodge, op(:xd, :x)))),
+      }
     end
 
     def to_latex()

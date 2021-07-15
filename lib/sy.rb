@@ -28,6 +28,7 @@ require 'sy/value'
 require 'sy/matrix'
 require 'sy/equation'
 require 'sy/diff'
+require 'sy/exteriorderivative'
 require 'sy/poly'
 require 'sy/poly/dup'
 require 'sy/poly/galois'
@@ -110,7 +111,7 @@ module Sy
   end
 
   def self.get_function(f)
-    return @@function_definitions[f]
+    return @@function_definitions[f.to_sym]
   end
   
   def self.define_function(definition, exp)
@@ -153,7 +154,7 @@ module Sy
   end
 
   def self.get_operator(o)
-    return @@operator_definitions[o]
+    return @@operator_definitions[o.to_sym]
   end
 
   def self.define_operator(definition, exp)
@@ -189,6 +190,10 @@ module Sy
 
   def self.clear_operator(name)
     @@opertor_definitions[name.to_sym]
+  end
+
+  def self.define_equation(exp1, exp2)
+    return Sy::Equation.new(exp1, exp2)
   end
 
   def self.get_variables()

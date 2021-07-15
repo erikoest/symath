@@ -7,22 +7,16 @@ module Sy
       super('div', [arg])
     end
 
-    def evaluate()
+    # Div is defined as *d*(Fb)
+    def get_definition()
       if Sy.get_variable(:basis.to_m).row(0).length != 3
         raise 'Div is only defined for 3 dimensions'
       end
-      
-      # Get list of variables to differentiate with respect to
-      vars = Sy.get_variable(:basis.to_m).row(0)
 
-      # Div is defined as *d*(Fb)
-      return op(:hodge,
-                op(:diff,
-                   op(:hodge,
-                      op(:flat, args[0])),
-                   *vars
-                  )
-               ).evaluate_recursive
+      return {
+        :definition => op(:div, :x),
+        :expression => op(:hodge, op(:xd, op(:hodge, op(:flat, args[0])))),
+      }
     end
 
     def to_latex()

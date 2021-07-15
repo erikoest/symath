@@ -7,12 +7,12 @@ module Sy
       super('grad', [arg])
     end
 
-    def evaluate()
-      # Get list of variables to differentiate with respect to
-      vars = Sy.get_variable(:basis.to_m).row(0)
-      
-      # Grad is defined as (dF)#
-      return op(:sharp, op(:diff, args[0], *vars)).evaluate_recursive
+    # Grad is defined as (dF)#
+    def get_definition()
+      return {
+        :definition => op(:grad, :x),
+        :expression => op(:sharp, op(:xd, :x)),
+      }
     end
 
     def to_latex()

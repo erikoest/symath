@@ -45,9 +45,6 @@ module Sy
       expect { op(:curl, -x2*x1v).evaluate }.to raise_error(RuntimeError,
         'Curl is only defined for 3 dimensions')
 
-      expect { op(:div, -x2*x1v).evaluate }.to raise_error(RuntimeError,
-        'Div is only defined for 3 dimensions')
-
       Sy.set_metric([[1, 0, 0], [0, 1, 0], [0, 0, 1]].to_m,
         [:x1, :x2, :x3].to_m)
     end
@@ -62,6 +59,16 @@ module Sy
       it "evaluates '#{from.to_s}' into '#{to.to_s}'" do
         expect(from.evaluate.normalize).to be_equal_to to
       end
+    end
+
+    it 'raises error on other dimensions than 3' do
+      Sy.set_metric([[1, 0], [0, 1]].to_m, [:x1, :x2].to_m)
+
+      expect { op(:div, -x2*x1v).evaluate }.to raise_error(RuntimeError,
+        'Div is only defined for 3 dimensions')
+
+      Sy.set_metric([[1, 0, 0], [0, 1, 0], [0, 0, 1]].to_m,
+        [:x1, :x2, :x3].to_m)
     end
   end
 

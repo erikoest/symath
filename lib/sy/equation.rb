@@ -8,7 +8,11 @@ module Sy
     end
 
     def to_s()
-      return @args[0].to_s + ' = ' + @args[1].to_s
+      return "#{@args[0]} = #{@args[1]}"
+    end
+
+    def to_latex()
+      return "#{@args[0]} = #{@args[1]}"
     end
   end
 end

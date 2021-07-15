@@ -11,13 +11,13 @@ module Sy
     ex_f = fn(:f, 3, 5)
 
     it 'f(3, 5) evaluates to 136' do
-      expect(ex_f.evaluate.normalize).to be_equal_to 136.to_m
+      expect(ex_f.expand_formula.normalize).to be_equal_to 136.to_m
     end
 
     error_f = fn(:f, 3, 4, 5)
 
     it 'f(3, 4, 5) raises error' do
-      expect { error_f.evaluate }.to raise_error 'Cannot evaluate function f(x,y) with 3 arguments'
+      expect { error_f.expand_formula }.to raise_error 'Cannot expand f(x,y) with 3 arguments (expected 2)'
     end
 
     ex_g = fn(:g, 1)
