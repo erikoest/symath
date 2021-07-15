@@ -1,20 +1,23 @@
 module Sy::Operation
+  # Repeat method until there are no changes
   def iterate(method)
-    result = deep_clone
-
-    while true
-      pass = result.send(method)
-      break if pass.nil?
-      result = pass
+    ret = deep_clone.send(method)
+    if ret == self
+      return ret
+    else
+      return ret.iterate(method)
     end
-
-    return result
   end
 
   # Call method recursively down the arguments of the expression
-  def recurse(method)
-    if is_a?(Sy::Constant) or is_a?(Sy::Variable)
-      return self.send(method)
+  # and call self_method on self.
+  def recurse(method, self_method = method)
+    if is_a?(Sy::Constant) or is_a?(Sy::Variable) or is_a?(Sy::Matrix)
+      if self_method.nil?
+        return self
+      else
+        return self.send(self_method)
+      end
     end
 
     # Call method on each argument
@@ -23,38 +26,10 @@ module Sy::Operation
     ret = self.deep_clone
     ret.args = newargs
 
-    return ret.send(method)
-  end
-
-  def act_subexpressions(method)
-    if is_a?(Sy::Constant)
-      return
+    if self_method.nil?
+      return ret
+    else
+      return ret.send(self_method)
     end
-      
-    if is_a?(Sy::Variable)
-      return
-    end
-
-    if is_a?(Sy::Minus)
-      return -argument.send(method)
-    end
-
-    # Call method on each argument
-    newargs = args.map { |a| a.send(method) }
-
-    if newargs == args
-      return
-    end
-
-    ret = self.deep_clone
-    ret.args = newargs
-    
-    return ret
-  end
-
-  def change_or_nil(e)
-    return nil if e.nil?
-    e = e.to_m
-    return self == e ? nil : e
   end
 end

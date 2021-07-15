@@ -55,6 +55,8 @@ module Sy
 
     def evaluate()
       if has_definition?
+        # Expand operator definition into formula expression, evaluate
+        # all sub-expressions, then evaluate the expression itself.
         expand_formula.recurse('evaluate')
       else
         a = get_action

@@ -7,8 +7,7 @@ module Sy::Operation::Exterior
 
   # Lower indices, transforming vectors to differential forms
   def flat()
-    res = act_subexpressions('flat')
-    res = deep_clone if res.nil?
+    res = recurse('flat', nil)
 
     if res.is_a?(Sy::Variable)
       if res.type.is_subtype?('vector')
@@ -21,8 +20,7 @@ module Sy::Operation::Exterior
 
   # Raise indices, transforming differential forms to vectors
   def sharp()
-    res = act_subexpressions('sharp')
-    res = deep_clone if res.nil?
+    res = recurse('sharp', nil)
 
     if res.is_a?(Sy::Variable)
       if res.type.is_subtype?('dform')
@@ -37,7 +35,13 @@ module Sy::Operation::Exterior
   def hodge()
     # Recurse down sums and subtractions
     if is_sum_exp?
-      return act_subexpressions('hodge')
+      return terms.map do |t|
+        if t.is_a?(Sy::Minus)
+          - t.argument.hodge
+        else
+          t.hodge
+        end
+      end.inject(:+)
     else
       # FIXME: If expression is a product of sums, expand the product first
       # (distributive law), then hodge op on the new sum.

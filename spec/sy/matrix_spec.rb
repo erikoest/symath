@@ -63,7 +63,7 @@ module Sy
       expect((ry*ry).evaluate.normalize).to be_equal_to i
       expect((rz*rz).evaluate.normalize).to be_equal_to i
 
-      expect((-:i*rx*ry*rz).evaluate_recursive.normalize).to be_equal_to i
+      expect((-:i*rx*ry*rz).recurse('evaluate').normalize).to be_equal_to i
 
       expect(rx.trace).to be_equal_to 0
       expect(ry.trace).to be_equal_to 0

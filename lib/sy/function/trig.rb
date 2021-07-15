@@ -29,9 +29,6 @@ module Sy
                        -1.to_m,  -(sqrt2/2),
                        nil,      sqrt2/2],
         
-        :cot_div6 => [nil,      sqrt3,       sqrt3/3,
-                      0.to_m,  -(sqrt3/3),  -sqrt3],
-      
         :tan_div6 => [0.to_m,   sqrt3/3,   sqrt3,
                       nil,     -sqrt3,    -(sqrt3/3)],
       
@@ -63,12 +60,14 @@ module Sy
 
       # Divisor is divisible by 6
       if 6 % dc == 0
-        return @@trig_reductions[:tan_div6][(off*3 + sign*c*6/dc) % 6]
+        ret = @@trig_reductions[:tan_div6][(off*3 + sign*c*6/dc) % 6]
+        return ret.nil? ? self : ret
       end
-      
+
       # Divisor is divisible by 4
       if 4 % dc == 0
-        return @@trig_reductions[:tan_div4][(off*2 + sign*c*4/dc) % 4]
+        ret = @@trig_reductions[:tan_div4][(off*2 + sign*c*4/dc) % 4]
+        return ret.nil? ? self : ret
       end
 
       return self
@@ -80,12 +79,14 @@ module Sy
     
       # Divisor is divisible by 6
       if 6 % dc == 0
-        return @@trig_reductions[:sec_div6][(off*3 + c*6/dc) % 12]
+        ret = @@trig_reductions[:sec_div6][(off*3 + c*6/dc) % 12]
+        return ret.nil? ? self : ret
       end
     
       # Divisor is divisible by 4
       if 4 % dc == 0
-        return @@trig_reductions[:sec_div4][(off*2 + c*4/dc) % 8]
+        ret = @@trig_reductions[:sec_div4][(off*2 + c*4/dc) % 8]
+        return ret.nil? ? self : ret
       end
     
       return self

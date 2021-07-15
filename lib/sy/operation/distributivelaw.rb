@@ -14,12 +14,7 @@ module Sy::Operation::DistributiveLaw
 
   def expand_single_pass
     if is_a?(Sy::Minus)
-      acted = argument.expand_single_pass
-      if acted.nil?
-        return
-      else
-        return -acted
-      end
+      return -argument.expand_single_pass
     end
 
     if is_a?(Sy::Power) or is_a?(Sy::Product)
@@ -37,29 +32,20 @@ module Sy::Operation::DistributiveLaw
         end
       end
 
-      return change_or_nil(ret)
+      return ret
     end
 
-    changed = false
     if is_sum_exp?
       ret = 0.to_m
       
       terms.each do |t|
-        acted = t.expand_single_pass
-        if acted.nil?
-          ret += t
-        else
-          ret += acted
-          changed = true
-        end
+        ret += t.expand_single_pass
       end
 
-      if changed
-        return ret
-      end
+      return ret
     end
     
-    return
+    return self
   end
 
   def expand_product(exp1, exp2)
@@ -277,12 +263,10 @@ module Sy::Operation::DistributiveLaw
   #   2*a/b + 2*c/(3*b) -> (6*a + 2*c)/(3*b)
   def combine_fractions()
     if is_sum_exp?
-      sum = combfrac_sum
-      return sum.nil? ? deep_clone : sum
+      return combfrac_sum
     end
-    
-    sub = act_subexpressions('combine_fractions')
-    return sub.nil? ? deep_clone : sub
+
+    return recurse('combine_fractions', nil)
   end
 
   def combfrac_add_term(sum, t)
@@ -358,7 +342,7 @@ module Sy::Operation::DistributiveLaw
       combfrac_add_term(sum, t)
     end
 
-    ret = nil
+    ret = 0.to_m
 
     sum.keys.each do |divf|
       s = sum[divf]
@@ -376,12 +360,7 @@ module Sy::Operation::DistributiveLaw
         r = r.div(divf)
       end
 
-      if ret.nil?
-        ret = r
-      else
-        ret = ret.add(r)
-      end
-
+      ret += r
       return ret
     end
   end

@@ -25,7 +25,7 @@ module Sy::Operation::Normalization
     return iterate('normalize_single_pass')
   end
 
-  def normalize_single_pass()
+  def normalize_single_pass
     if is_sum_exp?
       return normalize_sum
     end
@@ -42,11 +42,7 @@ module Sy::Operation::Normalization
       return normalize_matrix
     end
 
-    # Normalize all arguments,
-    norm = act_subexpressions('normalize')
-    return change_or_nil(reduce) if norm.nil?
-    # and then simplify the expression.
-    return norm.reduce
+    return recurse('normalize', 'reduce')
   end
 
   def normalize_sum()
@@ -101,7 +97,7 @@ module Sy::Operation::Normalization
     
     ret = terms2.reverse.inject(:+)
     
-    return change_or_nil(ret)
+    return ret
   end
 
   def normalize_product()
@@ -124,7 +120,7 @@ module Sy::Operation::Normalization
       e = e.product_on_fraction_form
     end
 
-    return change_or_nil(e)
+    return e
   end
 
   def normalize_power()
@@ -132,7 +128,7 @@ module Sy::Operation::Normalization
     e, sign, changed = norm.reduce_modulo_sign
     e *= -1 if sign == -1
 
-    return change_or_nil(e)
+    return e
   end
 
   def normalize_matrix()
@@ -140,7 +136,7 @@ module Sy::Operation::Normalization
       row(r).map { |e| e.normalize }
     end
 
-    return change_or_nil(Sy::Matrix.new(data))
+    return Sy::Matrix.new(data)
   end
 
   def product_on_fraction_form

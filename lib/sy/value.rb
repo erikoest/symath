@@ -1,6 +1,5 @@
 require 'sy/operation'
 require 'sy/operation/match'
-require 'sy/operation/evaluation'
 require 'sy/operation/normalization'
 require 'sy/operation/distributivelaw'
 require 'sy/operation/differential'
@@ -10,7 +9,6 @@ require 'sy/operation/exterior'
 module Sy
   class Value
     include Operation::Match
-    include Operation::Evaluation
     include Operation::Normalization
     include Operation::DistributiveLaw
     include Operation::Differential
