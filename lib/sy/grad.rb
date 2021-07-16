@@ -9,10 +9,7 @@ module Sy
 
     # Grad is defined as (dF)#
     def get_definition()
-      return {
-        :definition => op(:grad, :x),
-        :expression => op(:sharp, op(:xd, :x)),
-      }
+      return 'grad(F) = #(xd(F))'.to_mexp
     end
 
     def to_latex()

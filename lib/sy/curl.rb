@@ -13,10 +13,7 @@ module Sy
         raise 'Curl is only defined for 3 dimensions'
       end
 
-      return {
-        :definition => op(:curl, :x),
-        :expression => op(:sharp, op(:hodge, op(:xd, op(:flat, args[0])))),
-      }
+      return 'curl(F) = #(hodge(xd(b(F))))'.to_mexp
     end
 
     def to_latex()

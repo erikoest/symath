@@ -39,8 +39,8 @@ module Sy
       d = get_definition
       return self if d.nil?
 
-      dd = d[:definition]
-      res = d[:expression].deep_clone
+      dd = d.args[0]
+      res = d.args[1].deep_clone
       if dd.args.length == self.args.length
         map = {}
         dd.args.each_with_index do |a, i|
@@ -98,7 +98,7 @@ module Sy
     end
 
     def to_s()
-      return @name.to_s + '(' + @args.map { |a| a.to_s }.join(',') + ')'
+      return "#{@name}(#{@args.map { |a| a.to_s }.join(',')})"
     end
 
     def to_latex()

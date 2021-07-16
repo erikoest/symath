@@ -13,7 +13,7 @@ module Sy
     end
     
     def to_string()
-      return '#(' + @args[0].to_s + ')'
+      return "\#(#{@args[0]})"
     end
     
     def to_latex()

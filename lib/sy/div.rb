@@ -13,10 +13,7 @@ module Sy
         raise 'Div is only defined for 3 dimensions'
       end
 
-      return {
-        :definition => op(:div, :x),
-        :expression => op(:hodge, op(:xd, op(:hodge, op(:flat, args[0])))),
-      }
+      return 'div(F) = hodge(xd(hodge(b(F))))'.to_mexp
     end
 
     def to_latex()

@@ -14,12 +14,9 @@ module Sy
       vars = Sy.get_variable(:basis.to_m).row(0)
       n = vars.length
       k = @args[0].type.degree
-      sign = (-1)**(n*k + 1)
+      sign = (-1)**(n*k + 1) == -1 ? '-1*' : ''
 
-      return {
-        :definition => op(:codiff, :x),
-        :expression => sign*op(:hodge, op(:xd, op(:hodge, :x))),
-      }
+      return "codiff(F) = #{sign}hodge(xd(hodge(F)))".to_mexp
     end
 
     def to_latex()

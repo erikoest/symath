@@ -3,15 +3,16 @@ require 'sy'
 
 module Sy
   describe Sy::Function, ', evaluate' do
-    f_def = fn(:f, :x, :y)
-    f_exp = :y**3 + :x**2 + 2
-
-    Sy.define_function(f_def, f_exp)
+    Sy.define_function('f(x, y) = y**3 + x**2 + 2'.to_mexp)
 
     ex_f = fn(:f, 3, 5)
 
-    it 'f(3, 5) evaluates to 136' do
+    it 'f(3, 5) expands to 136' do
       expect(ex_f.expand_formula.normalize).to be_equal_to 136.to_m
+    end
+
+    it 'sinh(5) expands to (e**5 + e**-5)/2' do
+      expect(fn(:sinh, 5).expand_formula).to be_equal_to (:e.to_m**5 - :e.to_m**-5)/2
     end
 
     error_f = fn(:f, 3, 4, 5)

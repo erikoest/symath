@@ -9,10 +9,7 @@ module Sy
 
     # The laplacian is defined as *d*dF
     def get_definition()
-      return {
-        :definition => op(:laplacian, :x),
-        :expression => op(:hodge, op(:xd, op(:hodge, op(:xd, :x)))),
-      }
+      return 'laplacian(F) = hodge(xd(hodge(xd(F))))'.to_mexp
     end
 
     def to_latex()

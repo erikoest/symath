@@ -114,7 +114,14 @@ module Sy
     return @@function_definitions[f.to_sym]
   end
   
-  def self.define_function(definition, exp)
+  def self.define_function(eq)
+    if !eq.is_definition?
+      raise "#{eq} is not a definition"
+    end
+
+    definition = eq.args[0]
+    exp = eq.args[1]
+
     # Definition must be a function
     if !definition.is_a?(Sy::Function)
       raise definition.to_s + ' is not a function'
@@ -140,12 +147,10 @@ module Sy
     end
 
     # FIXME: Check that exp does not contain an operator
+    # FIXME: Check that exp does not contain any free variables
     # (functions should be composed only of other functions)
 
-    @@function_definitions[definition.name.to_sym] = {
-      :definition => definition,
-      :expression => exp,
-    }
+    @@function_definitions[definition.name.to_sym] = eq
   end
 
   def self.clear_function(name)
@@ -160,7 +165,14 @@ module Sy
     return @@operator_definitions[o.to_sym]
   end
 
-  def self.define_operator(definition, exp)
+  def self.define_operator(eq)
+    if !eq.is_definition?
+      raise "#{eq} is not a definition"
+    end
+
+    definition = eq.args[0]
+    exp = eq.args[1]
+
     # Each argument must be a variable
     if !definition.is_a?(Sy::Operator)
       raise definition.to_s + ' is not a function'
@@ -185,13 +197,11 @@ module Sy
       raise exp.to_s + ' is not a Sy::Value'
     end
 
-    # FIXME: Check that the exp contains at least one operator
+    # FIXME: Check that exp contains at least one operator
     # (otherwise it is a function)
+    # FIXME: Check that exp does not contain free variables
 
-    @@operator_definitions[definition] = {
-      definition => definition,
-      expression => exp,
-    }
+    @@operator_definitions[definition.name.to_sym] = eq
   end
 
   def self.clear_operator(name)
@@ -267,10 +277,5 @@ module Sy
   Sy::Operation::Differential.initialize
   Sy::Operation::Integration.initialize
   Sy::Function::Trig.initialize
-end
-
-class String
-  def to_mexp()
-    return Sy.parse(self)
-  end
+  Sy::Function.init_builtin_functions
 end

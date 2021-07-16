@@ -27,33 +27,21 @@ module Sy
       'Sy::Sum',
       'Sy::Function::Abs',
       'Sy::Function::Arccos',
-      'Sy::Function::Arcosh',
       'Sy::Function::Arccot',
-      'Sy::Function::Arcoth',
       'Sy::Function::Arccsc',
-      'Sy::Function::Arcsch',
       'Sy::Function::Arcsec',
-      'Sy::Function::Arsech',
       'Sy::Function::Arcsin',
-      'Sy::Function::Arsinh',
       'Sy::Function::Arctan',
-      'Sy::Function::Artanh',
       'Sy::Function::Cos',
-      'Sy::Function::Cosh',
       'Sy::Function::Cot',
-      'Sy::Function::Coth',
       'Sy::Function::Csc',
-      'Sy::Function::Csch',
       'Sy::Function::Exp',
       'Sy::Function::Fact',
       'Sy::Function::Ln',
       'Sy::Function::Sec',
-      'Sy::Function::Sech',
       'Sy::Function::Sin',
-      'Sy::Function::Sinh',
       'Sy::Function::Sqrt',
       'Sy::Function::Tan',
-      'Sy::Function::Tanh',
       'Sy::Function',
       'Sy::Operator',
     ]
@@ -826,3 +814,8 @@ class Symbol
   end
 end
 
+class String
+  def to_mexp()
+    return Sy.parse(self)
+  end
+end

@@ -71,24 +71,33 @@ module Sy
 #      :arcsec => 'Sy::Function::Arcsec',
 #      :arccsc => 'Sy::Function::Arccsc',
 #      :arccot => 'Sy::Function::Arccot',
-#      :sinh   => 'Sy::Function::Sinh',
-#      :cosh   => 'Sy::Function::Cosh',
-#      :tanh   => 'Sy::Function::Tanh',
-#      :sech   => 'Sy::Function::Sech',
-#      :csch   => 'Sy::Function::Csch',
-#      :coth   => 'Sy::Function::Coth',
-#      :arsinh => 'Sy::Function::Arsinh',
-#      :arcosh => 'Sy::Function::Arcosh',
-#      :artanh => 'Sy::Function::Artanh',
-#      :arsech => 'Sy::Function::Arsech',
-#      :arcsch => 'Sy::Function::Arcsch',
-#      :arcoth => 'Sy::Function::Arcoth',
       :ln     => 'Sy::Function::Ln',
       :exp    => 'Sy::Function::Exp',
       :abs    => 'Sy::Function::Abs',
       :fact   => 'Sy::Function::Fact',
       :sqrt   => 'Sy::Function::Sqrt',
     }
+
+    @@builtin_function_definitions = [
+      'sinh(x) = (e**x - e**-x)/2',
+      'cosh(x) = (e**x + e**-x)/2',
+      'tanh(x) = (e**x - e**-x)/(e**x + e**-x)',
+      'coth(x) = (e**x + e**-x)/(e**x - e**-x)',
+      'sech(x) = 2/(e**x + e**-x)',
+      'csch(x) = 2/(e**x - e**-x)',
+      'arcsinh(x) = ln(x + sqrt(x**2 + 1))',
+      'arccosh(x) = ln(x + sqrt(x**2 - 1))',
+      'arctanh(x) = ln((1 + x)/(1 - x))/2',
+      'arccoth(x) = ln((x + 1)/(x - 1))/2',
+      'arcsech(x) = ln((1/x + sqrt(x**-2 - 1)))',
+      'arccsch(x) = ln((1/x + sqrt(x**-2 + 1)))',
+    ]
+
+    def self.init_builtin_functions()
+      @@builtin_function_definitions.each do |d|
+        Sy.define_function(d.to_mexp)
+      end
+    end
 
     def self.builtin(name, args)
       name = name.to_sym

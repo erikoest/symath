@@ -56,7 +56,7 @@ module Sy
     end
 
     def to_latex()
-      return "#{@args[0]} = #{@args[1]}"
+      return @args[0].to_latex + ' = ' + @args[1].to_latex
     end
   end
 end
