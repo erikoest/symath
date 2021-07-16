@@ -58,6 +58,11 @@ module Sy
       expect(((a + b)**2).to_latex).to be == '\left(a + b\right)^{2}'
     end
 
+    # Equation
+    it 'equation to latex' do
+      expect('x = 2'.to_mexp.to_latex).to be == 'x = 2'
+    end
+
     # Differential, integral
     it 'differental to latex' do
       expect(op(:diff, a).to_latex).to be == '\mathrm{d}(a)'

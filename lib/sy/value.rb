@@ -441,6 +441,10 @@ module Sy
     # These operations do some simple reductions.
     ##
     def +(other)
+      if other.is_a?(Sy::Equation)
+        return eq(self + other.args[0], self + other.args[1])
+      end
+
       o = other.to_m
 
       if !Sy.setting(:compose_with_simplify)
@@ -501,6 +505,10 @@ module Sy
     end
     
     def -(other)
+      if other.is_a?(Sy::Equation)
+        return eq(self - other.args[0], self - other.args[1])
+      end
+
       o = other.to_m
 
       if !Sy.setting(:compose_with_simplify)
@@ -532,6 +540,10 @@ module Sy
     end
 
     def *(other)
+      if other.is_a?(Sy::Equation)
+        return eq(self * other.args[0], self * other.args[1])
+      end
+
       o = other.to_m
 
       if !Sy.setting(:compose_with_simplify)

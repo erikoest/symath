@@ -13,7 +13,7 @@ rule
   target: exp
      | /* none */      { result = nil }
   exp: CMD exp         { result = val[1].send(val[0]) }
-     | exp '=' exp     { result = Sy::Equation(val[0], val[2]) }
+     | exp '=' exp     { result = eq(val[0], val[2]) }
      | exp '+' exp     { result = val[0].add(val[2]) }
      | exp '-' exp     { result = val[0].sub(val[2]) }
      | exp '*' exp     { result = val[0].mul(val[2]) }

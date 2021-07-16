@@ -22,6 +22,10 @@ module Sy::Operation::Normalization
   # The operation is repeated until the expression is no longer changed
 
   def normalize()
+    if self.is_a?(Sy::Equation)
+      return Sy::Equation.new(args[0].normalize, args[1].normalize)
+    end
+
     return iterate('normalize_single_pass')
   end
 
