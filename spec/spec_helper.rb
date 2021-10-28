@@ -2,6 +2,16 @@ require 'simplecov'
 SimpleCov.start
 
 require "bundler/setup"
+require 'sy'
+
+# Make shortcut symbol methods available to rspec code
+class RSpec::Core::ExampleGroup
+  include Sy::Symbols
+end
+
+class Class
+  include Sy::Symbols
+end
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure

@@ -12,15 +12,15 @@ module Sy
   describe Sy::Operation::Match do
     matches = [
       {
-        :exp1 => :pi.to_m,
-        :exp2 => :pi.to_m,
+        :exp1 => pi,
+        :exp2 => pi,
         :match => [
           {}
         ],
       },
       {
-        :exp1 => :pi.to_m,
-        :exp2 => :e.to_m,
+        :exp1 => pi,
+        :exp2 => e,
         :match => nil,
       },
       {
@@ -37,19 +37,19 @@ module Sy
         ]
       },
       {
-        :exp1  => :pi.to_m,
+        :exp1  => pi,
         :exp2  => a,
         :free  => [a],
         :match => [
-          { a => :pi.to_m }
+          { a => pi }
         ]
       },
       {
-        :exp1  => fn(:sin, fn(:sin, x))*fn(:cos, fn(:sin, x)),
-        :exp2  => fn(:sin, y)*fn(:cos, y),
+        :exp1  => sin(sin(x))*cos(sin(x)),
+        :exp2  => sin(y)*cos(y),
         :free  => [y],
         :match => [
-          { y => fn(:sin, x) }
+          { y => sin(x) }
         ]
       },
       {
@@ -61,18 +61,18 @@ module Sy
         ],
       },
       {
-        :exp1  => :pi.to_m + 3 + :e.to_m,
-        :exp2  => :e.to_m + a,
+        :exp1  => pi + 3 + e,
+        :exp2  => e + a,
         :free  => [a],
         :match => [
-          { a => :pi.to_m + 3 },
+          { a => pi + 3 },
         ],
       },
       {
-        :exp1  => :pi.to_m + 3 + :e.to_m,
-        :exp2  => :e.to_m + a,
+        :exp1  => pi + 3 + e,
+        :exp2  => e + a,
         :bound =>
-          { a => :pi.to_m + 4 },
+          { a => pi + 4 },
         :match => nil,
       },
       {

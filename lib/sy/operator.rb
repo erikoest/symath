@@ -73,27 +73,43 @@ module Sy
     end
 
     @@skip_method_def = {
-      :+ => true,
-      :- => true,
-      :* => true,
-      :/ => true,
-      :** => true,
+      :+   => true,
+      :-   => true,
+      :*   => true,
+      :/   => true,
+      :**  => true,
+      :'=' => true,
+      :op  => true,
+      :fn  => true,
     }
-    
+
+    # Define operator symbol
+    def self.define_symbol(name)
+      if !Sy::Symbols.private_method_defined?(name) and
+        !Sy::Symbols.method_defined?(name) and
+        !@@skip_method_def[name.to_sym]
+
+        clazz = self
+        if clazz.is_builtin?(name)
+          Sy::Symbols.define_method :"#{name}" do |*args|
+            return clazz.new(*args.map { |a| a.to_m })
+          end
+        else
+          Sy::Symbols.define_method :"#{name}" do |*args|
+            return clazz.new("#{name}", args.map { |a| a.to_m })
+          end
+        end
+      end
+    end
+
     def initialize(name, args)
       @name = name
       @args = args
 
-      # Create ruby method for the function if the method name is not
+      # Create ruby method for the operator if the method name is not
       # already taken.
-      if !self.kind_of?(Sy::Constant) and
-        !Object.private_method_defined?(name) and
-        !Object.method_defined?(name) and
-        !@@skip_method_def[name.to_sym]
-        clazz = self.class
-        Object.define_method :"#{name}" do |*args|
-          return clazz.new("#{name}", args.map { |a| a.to_m })
-        end
+      if !self.kind_of?(Sy::Constant)
+        self.class.define_symbol(name)
       end
     end
 
@@ -183,6 +199,14 @@ module Sy
       :codiff => 'Sy::CoDiff',
       :xd     => 'Sy::ExteriorDerivative',
     }
+
+    def self.init_builtin_operators()
+      @@builtin_operators.keys.each do |d|
+        # Create a shortcut method for each of them
+        clazz = Object.const_get(@@builtin_operators[d])
+        clazz.define_symbol(d)
+      end
+    end
 
     def self.is_builtin?(name)
       return @@builtin_operators.key?(name)

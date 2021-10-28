@@ -3,8 +3,6 @@ require 'set'
 
 module Sy
   class ConstantSymbol < Constant
-    attr_reader :value
-
     @@symbols = [:pi, :e, :i, :j, :k, :phi, :oo, :NaN].to_set
 
     @@ltx_symbol = {
@@ -16,11 +14,29 @@ module Sy
     };
 
     @@unit_quaternions = [:i, :j, :k].to_set
-    
-    def initialize(name, value = nil)
+
+    def self.init_constants()
+      # Create a ruby method for each symbol
+      @@symbols.each do |s|
+        # Corner case with uppercase constant
+        if s == :NaN
+          Sy::Symbols.const_set('NaN', self.new(:NaN))
+          next
+        end
+        
+        if !Sy::Symbols.private_method_defined?(s) and
+          !Sy::Symbols.method_defined?(s)
+          clazz = self
+          Sy::Symbols.define_method :"#{s}" do
+            return clazz.new("#{s}")
+          end
+        end
+      end
+    end
+
+    def initialize(name)
       raise 'Not a known symbol: ' + name.to_s if !@@symbols.member?(name.to_sym)
       super(name.to_sym)
-      @value = value
     end
 
     def is_nan?()

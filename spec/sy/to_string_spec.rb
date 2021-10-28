@@ -79,31 +79,31 @@ module Sy
 
     # Integral
     it 'unbound integral to s' do
-      expect(op(:int, a).to_s).to be == 'int(a)'
+      expect(int(a).to_s).to be == 'int(a)'
     end
     it 'unbound integral with variable to s' do
-      expect(op(:int, a, da).to_s).to be == 'int(a,da)'
+      expect(int(a, da).to_s).to be == 'int(a,da)'
     end
     it 'bound integral to s' do
-      expect(op(:int, a, da, 1.to_m, 10.to_m).to_s).to be ==
+      expect(int(a, da, 1.to_m, 10.to_m).to_s).to be ==
         'int(a,da,1,10)'
     end
     it 'bounds operator to s' do
-      expect(op(:bounds, a, b, 1, 2).to_s).to be ==
+      expect(bounds(a, b, 1, 2).to_s).to be ==
         '[a](1,2)'
     end
     
     # Common functions
     it 'factorial to s' do
-      expect(fn(:fact, :a).to_s).to be == 'a!'
+      expect(fact(:a).to_s).to be == 'a!'
     end
     it 'abs to s' do
-      expect(fn(:abs, :a).to_s).to be == '|a|'
+      expect(abs(:a).to_s).to be == '|a|'
     end
     
     # Named operator
     it 'op to s' do
-      expect(op(:op, :a, :b).to_s).to be == 'op(a,b)'
+      expect(op(:o, :a, :b).to_s).to be == 'o(a,b)'
     end
     
     # Exterior algebra
@@ -116,10 +116,10 @@ module Sy
       Sy::setting(:expl_parentheses, false)
     end
     it 'flat to string' do
-      expect(op(:flat, :a).to_string).to be == 'b(a)'
+      expect(flat(:a).to_string).to be == 'b(a)'
     end
     it 'sharp to string' do
-      expect(op(:sharp, :a).to_string).to be == '#(a)'
+      expect(sharp(:a).to_string).to be == '#(a)'
     end
 
     # Matrix

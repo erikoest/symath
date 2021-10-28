@@ -2,10 +2,6 @@ require 'spec_helper'
 require 'sy'
 
 module Sy
-  i = :i.to_m
-  j = :j.to_m
-  k = :k.to_m
-
   describe Sy::ConstantSymbol, ', quaternion algebra' do
     expressions = {
       i*j => k,

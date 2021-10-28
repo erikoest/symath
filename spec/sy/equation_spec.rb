@@ -12,7 +12,7 @@ module Sy
 
     def1 = eq(:x.to_m, :y.to_m + 2)
     def2 = eq(fn(:a, :b), :b)
-    def3 = eq(op(:c, :d), op(:diff, op(:diff, :d)))
+    def3 = eq(op(:c, :d), diff(diff(:d)))
 
     it 'compare equations' do
       expect(e1).to be == e1_clone

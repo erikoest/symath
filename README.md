@@ -2,11 +2,11 @@
 
 Symbolic math library for Ruby. This gem is only intended as a coding excercise.
 
-## Installation
+# Installation
 
 Add this line to your application's Gemfile:
 
-```ruby
+```
 gem 'sy'
 ```
 
@@ -20,11 +20,193 @@ Or install it yourself as:
 
 ## Usage
 
-The method to_m can be used to transform integers and strings/symbols into symbolic math numbers and variables,
-respectively. The names pi, e, i, sq2 and phi have special meanings and will create the corresponding math
-constants rather than free variables. The method fn(name, *args) can be used to create a function object. Some
-of the function names have special meanings, so e.g. creating functions named 'sin' or 'exp' will create the
-sine and exponential functions. Other unrecognized names will just create an unknown function of that name.
+Using the library:
+```
+require 'Sy'
+```
+
+### Simple example
+
+The Sy library is a framework for building and manipulating symbolic mathematical expressions. A symbolic expression can be composed by first converting numbers and symbols into math objects, using the method '.to_m'. The math objects can then be combined using the operators 'x', '-', '*', '/' and '**':
+
+```
+require 'Sy'
+
+a = 1.to_m
+b = 3.to_m
+x = :x.to_m
+
+exp = x**b + a/b
+```
+
+A variable can be made either from a symbol or from a string. The two are equivalent:
+
+```
+a_from_str = 'a'.to_m
+a_from_sym = :a.to_m
+```
+
+Once you have a math object, you can combine it with numbers, symbols and strings. They will then implicitly be converted by the '.to_m' method during the composition. In the following example, it is necessary to convert the 1.to_m since the fraction has preceedence over the sum, so 1/3 is evaluated before the sum x**3 + 1/3:
+
+```
+x = :x.to_m
+exp = x**3 + 1.to_m/3
+```
+
+A complete symbolic expression can also be created from a string using the '.to_math' method. The expression can be converted back to a string by the '.to_s' method.
+
+```
+exp = 'x**3 + 1/3'.to_mexp
+puts exp.to_s  -->  'x*'3 + 1/3'
+```
+
+Use a function in an expression by first creating the function object by the 'fn' method, then applying it to one or more arguments. In a string expression, a function can be used directly. In both cases, the function must already be known to the system.
+
+```
+fn(:sin).(:pi)
+'sin(pi)'.to_mexp
+```
+
+An operator can be used in the same way.
+
+```
+op(:d).(:sin)
+'d(sin)'.to_mexp
+```
+
+All functions, operators and constants are available as ruby methods in the module
+Sy::Symbols which can be extended or included in your code:
+
+```
+extend Sy::Symbols
+
+sin(pi) --> 0
+d(sin) --> cos*dx
+```
+
+Various forms of derivation are available as an operators.
+
+Derivative of a function:
+
+```
+d = op(:d)
+d(sin)/d(:x)  --> cos
+```
+
+Differential:
+
+```
+d(:sin)  --> cos*dx
+```
+
+Partial derivative [f: f(x, y)]:
+
+```
+dpart(:f, :x) ---> df/dx
+```
+
+Total derivative [f : f(x, y)]:
+
+```
+dtot(:f)  --> [dpart(:f, :x), dpart(:f, :y)]
+```
+
+Exterior derivative [f : f(x1, x2, x3)]:
+
+```
+dext(:f) --> f1'*dx1 + f2'*dx2 + f3'*dx3
+```
+
+Integration is available as an operator.
+
+Indefinite integral (antiderivative):
+
+int(:f, :dx)
+
+Definite integral:
+
+defint(:f, :dx, :a, :b)
+
+A function can be defined using the def method:
+
+```
+def(:f, args: [:x, :y, :z], exp: [:x**3 + :y**2 + :z + 1])
+```
+
+An operator can be defined in the same way:
+
+```
+def(:o, args: [:f, :g], exp: [op(:d).(:f)])
+```
+
+### Math objects
+
+A symbolic mathematical expression is represented as an object which can be assigned to a variable. Primitive entities are instansiated 
+
+### Primitive entities
+
+#### Number
+
+Instansiating a number:
+
+#### Constant
+
+Instansiating a constant:
+
+  - Built in constants
+
+#### Variable
+
+Instansiating a variable:
+
+#### Operator
+
+Instansiating an operator:
+
+  - Operator definition
+  - Operator call
+  - Built in operators
+
+##### Operator call
+
+#### Function
+
+Instansiating vectors and matrices:
+
+### Expression composition
+
+a + b (addition)
+a - b (subtraction)
+- a   (negation
+a * b (multiplication)
+  - operator algebra
+a / b (division)
+a**b  (power)
+a^b   (wedge product)
+
+### Stringify
+
+### Compose from string
+
+### Methods to manipulate expressions
+
+  - Normalization
+  - Derivation
+  - Integration
+  - Variable replacement
+  - Pattern replacement
+  - Factorization
+  - Expand product
+
+
+The method to_m can be used to transform integers and strings/symbols
+into symbolic math numbers and variables, respectively. The names pi,
+e, i, sq2 and phi have special meanings and will create the
+corresponding math constants rather than free variables. The method
+fn(name, *args) can be used to create a function object. Some of the
+function names have special meanings, so e.g. creating functions named
+'sin' or 'exp' will create the sine and exponential functions. Other
+unrecognized names will just create an unknown function of that name.
 
 Creating a number:
     ten = 10.to_m

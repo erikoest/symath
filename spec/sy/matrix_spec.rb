@@ -11,9 +11,9 @@ module Sy
     s3 = [[4, 5], [5, 6]].to_m
     s4 = [[-2, -1, 2], [2, 1, 4], [-3, 3, -1]].to_m
 
-    i = [[1, 0], [0, 1]].to_m
+    ii = [[1, 0], [0, 1]].to_m
     rx = [[0, 1], [1, 0]].to_m
-    ry = [[0, -:i], [:i, 0]].to_m
+    ry = [[0, -i], [i, 0]].to_m
     rz = [[1, 0], [0, -1]].to_m
 
     it 'product of matrices' do
@@ -59,11 +59,11 @@ module Sy
     end
 
     it 'tests with spin matrices' do
-      expect((rx*rx).evaluate.normalize).to be_equal_to i
-      expect((ry*ry).evaluate.normalize).to be_equal_to i
-      expect((rz*rz).evaluate.normalize).to be_equal_to i
+      expect((rx*rx).evaluate.normalize).to be_equal_to ii
+      expect((ry*ry).evaluate.normalize).to be_equal_to ii
+      expect((rz*rz).evaluate.normalize).to be_equal_to ii
 
-      expect((-:i*rx*ry*rz).recurse('evaluate').normalize).to be_equal_to i
+      expect((-i*rx*ry*rz).recurse('evaluate').normalize).to be_equal_to ii
 
       expect(rx.trace).to be_equal_to 0
       expect(ry.trace).to be_equal_to 0

@@ -12,7 +12,7 @@ module Sy
     end
 
     it 'sinh(5) expands to (e**5 + e**-5)/2' do
-      expect(fn(:sinh, 5).expand_formula).to be_equal_to (:e.to_m**5 - :e.to_m**-5)/2
+      expect(sinh(5).expand_formula).to be_equal_to (e**5 - e**-5)/2
     end
 
     error_f = fn(:f, 3, 4, 5)
@@ -27,10 +27,10 @@ module Sy
       expect(ex_g.evaluate).to be_equal_to ex_g
     end
 
-    ex2_f = fn(:f, 2, :pi)
+    ex2_f = fn(:f, 2, pi)
 
     it 'f(2, pi) evaluates to pi**3 + 6' do
-      expect(ex2_f.evaluate.normalize).to be_equal_to :pi.to_m**3 + 6
+      expect(ex2_f.evaluate.normalize).to be_equal_to pi**3 + 6
     end
 
     it '3/4 does not evaluate' do

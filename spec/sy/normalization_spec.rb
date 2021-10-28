@@ -2,6 +2,8 @@ require 'spec_helper'
 require 'sy'
 
 module Sy
+  extend Sy::Symbols
+  
   x = :x.to_m
   y = :y.to_m
   a = :a.to_m
@@ -30,8 +32,8 @@ module Sy
         2*x,
       x.sub(x) =>
         0.to_m,
-      fn(:sin, x).add(fn(:sin, x)*2).add(3*y).sub(3*y) =>
-        3*fn(:sin, x),
+      sin(x).add(sin(x)*2).add(3*y).sub(3*y) =>
+        3*sin(x),
       2.to_m.power(3).add(3.to_m.power(2)) =>
         17.to_m,
       3.to_m.power(-4).add(2.to_m.power(-5)) =>
@@ -57,10 +59,10 @@ module Sy
         a*x/(b*y),
       14175.to_m.div(9000) =>
         63.to_m/40,
-      fn(:cos, x).mul(y) =>
-        y*fn(:cos, x),
-      :i.to_m*:j.to_m*:k.to_m => -1,
-      :i.to_m*:k.to_m*:j.to_m => 1,
+      cos(x).mul(y) =>
+        y*cos(x),
+      i*j*k => -1,
+      i*k*j => 1,
       dx.mul(x).mul(dx) => 0,
     },
 
@@ -73,10 +75,10 @@ module Sy
       (-2.to_m).power(3)                    => -8,
       x.power(2).power(3)                   => x**6,
       x.power(2).power(y)                   => x**(2*y),
-      :i.to_m.power(3)                      => -:i,
-      :j.to_m.power(6)                      => -1,
-      :k.to_m.power(4)                      => 1,
-      :i.to_m.power(x)                      => :i**x,
+      i.power(3)                            => -i,
+      j.power(6)                            => -1,
+      k.power(4)                            => 1,
+      i.power(x)                            => i**x,
       # No simplification
       (-4).to_m.power(x)                    => (-4)**x,
     },
@@ -86,50 +88,50 @@ module Sy
          0.to_m,
       dy.wedge(dx).wedge(dz) =>
         - (dx^dy^dz),
-      fn(:sin, x).mul(dy).wedge(dx) =>
-        - ((fn(:sin, x)*dx)^dy),
-      x.power(3).wedge(dy).mul(:e.to_m.power(4)).wedge(dz).wedge(dx) =>
-        (((:e**4*x**3*dx)^dy)^dz),
+      sin(x).mul(dy).wedge(dx) =>
+        - ((sin(x)*dx)^dy),
+      x.power(3).wedge(dy).mul(e.to_m.power(4)).wedge(dz).wedge(dx) =>
+        (((e**4*x**3*dx)^dy)^dz),
       dx.add(x.power(1).wedge(dx)) =>
         x*dx + dx,
-      (dx.wedge(fn(:ln, a.mul(x)))).add((x.wedge(1)).div(a.mul(x)).wedge((0.to_m.wedge(x)).add(a.wedge(dx)))).sub(dx) =>
-        fn(:ln, a*x)*dx,
+      (dx.wedge(ln(a.mul(x)))).add((x.wedge(1)).div(a.mul(x)).wedge((0.to_m.wedge(x)).add(a.wedge(dx)))).sub(dx) =>
+        ln(a*x)*dx,
     },
 
     'square roots' => {
-      fn(:sqrt, -7.to_m)   => :NaN,
-      fn(:sqrt, a**(2*b))  => a**b,
-      fn(:sqrt, -a**(2*b)) => :NaN,
+      sqrt(-7.to_m)   => NaN,
+      sqrt(a**(2*b))  => a**b,
+      sqrt(-a**(2*b)) => NaN,
     },
 
     'exp' => {
-      fn(:exp, 0)     => 1,
-      fn(:exp, 1)     => :e,
-      fn(:exp, :oo)   => :oo,
-      fn(:exp, -:oo)  => 0,
-      fn(:exp, :a)    => fn(:exp, :a),
-      fn(:exp, -:NaN) => :NaN,
+      exp(0)     => 1,
+      exp(1)     => e,
+      exp(oo)    => oo,
+      exp(-oo)   => 0,
+      exp(:a)    => exp(:a),
+      exp(-NaN)  => NaN,
     },
 
     'ln' => {
-      fn(:ln, 1)   => 0,
-      fn(:ln, :e)  => 1,
-      fn(:ln, 0)   => -:oo,
-      fn(:ln, :oo) => :oo,
-      fn(:ln, -10) => :NaN,
+      ln(1)   => 0,
+      ln(e)   => 1,
+      ln(0)   => -oo,
+      ln(oo)  => oo,
+      ln(-10) => NaN,
     },
 
     'factorial' => {
-      fn(:fact, 5)  => 120,
-      fn(:fact, :a) => fn(:fact, :a),
+      fact(5)  => 120,
+      fact(:a) => fact(:a),
     },
 
     'abs' => {
-      fn(:abs, -10)  => 10,
-      fn(:abs, 20)   => 20,
-      fn(:abs, 0)    => 0,
-      fn(:abs, :a)   => fn(:abs, :a),
-      fn(:abs, :NaN) => :NaN,
+      abs(-10)  => 10,
+      abs(20)   => 20,
+      abs(0)    => 0,
+      abs(:a)   => abs(:a),
+      abs(NaN)  => NaN,
     },
 
     'various' => {
@@ -156,23 +158,23 @@ module Sy
 
   complex = {
     'square roots' => {
-      fn(:sqrt, -4.to_m)   => 2.to_m*:i,
-      fn(:sqrt, -7.to_m)   => fn(:sqrt, 7)*:i,
-      fn(:sqrt, -a**(2*b)) => a**b*:i,
+      sqrt(-4.to_m)   => 2*i,
+      sqrt(-7.to_m)   => sqrt(7)*i,
+      sqrt(-a**(2*b)) => a**b*i,
     },
 
     'exp' => {
-      fn(:exp, :oo)  => :NaN,
-      fn(:exp, -:oo) => :NaN,
+      exp(oo)  => NaN,
+      exp(-oo) => NaN,
     },
 
     'ln' => {
-      fn(:ln, -1)          => :pi.to_m*:i,
-      fn(:ln, -:e)         => :pi.to_m*:i + 1,
-      fn(:ln, :i)          => :pi.to_m*:i/2,
-      fn(:ln, :i.to_m*:e)  => :pi.to_m*:i/2 + 1,
-      fn(:ln, -:i)         => -:pi.to_m*:i/2,
-      fn(:ln, -:i.to_m*:e) => -:pi.to_m*:i/2 + 1,
+      ln(-1)         => pi*i,
+      ln(-e)         => pi*i + 1,
+      ln(i)          => pi*i/2,
+      ln(i*e)        => pi*i/2 + 1,
+      ln(-i)         => -pi*i/2,
+      ln(-i*e)       => -pi*i/2 + 1,
     },
   }
 
@@ -188,8 +190,8 @@ module Sy
   end
 
   reductions = {
-    fn(:abs, Sy::Minus.new(:NaN.to_m)) => :NaN,
-    fn(:abs, -fn(:myfunc, x))           => fn(:abs, -fn(:myfunc, x)),
+    abs(Sy::Minus.new(NaN))   => NaN,
+    abs(-fn(:myfunc, x))      => abs(-fn(:myfunc, x)),
   }
 
   describe Sy::Operation::Normalization, ', reductions' do
@@ -203,7 +205,7 @@ module Sy
   end
 
   complex_reductions = {
-    fn(:abs, Sy::Minus.new(:oo.to_m)) => :oo,
+    abs(Sy::Minus.new(oo)) => oo,
   }
 
   describe Sy::Operation::Normalization, ', complex reductions' do

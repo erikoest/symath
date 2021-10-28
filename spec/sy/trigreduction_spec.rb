@@ -4,19 +4,19 @@ require 'sy'
 module Sy
   describe Sy::Operation::Normalization, ', trigreduction' do
     exp = {
-      fn(:sin, 0)                  => 0.to_m,
-      fn(:sin, :pi/6)               => 1.to_m/2,
-      fn(:sin, 17*:pi/6)           => 1.to_m/2,
-      fn(:sin, -23*:pi/4)          => fn(:sqrt, 2)/2,
-      fn(:cos, 0)                  => 1.to_m,
-      fn(:cos, 3*:pi/4)            => - fn(:sqrt, 2)/2,
-      fn(:tan, 0)                  => 0.to_m,
-      fn(:tan, :pi/4)              => 1.to_m,
-      fn(:cot, -:pi/6)             => - fn(:sqrt, 3),
-      fn(:sec, 0)                  => 1.to_m,
-      fn(:sec, :pi/4)              => fn(:sqrt, 2)/2,
-      fn(:csc, 0)                  => 1.to_m,
-      fn(:csc, 3*:pi/4)            => - fn(:sqrt, 2)/2,
+      sin(0)                 => 0.to_m,
+      sin(pi/6)              => 1.to_m/2,
+      sin(17*pi/6)           => 1.to_m/2,
+      sin(-23*pi/4)          => sqrt(2)/2,
+      cos(0)                 => 1.to_m,
+      cos(3*pi/4)            => - sqrt(2)/2,
+      tan(0)                 => 0.to_m,
+      tan(pi/4)              => 1.to_m,
+      cot(-pi/6)             => - sqrt(3),
+      sec(0)                 => 1.to_m,
+      sec(pi/4)              => sqrt(2)/2,
+      csc(0)                 => 1.to_m,
+      csc(3*pi/4)            => - sqrt(2)/2,
     }
 
     exp.each do |from, to|
@@ -26,14 +26,14 @@ module Sy
     end
 
     nored = [
-      fn(:sin, :pi/14),
-      fn(:cos, -:pi/5),
-      fn(:tan, :pi/2),
-      fn(:tan, -3.to_m*:pi/9),
-      fn(:cot, 0),
-      fn(:cot, -17.to_m*:pi/5),
-      fn(:sec, 3*:pi/11),
-      fn(:csc, -3*:pi/13),
+      sin(pi/14),
+      cos(-pi/5),
+      tan(pi/2),
+      tan(-3*pi/9),
+      cot(0),
+      cot(-17*pi/5),
+      sec(3*pi/11),
+      csc(-3*pi/13),
     ];
 
     nored.each do |n|

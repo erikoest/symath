@@ -13,14 +13,13 @@ module Sy
     t = :t.to_m(Sy::Type.new('tensor', indexes: ['u', 'l']))
 
     # Constant symbols
-    it 'pi to latex' do expect(:pi.to_m.to_latex).to be == '\pi' end
-    it 'e to latex' do expect(:e.to_m.to_latex).to be == '\mathrm{e}' end
-    it 'i to latex' do expect(:i.to_m.to_latex).to be == 'i' end
-    it 'phi to latex' do expect(:phi.to_m.to_latex).to be == '\varphi' end
-    it 'NaN to latex' do
-      expect(:NaN.to_m.to_latex).to be == '\mathrm{NaN}'
+    it 'pi to latex' do expect(pi.to_latex).to be == '\pi' end
+    it 'e to latex' do expect(e.to_latex).to be == '\mathrm{e}' end
+    it 'i to latex' do expect(i.to_latex).to be == 'i' end
+    it 'phi to latex' do expect(phi.to_latex).to be == '\varphi' end
+    it 'NaN to latex' do expect(NaN.to_latex).to be == '\mathrm{NaN}'
     end
-    it 'oo to latex' do expect(:oo.to_m.to_latex).to be == '\infty' end
+    it 'oo to latex' do expect(oo.to_latex).to be == '\infty' end
     it 'x to latex' do expect(:x.to_m.to_latex).to be == 'x' end
 
     # Types
@@ -65,45 +64,45 @@ module Sy
 
     # Differential, integral
     it 'differental to latex' do
-      expect(op(:diff, a).to_latex).to be == '\mathrm{d}(a)'
+      expect(diff(a).to_latex).to be == '\mathrm{d}(a)'
     end
     it 'differental to latex' do
-      expect(op(:xd, a).to_latex).to be == '\mathrm{d}(a)'
+      expect(xd(a).to_latex).to be == '\mathrm{d}(a)'
     end
     it 'unbound integral to latex' do
-      expect(op(:int, a, da).to_latex).to be == '\int a\,da'
+      expect(int(a, da).to_latex).to be == '\int a\,da'
     end
     it 'unbound integral of sum to latex' do
-      expect(op(:int, a + b, da).to_latex).to be ==
+      expect(int(a + b, da).to_latex).to be ==
         '\int \\left(a + b\\right)\,da'
     end
     it 'bound integral to latex' do
-      expect(op(:int, a, da, 1.to_m, 10.to_m).to_latex).to be ==
+      expect(int(a, da, 1.to_m, 10.to_m).to_latex).to be ==
         '\int_{1}^{10} a\, da'
     end
     it 'bounds operator to latex' do
-      expect(op(:bounds, a, b, 1, 2).to_latex).to be ==
+      expect(bounds(a, b, 1, 2).to_latex).to be ==
         '\left[a\right]^{2}_{1}'
     end
 
     # Common functions
     it 'factorial to latex' do
-      expect(fn(:fact, :a).to_latex).to be == 'a!'
+      expect(fact(:a).to_latex).to be == 'a!'
     end
     it 'sqrt to latex' do
-      expect(fn(:sqrt, :a).to_latex).to be == '\sqrt{a}'
+      expect(sqrt(:a).to_latex).to be == '\sqrt{a}'
     end
     it 'abs to latex' do
-      expect(fn(:abs, :a).to_latex).to be == '\lverta\rvert'
+      expect(abs(:a).to_latex).to be == '\lverta\rvert'
     end
 
-    # Named operator
+    # function
     it 'fn to latex' do
       expect(fn(:f, :a, :b).to_latex).to be == 'f(a,b)'
     end
     # operator
     it 'op to latex' do
-      expect(op(:op, :a, :b).to_latex).to be == '\operatorname{op}(a,b)'
+      expect(op(:o, :a, :b).to_latex).to be == '\operatorname{o}(a,b)'
     end
 
     # Exterior algebra
@@ -111,28 +110,28 @@ module Sy
       expect((xv^yv).to_latex).to be == '\vec{x}\wedge\vec{y}'
     end
     it 'flat to latex' do
-      expect(op(:flat, :a).to_latex).to be == 'a^\flat'
+      expect(flat(:a).to_latex).to be == 'a^\flat'
     end
     it 'sharp to latex' do
-      expect(op(:sharp, :a).to_latex).to be == 'a^\sharp'
+      expect(sharp(:a).to_latex).to be == 'a^\sharp'
     end
     it 'hodge to latex' do
-      expect(op(:hodge, :a).to_latex).to be == '\star a'
+      expect(hodge(:a).to_latex).to be == '\star a'
     end
     it 'curl to latex' do
-      expect(op(:curl, :a).to_latex).to be == '\nabla\times a'
+      expect(curl(:a).to_latex).to be == '\nabla\times a'
     end
     it 'div to latex' do
-      expect(op(:div, :a).to_latex).to be == '\nabla\cdot a'
+      expect(div(:a).to_latex).to be == '\nabla\cdot a'
     end
     it 'laplacian to latex' do
-      expect(op(:laplacian, :a).to_latex).to be == '\nabla^2 a'
+      expect(laplacian(:a).to_latex).to be == '\nabla^2 a'
     end
     it 'codiff to latex' do
-      expect(op(:codiff, :a).to_latex).to be == '\delta a'
+      expect(codiff(:a).to_latex).to be == '\delta a'
     end
     it 'grad to latex' do
-      expect(op(:grad, :a).to_latex).to be == '\nabla a'
+      expect(grad(:a).to_latex).to be == '\nabla a'
     end
   end
 end

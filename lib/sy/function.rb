@@ -93,15 +93,37 @@ module Sy
       'arccsch(x) = ln((1/x + sqrt(x**-2 + 1)))',
     ]
 
+    # Define operator symbol
+    def self.define_symbol(name)
+      if !Sy::Symbols.private_method_defined?(name) and
+        !Sy::Symbols.method_defined?(name) and
+        !@@skip_method_def[name.to_sym]
+
+        clazz = self
+        Sy::Symbols.define_method :"#{name}" do |*args|
+          return clazz.new(name, args.map { |a| a.to_m })
+        end
+      end
+    end
+
     def self.init_builtin_functions()
+      @@builtin_functions.keys.each do |f|
+        clazz = Object.const_get(@@builtin_functions[f])
+        clazz.define_symbol(f)
+      end
+
       @@builtin_function_definitions.each do |d|
         Sy.define_function(d.to_mexp)
       end
     end
 
+    def self.is_builtin?(name)
+      return @@builtin_functions.key?(name)
+    end
+
     def self.builtin(name, args)
       name = name.to_sym
-      if !@@builtin_functions.key?(name)
+      if !self.is_builtin?(name)
         return
       end
 

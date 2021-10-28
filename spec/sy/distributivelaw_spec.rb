@@ -14,8 +14,8 @@ module Sy
       -x*(-y - 3)                           => x*y + 3*x,
       -x*(x - 3)                            => - x**2 + 3*x,
       (a + b)*c                             => b*c + a*c,
-      (fn(:sin, x) + y)*(fn(:cos, x) + y)   =>
-        fn(:cos, x)*fn(:sin, x) + y**2 + y*fn(:sin, x) + y*fn(:cos, x),
+      (sin(x) + y)*(cos(x) + y)   =>
+        cos(x)*sin(x) + y**2 + y*sin(x) + y*cos(x),
       3*x*(2*x - 1)*(4*x + 3)*(3*x**3 + 1)  =>
         72*x**6 + 18*x**5 - 27*x**4 + 24*x**3 + 6*x**2 - 9*x,
     }

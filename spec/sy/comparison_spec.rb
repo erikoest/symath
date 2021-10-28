@@ -15,19 +15,20 @@ module Sy
 
   describe Sy::Value, ', comparison' do
     it '900 < :x' do
+      puts self.class.superclass.to_s
       expect(900.to_m).to be < :x.to_m
     end
 
     it 'sin(:x) > :x' do
-      expect(fn(:sin, :x)).to be > :x.to_m
+      expect(sin(:x)).to be > :x.to_m
     end
 
     it 'cos(:x) < sin(:x)' do
-      expect(fn(:cos, :x)).to be < fn(:sin, :x)
+      expect(cos(:x)).to be < sin(:x)
     end
 
     it 'cos(:x) <= cos(:x)' do
-      expect(fn(:cos, :x)).to be <= fn(:cos, :x)
+      expect(cos(:x)).to be <= cos(:x)
     end
 
     it ":x <= 'x'" do
@@ -39,14 +40,14 @@ module Sy
     end
 
     it 'cos(:x) < cos(:y)' do
-      expect(fn(:cos, :x)).to be < fn(:cos, :y)
+      expect(cos(:x)).to be < cos(:y)
     end
   end
 
   describe Sy::Value, ', sorting' do
     it '[sin(:x), 100, :x, :y*:z] sorts to [sin(:x), :y*:z, :x, 100]' do
-      expect([fn(:sin, :x), 100.to_m, :x.to_m, :y.to_m*:z, ].sort).to be ==
-        [100.to_m, :x.to_m, :y.to_m*:z, fn(:sin, :x)]
+      expect([sin(:x), 100.to_m, :x.to_m, :y.to_m*:z, ].sort).to be ==
+        [100.to_m, :x.to_m, :y.to_m*:z, sin(:x)]
     end
   end
 

@@ -64,6 +64,11 @@ module Sy
     :max_calculated_factorial => 100,
   }
 
+  # Empty submodule in which to place function, operator and constant symbols which
+  # then can be extended/included into the code of the library user.
+  module Symbols
+  end
+  
   # Note: No type checking here, although the library code expects the various
   # parameters to be of specific types (boolean, string, etc.). Failure and/or
   # strange behaviour must be expected if they are set to different types.
@@ -124,26 +129,26 @@ module Sy
 
     # Definition must be a function
     if !definition.is_a?(Sy::Function)
-      raise definition.to_s + ' is not a function'
+      raise "#{definition} is not a function"
     end
 
     vars = {}
     definition.args.each do |a|
       # Each argument must be a variable
       if !a.is_a?(Sy::Variable)
-        raise 'Function argument ' + a.to_s + ' is not a variable'
+        raise "Function argument #{a} is not a variable"
       end
       
       # All variables must be different
       if vars.key?(a.name.to_sym)
-        raise 'Variable ' + a.to_s + ' occurs multiple times'
+        raise "Variable #{a} occurs multiple times"
       end
 
       vars[a.name.to_sym] = true
     end
 
     if !exp.is_a?(Sy::Value)
-      raise exp.to_s + ' is not a Sy::Value'
+      raise "#{exp} is not a Sy::Value"
     end
 
     # FIXME: Check that exp does not contain an operator
@@ -175,26 +180,26 @@ module Sy
 
     # Each argument must be a variable
     if !definition.is_a?(Sy::Operator)
-      raise definition.to_s + ' is not a function'
+      raise "#{definition} is not an operator"
     end
     
     vars = {}
     definition.args.each do |a|
       # Each argument must be a variable
       if !a.is_a?(Sy::Variable)
-        raise 'Function argument ' + a.to_s + ' is not a variable'
+        raise "Function argument #{a} is not a variable"
       end
       
       # All variables must be different
       if vars.key?(a.name.to_sym)
-        raise 'Variable ' + a.to_s + ' occurs multiple times'
+        raise "Variable #{a} occurs multiple times"
       end
 
       vars[a.name.to_sym] = true
     end
     
     if !exp.is_a?(Sy::Value)
-      raise exp.to_s + ' is not a Sy::Value'
+      raise "#{exp} is not a Sy::Value"
     end
 
     # FIXME: Check that exp contains at least one operator
@@ -226,11 +231,11 @@ module Sy
     
     # Check that name is a variable
     if !var.is_a?(Sy::Variable)
-      raise var.to_s + ' is not a variable'
+      raise "#{var} is not a variable"
     end
 
     if !value.is_a?(Sy::Value)
-      raise value.to_s + ' is not a Sy::Value'
+      raise "#{value} is not a Sy::Value"
     end
     
     @@variable_assignments[var] = value
@@ -278,4 +283,6 @@ module Sy
   Sy::Operation::Integration.initialize
   Sy::Function::Trig.initialize
   Sy::Function.init_builtin_functions
+  Sy::Operator.init_builtin_operators
+  Sy::ConstantSymbol.init_constants
 end
