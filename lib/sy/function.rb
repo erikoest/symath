@@ -101,7 +101,7 @@ module Sy
 
         clazz = self
         Sy::Symbols.define_method :"#{name}" do |*args|
-          return clazz.new(name, args.map { |a| a.to_m })
+          return clazz.create(name, args.map { |a| a.to_m })
         end
       end
     end
@@ -128,7 +128,7 @@ module Sy
       end
 
       clazz = Object.const_get(@@builtin_functions[name])
-      return clazz.new(name, args.map { |a| a.to_m })
+      return clazz.create(name, args.map { |a| a.to_m })
     end
   end
 end
@@ -140,7 +140,7 @@ def fn(name, *args)
   end
 
   # Not a built-in function. Create a custom one.
-  return Sy::Function.new(name, args.map { |a| a.to_m })
+  return Sy::Function.create(name, args.map { |a| a.to_m })
 end
 
 require 'sy/function/sin'

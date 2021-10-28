@@ -6,7 +6,7 @@ module Sy
 
     a = :a.to_m
     b = :b.to_m
-    da = :a.to_m('dform')
+    da = d(:a)
     xv = :x.to_m('vector')
     yv = :y.to_m('vector')
     xc = :x.to_m('covector')
@@ -17,8 +17,7 @@ module Sy
     it 'e to latex' do expect(e.to_latex).to be == '\mathrm{e}' end
     it 'i to latex' do expect(i.to_latex).to be == 'i' end
     it 'phi to latex' do expect(phi.to_latex).to be == '\varphi' end
-    it 'NaN to latex' do expect(NaN.to_latex).to be == '\mathrm{NaN}'
-    end
+    it 'NaN to latex' do expect(:NaN.to_m.to_latex).to be == '\mathrm{NaN}' end
     it 'oo to latex' do expect(oo.to_latex).to be == '\infty' end
     it 'x to latex' do expect(:x.to_m.to_latex).to be == 'x' end
 
@@ -26,7 +25,7 @@ module Sy
     it '1234 to latex' do expect(1234.to_m.to_latex).to be == '1234' end
     it 'vector to latex' do expect(xv.to_latex).to be == '\vec{x}' end
     it 'covector to latex' do expect(xc.to_latex).to be == '\vec{x}' end
-    it 'dform to latex' do expect(da.to_latex).to be == 'da' end
+    it 'dform to latex' do expect(da.to_latex).to be == '\\mathrm{d}a' end
     it 'tensor to latex' do expect(t.to_latex).to be == 't[\'.]' end
 
     # Basic operators
@@ -64,21 +63,21 @@ module Sy
 
     # Differential, integral
     it 'differental to latex' do
-      expect(d(a).to_latex).to be == '\mathrm{d}(a)'
+      expect(Sy::D.new(a).to_latex).to be == '\mathrm{d}(a)'
     end
     it 'differental to latex' do
       expect(xd(a).to_latex).to be == '\mathrm{d}(a)'
     end
     it 'unbound integral to latex' do
-      expect(int(a, da).to_latex).to be == '\int a\,da'
+      expect(int(a, da).to_latex).to be == '\int a\,\mathrm{d}a'
     end
     it 'unbound integral of sum to latex' do
       expect(int(a + b, da).to_latex).to be ==
-        '\int \\left(a + b\\right)\,da'
+        '\int \\left(a + b\\right)\,\mathrm{d}a'
     end
     it 'bound integral to latex' do
       expect(int(a, da, 1.to_m, 10.to_m).to_latex).to be ==
-        '\int_{1}^{10} a\, da'
+        '\int_{1}^{10} a\, \mathrm{d}a'
     end
     it 'bounds operator to latex' do
       expect(bounds(a, b, 1, 2).to_latex).to be ==

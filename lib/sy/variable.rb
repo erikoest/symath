@@ -224,7 +224,7 @@ module Sy
 
     def to_latex()
       if type.is_dform?
-        return Sy.setting(:d_symbol) + undiff.to_latex
+        return '\mathrm{d}' + undiff.to_latex
       elsif @type.is_vector?
         return '\vec{'.to_s + @name.to_s + '}'.to_s
       elsif @type.is_covector?

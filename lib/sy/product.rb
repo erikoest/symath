@@ -2,6 +2,104 @@ require 'sy/function'
 
 module Sy
   class Product < Function
+    def self.compose_with_simplify(a, b)
+      a = a.to_m
+      b = b.to_m
+
+      # Multipling a value with an equation multiplies it with both sides,
+      # preserving the balance of the equation
+      if b.is_a?(Sy::Equation)
+        return eq(a * b.args[0], a * b.args[1])
+      end
+
+      if a.is_finite?() == false or b.is_finite?() == false
+        return self.simplify_inf(a, b)
+      end
+
+      # First try some simple reductions
+      # a*1 => a
+      return a if b == 1
+      return b if a == 1
+
+      # -a*-b => a*b
+      if b.is_a?(Sy::Minus) and a.is_a?(Sy::Minus)
+        return a.argument*b.argument
+      end
+
+      # (-a)*b => -(a*b)
+      # a*(-b) => -(a*b)
+      return -(a*b.argument) if b.is_a?(Sy::Minus)
+      return -(a.argument*b) if a.is_a?(Sy::Minus)
+      
+      if b.is_a?(Sy::Matrix)
+        return self.new(a, b)
+      end
+      
+      if a.base == b.base
+        return a.base ** (a.exponent + b.exponent)
+      end
+
+      # (1/a)*b => b/a
+      if a.is_a?(Sy::Fraction) and a.dividend == 1.to_m
+        return b/a.divisor
+      end
+
+      # a*(1/b) => a*/b
+      if b.is_a?(Sy::Fraction) and b.dividend == 1.to_m
+        return a/b.divisor
+      end
+
+      if a.type.is_subtype?(:tensor) and b.type.is_subtype?(:tensor)
+        # Expand expression if any of the parts are sum
+        if b.is_sum_exp?
+          return b.terms.map { |f| a.*(f) }.inject(:+)
+        end
+
+        if a.is_sum_exp?
+          return a.terms.map { |f| f.wedge(b) }.inject(:+)
+        end
+        
+        return a.wedge(b)
+      end
+
+      return self.new(a, b)
+    end
+
+    def self.simplify_inf(a, b)
+      # Indefinite factors
+      if a.is_finite?.nil? or b.is_finite?.nil?
+        return self.new(a, b)
+      end
+
+      # NaN multiplies to NaN
+      if a.is_nan? or b.is_nan?
+        return :NaN.to_m
+      end
+
+      # oo*0 = 0*oo = NaN
+      if a.is_zero? or b.is_zero?
+        return :NaN.to_m
+      end
+
+      if Sy.setting(:complex_arithmetic)
+        return :oo.to_m
+      else
+        if (a.is_positive? and b.is_positive?) or
+          (a.is_negative? and b.is_negative?)
+          return :oo.to_m
+        end
+
+        if (a.is_negative? and b.is_positive?) or
+          (a.is_positive? and b.is_negative?)
+          return -:oo.to_m
+        end
+      end
+      
+      # :nocov:
+      raise 'Internal error'
+      # :nocov:
+    end
+    
     def initialize(arg1, arg2)
       super('*', [arg1, arg2])
     end

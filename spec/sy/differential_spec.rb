@@ -7,10 +7,10 @@ module Sy
   x = :x
   y = :y
   z = :z
-  dx = d(x).evaluate
-  dy = d(y).evaluate
-  dz = d(z).evaluate
-  
+  dx = d(x)
+  dy = d(y)
+  dz = d(z)
+
   describe Sy::Operation::Differential, ', error conditions' do
     it 'raises error on d(x, dx)' do
       expect { d(x, dx) }.to raise_error('Var is not allowed to be differential, got dx')

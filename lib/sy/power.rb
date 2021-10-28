@@ -2,6 +2,84 @@ require 'sy/function'
 
 module Sy
   class Power < Function
+    def self.compose_with_simplify(a, b)
+      a = a.to_m
+      b = b.to_m
+
+      if a.is_finite?() == false or b.is_finite?() == false
+        return self.simplify_inf(a, b)
+      end
+            
+      # 0**0 = NaN
+      if a.is_zero? and b.is_zero?
+        return :NaN.to_m
+      end
+
+      # n**1 = n
+      if b == 1
+        return a
+      end
+      
+      if a.is_a?(Sy::Power)
+        return a.base**(a.exponent*b)
+      end
+
+      return self.new(a, b)
+    end
+
+    def self.simplify_inf(a, b)
+      # Indefinite factors
+      if a.is_finite?.nil? or b.is_finite?.nil?
+        return self.new(a, b)
+      end
+
+      # NaN**(..) = NaN, (..)**NaN = NaN
+      if a.is_nan? or b.is_nan?
+        return :NaN.to_m
+      end
+
+      # 1**oo = 1**-oo = oo**0 = -oo**0 = NaN
+      if a == 1 or b.is_zero?
+        return :NaN.to_m
+      end
+
+      if Sy.setting(:complex_arithmetic)
+        if b.is_finite? == false
+          return :NaN.to_m
+        else
+          return :oo.to_m
+        end
+      else
+        if a.is_zero? and b.is_finite? == false
+          return :NaN.to_m
+        end
+
+        # n**-oo = oo**-oo = -oo**-oo = 0
+        if b.is_finite? == false and b.is_negative?
+          return 0.to_m
+        end
+        
+        if a.is_finite? == false and a.is_negative?
+          if b.is_finite? == true
+            # -oo*n = oo*(-1**n)
+            return :oo.to_m.mul(a.sign**b)
+          else
+            # -oo**oo = NaN
+            return :NaN.to_m
+          end
+        end
+
+        # -n**oo => NaN
+        if a.is_finite? and a.is_negative?
+          return :NaN.to_m
+        end
+        
+        # The only remaining possibilities:
+        # oo**n = n*oo = oo*oo = oo
+        return :oo.to_m
+      end
+    end
+    
     def initialize(base, exponent)
       super('**', [base, exponent])
     end

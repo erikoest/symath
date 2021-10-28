@@ -2,6 +2,21 @@ require 'sy/function'
 
 module Sy
   class Minus < Function
+    def self.compose_with_simplify(a)
+      a = a.to_m
+
+      if a == 0
+        return a
+      end
+      
+      if a.is_a?(Sy::Minus)
+        # - - a => a
+        return a.argument
+      else
+        return self.new(a)
+      end
+    end
+
     def initialize(arg)
       super('-', [arg])
     end

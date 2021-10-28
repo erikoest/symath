@@ -3,6 +3,16 @@ require 'sy/operator'
 
 module Sy
   class D < Operator
+    def self.compose_with_simplify(arg, *vars)
+      if arg.is_a?(Sy::Variable) and
+        arg.type.is_scalar? and
+        vars.length == 0
+        return arg.to_d
+      end
+
+      return self.new(arg, *vars)
+    end
+
     def initialize(arg, *vars)
       super('d', [arg])
 

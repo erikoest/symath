@@ -27,7 +27,7 @@ module Sy
     before do
       Sy.setting(:complex_arithmetic, false)
     end
-  
+
     x = :x.to_m
 
     # Undetermined

@@ -2,6 +2,111 @@ require 'sy/function'
 
 module Sy
   class Sum < Function
+    def self.compose_with_simplify(a, b)
+      a = a.to_m
+      b = b.to_m
+
+      # Adding a value to an equation adds it to both sides, preserving
+      # the balance of the equation
+      if b.is_a?(Sy::Equation)
+        return eq(a + b.args[0], a + b.args[1])
+      end
+
+      if a.is_finite?() == false or b.is_finite?() == false
+        return self.simplify_inf(a, b)
+      end
+
+      return a if b == 0
+      return b if a == 0
+
+      sc = 1
+      sf = []
+      oc = 1
+      of = []
+
+      a.factors.each do |f|
+        if f == -1
+          sc *= -1
+        elsif f.is_number?
+          sc *= f.value
+        else
+          sf.push f
+        end
+      end
+
+      b.factors.each do |f|
+        if f == -1
+          oc *= -1
+        elsif f.is_number?
+          oc *= f.value
+        else
+          of.push f
+        end
+      end
+      
+      sc += oc
+
+      if sf == of
+        if sc == 0
+          return 0.to_m
+        end
+
+        if sc != 1
+          sf.unshift sc.to_m
+        end
+
+        return sf.empty? ? 1.to_m : sf.inject(:*)
+      end
+
+      return self.new(a, b)
+    end
+
+    def self.simplify_inf(a, b)
+      # Indefinite terms
+      if a.is_finite?.nil? or b.is_finite?.nil?
+        return a.add(b)
+      end
+      
+      # NaN add to NaN
+      if a.is_nan? or b.is_nan?
+        return :NaN.to_m
+      end
+
+      if Sy.setting(:complex_arithmetic)
+        # +- oo +- oo = NaN
+        if (a.is_finite? == false and b.is_finite? == false)
+          return :NaN.to_m
+        end
+
+        # oo + n = n + oo = NaN
+        if (a.is_finite? == false or b.is_finite? == false)
+          return :oo.to_m
+        end
+      else
+        # oo - oo = -oo + oo = NaN
+        if (a.is_finite? == false and b.is_finite? == false)
+          if (a.is_positive? and b.is_negative?) or
+            (a.is_negative? and b.is_positive?)
+            return :NaN.to_m
+          end
+        end
+
+        # oo + n = n + oo = oo + oo = oo
+        if a.is_finite? == false
+          return a
+        end
+
+        # n - oo = - oo + n = -oo - oo = -oo
+        if b.is_finite? == false
+          return b
+        end
+      end
+
+      # :nocov:
+      raise 'Internal error'
+      # :nocov:
+    end
+    
     def initialize(arg1, arg2)
       super('+', [arg1, arg2])
     end

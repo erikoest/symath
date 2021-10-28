@@ -92,11 +92,11 @@ module Sy
         clazz = self
         if clazz.is_builtin?(name)
           Sy::Symbols.define_method :"#{name}" do |*args|
-            return clazz.new(*args.map { |a| a.to_m })
+            return clazz.create(*args.map { |a| a.to_m })
           end
         else
           Sy::Symbols.define_method :"#{name}" do |*args|
-            return clazz.new("#{name}", args.map { |a| a.to_m })
+            return clazz.create("#{name}", args.map { |a| a.to_m })
           end
         end
       end
@@ -219,7 +219,7 @@ module Sy
       end
 
       clazz = Object.const_get(@@builtin_operators[name])
-      return clazz.new(*args.map { |a| a.nil? ? a : a.to_m })
+      return clazz.create(*args.map { |a| a.nil? ? a : a.to_m })
     end
   end
 end
@@ -231,5 +231,5 @@ def op(name, *args)
   end
 
   # Not a built-in operator. Create a custom one.
-  return Sy::Operator.new(name, args.map { |a| a.to_m })
+  return Sy::Operator.create(name, args.map { |a| a.to_m })
 end
