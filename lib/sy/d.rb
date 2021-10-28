@@ -2,9 +2,9 @@ require 'sy/value'
 require 'sy/operator'
 
 module Sy
-  class Diff < Operator
+  class D < Operator
     def initialize(arg, *vars)
-      super('diff', [arg])
+      super('d', [arg])
 
       if vars.length == 0
         # Find first free variable in expression and expand d.
@@ -15,7 +15,7 @@ module Sy
             raise "Expected variable, got " + v.class.name
           end
 
-          if v.is_diff?
+          if v.is_d?
             raise "Var is not allowed to be differential, got " + v.to_s
           end
         end
@@ -25,7 +25,7 @@ module Sy
     end
 
     def evaluate()
-      return args[0].diff(@vars)
+      return args[0].d(@vars)
     end
 
     def to_latex()

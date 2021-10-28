@@ -64,7 +64,7 @@ module Sy
 
     # Differential, integral
     it 'differental to latex' do
-      expect(diff(a).to_latex).to be == '\mathrm{d}(a)'
+      expect(d(a).to_latex).to be == '\mathrm{d}(a)'
     end
     it 'differental to latex' do
       expect(xd(a).to_latex).to be == '\mathrm{d}(a)'

@@ -10,7 +10,7 @@ module Sy
     def evaluate()
       vars = Sy.get_variable(:basis.to_m).row(0)
 
-      return @args[0].diff(vars)
+      return @args[0].d(vars)
     end
 
     def to_latex()

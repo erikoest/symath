@@ -164,7 +164,7 @@ module Sy
     end
 
     # Returns true if variable is a differential form
-    def is_diff?()
+    def is_d?()
       return @type.is_dform?
     end
 
@@ -174,7 +174,7 @@ module Sy
       return Sy::Variable.new(@name, :real)
     end
     
-    def to_diff()
+    def to_d()
       return @name.to_m(:dform)
     end
 
@@ -210,7 +210,7 @@ module Sy
     
     def to_s()
       if @type.is_dform?
-        return Sy.setting(:diff_symbol) + @name.to_s
+        return Sy.setting(:d_symbol) + @name.to_s
       elsif @type.is_vector?
         return @name.to_s + Sy.setting(:vector_symbol)
       elsif @type.is_covector?
@@ -224,7 +224,7 @@ module Sy
 
     def to_latex()
       if type.is_dform?
-        return Sy.setting(:diff_symbol) + undiff.to_latex
+        return Sy.setting(:d_symbol) + undiff.to_latex
       elsif @type.is_vector?
         return '\vec{'.to_s + @name.to_s + '}'.to_s
       elsif @type.is_covector?

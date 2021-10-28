@@ -5,7 +5,7 @@ module Sy
   describe Sy::Operation::Integration, ', simple integration' do
     x = :x.to_m
     y = :y.to_m
-    dx = :x.to_m('dform')
+    dx = d(x).evaluate
     a = :a.to_m
     b = :b.to_m
     capC = :C.to_m

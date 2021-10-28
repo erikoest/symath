@@ -13,14 +13,14 @@ module Sy
 
   describe Sy::Poly::DUP do
     # Map expression to dup
-    def d(exp)
+    def dup(exp)
       return Sy::Poly::DUP.new(exp)
     end
 
     # Map dup (or structure of dups) to expression
-    def e(dup)
+    def exp(dup)
       if dup.is_a?(Array)
-        return dup.map { |i| e(i) }
+        return dup.map { |i| exp(i) }
       end
 
       return dup.to_m
@@ -33,11 +33,11 @@ module Sy
       poly = [3, 0, -2, 1000]
 
       it "Exp to array, #{ex} => #{poly}" do
-        expect(d(ex).arr).to be == poly
+        expect(dup(ex).arr).to be == poly
       end
 
       it "Array to exp, #{poly} => #{ex}" do
-        expect(d(ex).to_m).to be == ex
+        expect(dup(ex).to_m).to be == ex
       end
     end
 
@@ -47,7 +47,7 @@ module Sy
       r = 52*x + 111
 
       it "(#{f}, #{g}) => #{r}" do
-        expect(e(d(f).pseudo_rem(d(g)))).to be_equal_to r
+        expect(exp(dup(f).pseudo_rem(dup(g)))).to be_equal_to r
       end
     end
 
@@ -57,7 +57,7 @@ module Sy
       r = [f, g, 15*x**4 - 3*x**2 + 9, 65*x**2 + 125*x - 245, 9326*x - 12300, 260708.to_m]
 
       it "(#{f}, #{g}) => #{Sy.atos(r)})" do
-        expect(e(d(f).subresultants(d(g)))).to be_equal_to r
+        expect(exp(dup(f).subresultants(dup(g)))).to be_equal_to r
       end
     end
 
@@ -67,7 +67,7 @@ module Sy
       r1 = [5*x**2 - 6*x, 20*x + 1]
       
       it "(#{f1}, #{g1}) => #{Sy.atos(r1)}" do
-        expect(e(d(f1).div(d(g1)))).to be_equal_to r1
+        expect(exp(dup(f1).div(dup(g1)))).to be_equal_to r1
       end
 
       f2 = 5*x**5 + 4*x**4 + 3*x**3 + 2*x**2 + x
@@ -75,7 +75,7 @@ module Sy
       r2 = [5*x - 6, 15*x**3 + 2*x**2 - 44*x + 54]
 
       it "(#{f2}, #{g2}) => #{Sy.atos(r2)}" do
-        expect(e(d(f2).div(d(g2)))).to be_equal_to r2
+        expect(exp(dup(f2).div(dup(g2)))).to be_equal_to r2
       end
     end
 
@@ -84,14 +84,14 @@ module Sy
       r1 = 2*x + 2
 
       it "#{f1} => #{r1}" do
-        expect(e(d(f1).diff)).to be_equal_to r1
+        expect(exp(dup(f1).diff)).to be_equal_to r1
       end
 
       f2 = x**3 + 2*x**2 + 3*x + 4
       r2 = 3*x**2 + 4*x + 3
 
       it "#{f2} => #{r2}" do
-        expect(e(d(f2).diff)).to be_equal_to r2
+        expect(exp(dup(f2).diff)).to be_equal_to r2
       end
     end
 
@@ -101,7 +101,7 @@ module Sy
       r1 = [1.to_m, f1, g1]
 
       it "(#{f1}, #{g1}) => #{Sy.atos(r1)}" do
-        expect(e(d(f1).gcd(d(g1)))).to be_equal_to r1
+        expect(exp(dup(f1).gcd(dup(g1)))).to be_equal_to r1
       end
       
       f2 = x**2 - 1
@@ -109,7 +109,7 @@ module Sy
       r2 = [x - 1, x + 1, x - 2]
 
       it "(#{f2}, #{g2}) => [#{Sy.atos(r2)}" do
-        expect(e(d(f2).gcd(d(g2)))).to be_equal_to r2
+        expect(exp(dup(f2).gcd(dup(g2)))).to be_equal_to r2
       end
     end
 
@@ -118,28 +118,28 @@ module Sy
       r1 = x**3 + x + 1
 
       it "#{f1} => #{r1}" do
-        expect(e(d(f1).sqf_part)).to be_equal_to r1
+        expect(exp(dup(f1).sqf_part)).to be_equal_to r1
       end
 
       f2 = -x**3 + x + 1
       r2 = x**3 - x - 1
 
       it "#{f2} => #{r2}" do
-        expect(e(d(f2).sqf_part)).to be_equal_to r2
+        expect(exp(dup(f2).sqf_part)).to be_equal_to r2
       end
 
       f3 = 2*x**3 + 3*x**2
       r3 = 2*x**2 + 3*x
 
       it "#{f3} => #{r3}" do
-        expect(e(d(f3).sqf_part)).to be_equal_to r3
+        expect(exp(dup(f3).sqf_part)).to be_equal_to r3
       end
 
       f4 = -(2*x**3) + 3*x**2
       r4 = 2*x**2 - 3*x
 
       it "#{f4} => #{r4}" do
-        expect(e(d(f4).sqf_part)).to be_equal_to r4
+        expect(exp(dup(f4).sqf_part)).to be_equal_to r4
       end
     end
 
@@ -148,21 +148,21 @@ module Sy
       r1 = [-1, [[x**3 + x**2 + x + 1, 1], [x - 1, 2]]]
 
       it "#{f1} => #{Sy.atos(r1)}" do
-        expect(e(d(f1).sqf_list)).to be_equal_to r1
+        expect(exp(dup(f1).sqf_list)).to be_equal_to r1
       end
 
       f2 = x**8 + 6*x**6 + 12*x**4 + 8*x**2
       r2 = [1, [[x, 2], [x**2 + 2, 3]]]
 
       it "#{f2} => #{Sy.atos(r2)}" do
-        expect(e(d(f2).sqf_list)).to be_equal_to r2
+        expect(exp(dup(f2).sqf_list)).to be_equal_to r2
       end
 
       f3 = 2*x**2 + 4*x + 2
       r3 = [2, [[x + 1, 2]]]
 
       it "#{f3} => #{Sy.atos(r3)}" do
-        expect(e(d(f3).sqf_list)).to be_equal_to r3
+        expect(exp(dup(f3).sqf_list)).to be_equal_to r3
       end
     end
 
@@ -209,7 +209,7 @@ module Sy
       
       tests.each do |t|
         it "#{t[:f]} => #{Sy.atos(t[:r])}" do
-          expect(e(d(t[:f]).factor)).to be_equal_to t[:r]
+          expect(exp(dup(t[:f]).factor)).to be_equal_to t[:r]
         end
       end
     end

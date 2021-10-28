@@ -4,7 +4,7 @@ require "sy/parser"
 require 'sy/type'
 require 'sy/function'
 require 'sy/operator'
-require 'sy/diff'
+require 'sy/d'
 require 'sy/int'
 require 'sy/bounds'
 require 'sy/sharp'
@@ -27,7 +27,6 @@ require 'sy/number'
 require 'sy/value'
 require 'sy/matrix'
 require 'sy/equation'
-require 'sy/diff'
 require 'sy/exteriorderivative'
 require 'sy/poly'
 require 'sy/poly/dup'
@@ -37,7 +36,7 @@ module Sy
   @@global_settings = {
     # Symbol used to represent the differential operator
     # on variables
-    :diff_symbol => 'd',
+    :d_symbol => 'd',
     # Symbol used to represent vector variables
     :vector_symbol => '\'',
     # Symbol used to represent covector variables

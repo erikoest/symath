@@ -13,7 +13,7 @@ module Sy
           raise "Expected variable for var, got " + var.class.name
         end
 
-        if !var.is_diff?
+        if !var.is_d?
           raise "Expected var to be a differential, got " + var.to_s
         end
       end

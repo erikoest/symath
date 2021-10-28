@@ -88,7 +88,7 @@ module Sy::Operation::Integration
   end
 
   def anti_derivative(var)
-    raise 'Var is not a differential' if !var.is_diff?
+    raise 'Var is not a differential' if !var.is_d?
 
     if is_constant?([var.undiff].to_set)
       return int_constant(var)

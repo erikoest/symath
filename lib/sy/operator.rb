@@ -185,7 +185,7 @@ module Sy
     end
 
     @@builtin_operators = {
-      :diff   => 'Sy::Diff',
+      :d      => 'Sy::D',
       :int    => 'Sy::Int',
       :bounds => 'Sy::Bounds',
       :'='    => 'Sy::Equation',

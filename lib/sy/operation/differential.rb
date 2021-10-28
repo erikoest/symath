@@ -7,7 +7,7 @@ module Sy::Operation::Differential
 
   include Sy::Operation
 
-  # The diff() method provided in this operation module calculates the
+  # The d() method provided in this operation module calculates the
   # differential with respect to a given set of variables. Note that the
   # operation returns the differential and not the derivative, so the
   # resulting expression is a differential form.
@@ -53,78 +53,78 @@ module Sy::Operation::Differential
     }
   end
 
-  def diff(vars)
+  def d(vars)
     if is_constant?(vars)
       return 0.to_m
     end
 
     if vars.member?(self)
-      return to_diff
+      return to_d
     end
       
     if is_a?(Sy::Sum)
-      return term1.diff(vars) + term2.diff(vars)
+      return term1.d(vars) + term2.d(vars)
     end
 
     if is_a?(Sy::Minus)
-      return -argument.diff(vars)
+      return -argument.d(vars)
     end
 
     if is_a?(Sy::Product)
-      return diff_product(vars)
+      return d_product(vars)
     end
 
     if is_a?(Sy::Fraction)
-      return diff_fraction(vars)
+      return d_fraction(vars)
     end
 
     if is_a?(Sy::Power)
-      return diff_power(vars)
+      return d_power(vars)
     end
 
     if is_a?(Sy::Function)
-      return diff_function(vars)
+      return d_function(vars)
     end
 
-    diff_failure
+    d_failure
   end
 
-  def diff_failure()
+  def d_failure()
     raise DifferentialError, 'Cannot calculate differential of expression ' + to_s
   end
 
   # For simplicity, just use wedge products all the time. They will be
   # normalized to scalar products afterwards.
-  def diff_product(vars)
-    return (_diff_wedge(factor1.diff(vars), factor2) +
-            _diff_wedge(factor1, factor2.diff(vars)))
+  def d_product(vars)
+    return (_d_wedge(factor1.d(vars), factor2) +
+            _d_wedge(factor1, factor2.d(vars)))
   end
 
-  def diff_fraction(vars)
-    return (_diff_wedge(dividend.diff(vars), divisor) -
-            _diff_wedge(dividend, divisor.diff(vars))) /
+  def d_fraction(vars)
+    return (_d_wedge(dividend.d(vars), divisor) -
+            _d_wedge(dividend, divisor.d(vars))) /
            (divisor**2)
   end
 
-  def diff_power(vars)
-    return _diff_wedge(_diff_wedge(self, fn(:ln, base)), exponent.diff(vars)) +
-           _diff_wedge(_diff_wedge(exponent, base**(exponent - 1)),
-                                   base.diff(vars))
+  def d_power(vars)
+    return _d_wedge(_d_wedge(self, fn(:ln, base)), exponent.d(vars)) +
+           _d_wedge(_d_wedge(exponent, base**(exponent - 1)),
+                                   base.d(vars))
   end
 
-  def diff_function(vars)
+  def d_function(vars)
     if @@functions.key?(name.to_sym)
       d = @@functions[name.to_sym].deep_clone
       d.replace({ :a.to_m => args[0] })
-      return _diff_wedge(d, args[0].diff(vars))
+      return _d_wedge(d, args[0].d(vars))
     else
-      diff_failure
+      d_failure
     end
   end
   
   # Apply wedge product or ordinary product between two expressions,
   # depending on whether or not they have vector parts.
-  def _diff_wedge(exp1, exp2)
+  def _d_wedge(exp1, exp2)
     # The product operator will determine whether this is a scalar
     # or a wedge product.
     return (exp1.factors.to_a + exp2.factors.to_a).inject(:*)
