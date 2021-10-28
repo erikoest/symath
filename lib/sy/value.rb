@@ -300,6 +300,14 @@ module Sy
     def to_m()
       return self
     end
+
+    def inspect()
+      if Sy.setting(:inspect_to_s)
+        return self.to_s
+      else
+        return super.to_s
+      end
+    end
   end
 end
 

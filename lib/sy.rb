@@ -54,10 +54,14 @@ module Sy
     # Simplify expression at the time they are composed
     :compose_with_simplify => true,
 
-    # Use complex arithmetic. Negative square roots are reduced to i*square root
-    # of the positive part. The complex infinity is used rather than the
+    # Use complex arithmetic. Negative square roots are reduced to i*square
+    # root of the positive part. The complex infinity is used rather than the
     # positive and negative real infinities.
     :complex_arithmetic => true,
+
+    # Override inspect for value objects. This makes expression dumps more
+    # readable, but less precise.
+    :inspect_to_s => true,
 
     # Biggest factorial that we calculate to a value
     :max_calculated_factorial => 100,
