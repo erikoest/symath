@@ -353,7 +353,10 @@ module Sy::Operation::Normalization
     end
 
     if base1 == base2
-      if base1.type.is_subtype?('tensor') and base2.type.is_subtype?('tensor')
+      if base1.type.is_subtype?('tensor') and
+        base2.type.is_subtype?('tensor') and
+        (exp1 + exp2).is_number? and
+        (exp1 + exp2).value > 1
         return replace_combined_factors(0.to_m), 1, true
       end
       

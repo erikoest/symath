@@ -162,9 +162,10 @@ module Sy
       if base.is_a?(Sy::Power)
         return base.base.power(base.exponent.mul(exponent)), 1, true
       end
-      
-      # Reduce power of vectors and dforms to zero
-      if base.type.is_dform? or base.type.is_vector?
+
+      # Reduce positive integer power of vectors and dforms to zero
+      if (base.type.is_dform? or base.type.is_vector?) and
+        exponent.is_number?
         return 0.to_m, 1, true
       end
       
