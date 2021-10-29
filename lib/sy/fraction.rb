@@ -115,8 +115,35 @@ module Sy
     end
 
     def evaluate()
+      # Evaluate matrix division by divding elements
       if dividend.is_a?(Sy::Matrix)
         return dividend.matrix_div(divisor)
+      end
+
+      # Evaluate df/dx expression.
+      if dividend.is_a?(Sy::D) and
+        # Evaluate if the divisor is a simple dform. The composed form
+        # d(x) is accepted as well as the simple dx variable.
+        if divisor.is_a?(Sy::Variable) and divisor.is_d?
+          v = divisor.undiff
+        elsif divisor.is_a?(Sy::D) and
+             divisor.args[0].is_a?(Sy::Variable) and
+             divisor.args[0].type.is_scalar?
+          v = divisor.args[0]
+        else
+          return self
+        end
+
+        diff = dividend.args[0].d([v]).normalize
+        # Hack: We must divide all terms by dv since the simplification does
+        # not recognize factors common to each term
+        ret = 0
+        dv = v.to_d
+        diff.terms.each do |t|
+          ret += (t/dv).normalize
+        end
+
+        return ret
       end
 
       return self
