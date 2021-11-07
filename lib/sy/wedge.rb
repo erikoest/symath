@@ -1,4 +1,4 @@
-require 'sy/function'
+require 'sy/product'
 
 module Sy
   class Wedge < Product
@@ -26,7 +26,7 @@ module Sy
         return factor1.type.sum(factor2.type)
       end
     end
-    
+
     def to_s()
       if Sy.setting(:expl_parentheses)
         return '('.to_s + factor1.to_s + '^' + factor2.to_s + ')'.to_s

@@ -104,9 +104,9 @@ module Sy::Operation::Match
     # Traverse self and exp in parallel. Match subexpressions recursively,
     # and match end nodes one by one. The two value nodes are compared for
     # equality and each argument are matched recursively.
-    # Constant: Just match nodes by exact comparison
-    if exp.is_a?(Sy::Constant)
-      # Node is a constant. Exact match is required
+    # Definition: Just match nodes by exact comparison
+    if exp.is_a?(Sy::Definition)
+      # Node is a definition. Exact match is required
       if (self == exp)
         # Return match with no variable bindings
         return [{}]

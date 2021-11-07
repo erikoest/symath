@@ -344,6 +344,8 @@ module Sy::Operation::DistributiveLaw
 
     ret = 0.to_m
 
+    puts sum
+
     sum.keys.each do |divf|
       s = sum[divf]
       if s[:c] > 1

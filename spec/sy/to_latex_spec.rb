@@ -11,13 +11,15 @@ module Sy
     yv = :y.to_m('vector')
     xc = :x.to_m('covector')
     t = :t.to_m(Sy::Type.new('tensor', indexes: ['u', 'l']))
+    define_fn(:fltx, [:x, :y])
+    define_op(:oltx, [:x, :y])
 
     # Constant symbols
     it 'pi to latex' do expect(pi.to_latex).to be == '\pi' end
     it 'e to latex' do expect(e.to_latex).to be == '\mathrm{e}' end
     it 'i to latex' do expect(i.to_latex).to be == 'i' end
     it 'phi to latex' do expect(phi.to_latex).to be == '\varphi' end
-    it 'NaN to latex' do expect(:NaN.to_m.to_latex).to be == '\mathrm{NaN}' end
+    it 'NaN to latex' do expect(:nan.to_m.to_latex).to be == '\mathrm{NaN}' end
     it 'oo to latex' do expect(oo.to_latex).to be == '\infty' end
     it 'x to latex' do expect(:x.to_m.to_latex).to be == 'x' end
 
@@ -63,7 +65,7 @@ module Sy
 
     # Differential, integral
     it 'differental to latex' do
-      expect(Sy::D.new(a).to_latex).to be == '\mathrm{d}(a)'
+      expect(d(2*a).to_latex).to be == '\mathrm{d}(2 a)'
     end
     it 'differental to latex' do
       expect(xd(a).to_latex).to be == '\mathrm{d}(a)'
@@ -77,7 +79,7 @@ module Sy
     end
     it 'bound integral to latex' do
       expect(int(a, da, 1.to_m, 10.to_m).to_latex).to be ==
-        '\int_{1}^{10} a\, \mathrm{d}a'
+        '\int_{1}^{10} a\,\mathrm{d}a'
     end
     it 'bounds operator to latex' do
       expect(bounds(a, b, 1, 2).to_latex).to be ==
@@ -97,11 +99,11 @@ module Sy
 
     # function
     it 'fn to latex' do
-      expect(fn(:f, :a, :b).to_latex).to be == 'f(a,b)'
+      expect(fn(:fltx, :a, :b).to_latex).to be == 'fltx(a,b)'
     end
     # operator
     it 'op to latex' do
-      expect(op(:o, :a, :b).to_latex).to be == '\operatorname{o}(a,b)'
+      expect(op(:oltx, :a, :b).to_latex).to be == '\operatorname{oltx}(a,b)'
     end
 
     # Exterior algebra

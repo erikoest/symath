@@ -12,12 +12,12 @@ module Sy::Operation::Differential
   # operation returns the differential and not the derivative, so the
   # resulting expression is a differential form.
 
-  @@functions = {}
-    
   # Module initialization
   def self.initialize()
     # Map of single argument functions to their derivative. By convention,
     # the free variable name is :a
+    # FIXME: This does not work if the function definition 'a' exists.
+    #        Use lambda operators.
     @@functions = {
       # Exponential and trigonometric functions
       :exp => fn(:exp, :a.to_m),
@@ -82,11 +82,7 @@ module Sy::Operation::Differential
       return d_power(vars)
     end
 
-    if is_a?(Sy::Function)
-      return d_function(vars)
-    end
-
-    d_failure
+    return d_function(vars)
   end
 
   def d_failure()
@@ -113,13 +109,17 @@ module Sy::Operation::Differential
   end
 
   def d_function(vars)
-    if @@functions.key?(name.to_sym)
-      d = @@functions[name.to_sym].deep_clone
-      d.replace({ :a.to_m => args[0] })
-      return _d_wedge(d, args[0].d(vars))
-    else
+    if !self.is_a?Sy::Operator
       d_failure
     end
+    
+    if !@@functions.key?(name.to_sym)
+      d_failure
+    end
+    
+    d = @@functions[name.to_sym].deep_clone
+    d.replace({ :a.to_m => args[0] })
+    return _d_wedge(d, args[0].d(vars))
   end
   
   # Apply wedge product or ordinary product between two expressions,

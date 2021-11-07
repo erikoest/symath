@@ -6,18 +6,25 @@ module Sy
     attr_reader :name
     attr_accessor :args
 
-    def has_definition?()
-      return !get_definition.nil?
+    # Compose with simplify. Defaults to composition with no reductions
+    def self.compose_with_simplify(*args)
+      s = Sy::Definition.get(args[0])
+      ret = s.compose_with_simplify(*args)
+      if ret
+        return ret
+      else
+        return self.new(*args)
+      end
     end
 
-    def get_definition()
-      return Sy.get_operator(self.name)
+    def definition()
+      if name.is_a?(Sy::Definition)
+        return name
+      else
+        return Sy::Definition.get(name)
+      end
     end
-
-    def get_action()
-      return
-    end
-
+    
     # Return arguments 
     def args_assoc()
       if is_associative?
@@ -35,90 +42,47 @@ module Sy
       return false
     end
 
-    def expand_formula()
-      d = get_definition
-      return self if d.nil?
-
-      dd = d.args[0]
-      res = d.args[1].deep_clone
-      if dd.args.length == self.args.length
-        map = {}
-        dd.args.each_with_index do |a, i|
-          map[a] = self.args[i]
-        end
-        res.replace(map)
-        return res
-      else
-        raise "Cannot expand #{dd} with #{self.args.length} arguments (expected #{dd.args.length})"
-      end
-    end
-
     def evaluate()
-      if has_definition?
-        # Expand operator definition into formula expression, evaluate
-        # all sub-expressions, then evaluate the expression itself.
-        expand_formula.recurse('evaluate')
+      d = definition
+      if d
+        d.evaluate(self)
       else
-        a = get_action
-        if a.nil?
-          return self
-        else
-          return args[0].send(a)
-        end
+        return self
       end
     end
 
-    def arity
+    def arity()
       return @args.length
     end
 
-    @@skip_method_def = {
-      :+   => true,
-      :-   => true,
-      :*   => true,
-      :/   => true,
-      :**  => true,
-      :'=' => true,
-      :op  => true,
-      :fn  => true,
-    }
-
-    # Define operator symbol
-    def self.define_symbol(name)
-      if !Sy::Symbols.private_method_defined?(name) and
-        !Sy::Symbols.method_defined?(name) and
-        !@@skip_method_def[name.to_sym]
-
-        clazz = self
-        if clazz.is_builtin?(name)
-          Sy::Symbols.define_method :"#{name}" do |*args|
-            return clazz.create(*args.map { |a| a.to_m })
-          end
-        else
-          Sy::Symbols.define_method :"#{name}" do |*args|
-            return clazz.create("#{name}", args.map { |a| a.to_m })
-          end
-        end
-      end
-    end
-
     def initialize(name, args)
+      if name.is_a?(String)
+        name = name.to_sym
+      end
+
       @name = name
       @args = args
 
-      # Create ruby method for the operator if the method name is not
-      # already taken.
-      if !self.kind_of?(Sy::Constant)
-        self.class.define_symbol(name)
+      d = definition
+      if d
+        d.validate_args(self)
       end
     end
 
     def to_s()
-      return "#{@name}(#{@args.map { |a| a.to_s }.join(',')})"
+      return definition.to_s(@args)
     end
 
     def to_latex()
-      return '\operatorname{' + @name.to_s + '}(' + @args.map { |a| a.to_latex }.join(',') + ')'
+      return definition.to_latex(@args)
+    end
+
+    def dump(indent = 0)
+      i = ' '*indent
+      puts i + self.class.to_s + ': ' + name.to_s
+      args.each do |a|
+        a.dump(indent + 2)
+      end
     end
 
     def hash()
@@ -163,6 +127,10 @@ module Sy
 
     alias eql? ==
 
+    def reduce()
+      return definition.reduce_exp(self)
+    end
+
     def is_constant?(vars = nil)
       @args.each do |a|
         return false if !a.is_constant?(vars)
@@ -181,55 +149,11 @@ module Sy
         a.replace(map)
       end
 
+      if name.is_a?(Sy::Definition)
+        name.replace(map)
+      end
+
       return self
     end
-
-    @@builtin_operators = {
-      :d      => 'Sy::D',
-      :int    => 'Sy::Int',
-      :bounds => 'Sy::Bounds',
-      :'='    => 'Sy::Equation',
-      :sharp  => 'Sy::Sharp',
-      :flat   => 'Sy::Flat',
-      :hodge  => 'Sy::Hodge',
-      :grad   => 'Sy::Grad',
-      :curl   => 'Sy::Curl',
-      :div    => 'Sy::Div',
-      :laplacian => 'Sy::Laplacian',
-      :codiff => 'Sy::CoDiff',
-      :xd     => 'Sy::ExteriorDerivative',
-    }
-
-    def self.init_builtin_operators()
-      @@builtin_operators.keys.each do |d|
-        # Create a shortcut method for each of them
-        clazz = Object.const_get(@@builtin_operators[d])
-        clazz.define_symbol(d)
-      end
-    end
-
-    def self.is_builtin?(name)
-      return @@builtin_operators.key?(name)
-    end
-
-    def self.builtin(name, args)
-      name = name.to_sym
-      if !self.is_builtin?(name)
-        return
-      end
-
-      clazz = Object.const_get(@@builtin_operators[name])
-      return clazz.create(*args.map { |a| a.nil? ? a : a.to_m })
-    end
   end
-end
-
-def op(name, *args)
-  op = Sy::Operator.builtin(name, args)
-  if !op.nil?
-    return op
-  end
-
-  # Not a built-in operator. Create a custom one.
-  return Sy::Operator.create(name, args.map { |a| a.to_m })
 end

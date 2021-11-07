@@ -2,23 +2,24 @@ require 'spec_helper'
 require 'sy'
 
 module Sy
-  describe Sy::Function, ', evaluate' do
-    Sy.define_function('f(x, y) = y**3 + x**2 + 2'.to_mexp)
+  describe Sy::Definition::Function, ', evaluate' do
+    define_fn(:f, [:x, :y], 'y**3 + x**2 + 2')
+    define_fn(:g, [:x])
 
     ex_f = fn(:f, 3, 5)
 
-    it 'f(3, 5) expands to 136' do
-      expect(ex_f.expand_formula.normalize).to be_equal_to 136.to_m
+    it 'f(3, 5) evaluates to 136' do
+      expect(ex_f.evaluate.normalize).to be_equal_to 136.to_m
     end
 
-    it 'sinh(5) expands to (e**5 + e**-5)/2' do
-      expect(sinh(5).expand_formula).to be_equal_to (e**5 - e**-5)/2
+    it 'sinh(5) evaluates to (e**5 + e**-5)/2' do
+      expect(sinh(5).evaluate).to be_equal_to (e**5 - e**-5)/2
     end
 
     error_f = fn(:f, 3, 4, 5)
 
     it 'f(3, 4, 5) raises error' do
-      expect { error_f.expand_formula }.to raise_error 'Cannot expand f(x,y) with 3 arguments (expected 2)'
+      expect { error_f.evaluate }.to raise_error 'Cannot evaluate f with 3 arguments. Expected 2.'
     end
 
     ex_g = fn(:g, 1)

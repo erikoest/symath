@@ -45,27 +45,27 @@ module Sy
 
     # Test syntactic sugar for integers and symbols
     it '2.to_m + 2 simplifies to number' do
-      expect((2.to_m + 2).class.to_s).to be == 'Sy::Number'
+      expect((2.to_m + 2).class.to_s).to be == 'Sy::Definition::Number'
     end
 
     it '2.to_m - 2 simplifies to number' do
-      expect((2.to_m - 2).class.to_s).to be == 'Sy::Number'
+      expect((2.to_m - 2).class.to_s).to be == 'Sy::Definition::Number'
     end
 
     it '- (- 2) simplifies to number' do
-      expect((- (- 2.to_m)).class.to_s).to be == 'Sy::Number'
+      expect((- (- 2.to_m)).class.to_s).to be == 'Sy::Definition::Number'
     end
 
     it '2.to_m * 4 simplifies to number' do
-      expect((2.to_m + 4).class.to_s).to be == 'Sy::Number'
+      expect((2.to_m + 4).class.to_s).to be == 'Sy::Definition::Number'
     end
 
     it '4/1 simplifies to 4' do
-      expect((4.to_m / 1).class.to_s).to be == 'Sy::Number'
+      expect((4.to_m / 1).class.to_s).to be == 'Sy::Definition::Number'
     end
 
     it '4**1 simplifies to 4' do
-      expect((4.to_m ** 1).class.to_s).to be == 'Sy::Number'
+      expect((4.to_m ** 1).class.to_s).to be == 'Sy::Definition::Number'
     end
 
     it '(-4)**x does not simplify' do

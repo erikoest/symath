@@ -13,6 +13,7 @@ module Sy
     t = :t.to_m(Sy::Type.new('tensor', indexes: ['u', 'l']))
     m = :m.to_m(Sy::Type.new('matrix', dimm: 2, dimn: 3))
     mx = [[1, 2, 3], [4, 5, 6]].to_m
+    define_op(:o, [:x, :y])
 
     # Constant symbols
     it 'pi to s' do expect(:pi.to_m.to_s).to be == 'pi' end
@@ -116,10 +117,10 @@ module Sy
       Sy::setting(:expl_parentheses, false)
     end
     it 'flat to string' do
-      expect(flat(:a).to_string).to be == 'b(a)'
+      expect(flat(:a).to_s).to be == 'b(a)'
     end
     it 'sharp to string' do
-      expect(sharp(:a).to_string).to be == '#(a)'
+      expect(sharp(:a).to_s).to be == '#(a)'
     end
 
     # Matrix

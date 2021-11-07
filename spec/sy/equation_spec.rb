@@ -4,6 +4,9 @@ require 'sy'
 module Sy
   describe Sy::Equation do
 
+    define_fn(:ab, [:x])
+    define_op(:cd, [:x])
+
     z = :z.to_m
     e1 = 'y + 2*x + 3 = 4'.to_mexp
     e2 = '2*y + 2*x + 1 = 2'.to_mexp
@@ -11,8 +14,8 @@ module Sy
     e1_clone = 'y + 2*x + 3 = 4'.to_mexp
 
     def1 = eq(:x.to_m, :y.to_m + 2)
-    def2 = eq(fn(:a, :b), :b)
-    def3 = eq(op(:c, :d), d(d(:d)))
+    def2 = eq(fn(:ab, :b), :b)
+    def3 = eq(op(:cd, :d), d(d(:d)))
 
     it 'compare equations' do
       expect(e1).to be == e1_clone
@@ -45,13 +48,6 @@ module Sy
     it 'power' do
       expect { e1**e2 }.to raise_error 'Cannot use equation as exponent'
       expect((e1**2).normalize.to_s).to be == '(y + 2*x + 3)**2 = 16'
-    end
-
-    it 'equation is definition' do
-      expect(e1.is_definition?()).to be false
-      expect(def1.is_definition?()).to be
-      expect(def2.is_definition?()).to be
-      expect(def3.is_definition?()).to be
     end
   end
 end

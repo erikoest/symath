@@ -11,6 +11,8 @@ module Sy
   xv = :x.to_m('vector')
   yv = :y.to_m('vector')
   zv = :z.to_m('vector')
+ 
+  define_fn(:myfun, [:x, :y])
 
   describe Sy::Parser do
     parse = {

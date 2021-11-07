@@ -98,7 +98,7 @@ module Sy::Operation::Normalization
 
       terms2.push p
     end
-    
+
     ret = terms2.reverse.inject(:+)
     
     return ret

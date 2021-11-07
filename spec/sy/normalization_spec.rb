@@ -2,7 +2,7 @@ require 'spec_helper'
 require 'sy'
 
 module Sy
-  extend Sy::Symbols
+  extend Sy::Definitions
   
   x = :x.to_m
   y = :y.to_m
@@ -13,7 +13,7 @@ module Sy
   dy = :y.to_m(:dform)
   dz = :z.to_m(:dform)
 
-  op1 = :op1.to_m(Sy::Type.new('operator'))
+  op12 = :op12.to_m(Sy::Type.new('operator'))
 
   m23 = [[1, 2, 3], [4, 5, 6]].to_m
   m32 = [[-1, 3], [-4, -5], [2, 1]].to_m
@@ -99,9 +99,9 @@ module Sy
     },
 
     'square roots' => {
-      sqrt(-7.to_m)   => NaN,
+      sqrt(-7.to_m)   => nan,
       sqrt(a**(2*b))  => a**b,
-      sqrt(-a**(2*b)) => NaN,
+      sqrt(-a**(2*b)) => nan,
     },
 
     'exp' => {
@@ -110,7 +110,7 @@ module Sy
       exp(oo)    => oo,
       exp(-oo)   => 0,
       exp(:a)    => exp(:a),
-      exp(-NaN)  => NaN,
+      exp(-nan)  => nan,
     },
 
     'ln' => {
@@ -118,7 +118,7 @@ module Sy
       ln(e)   => 1,
       ln(0)   => -oo,
       ln(oo)  => oo,
-      ln(-10) => NaN,
+      ln(-10) => nan,
     },
 
     'factorial' => {
@@ -131,11 +131,11 @@ module Sy
       abs(20)   => 20,
       abs(0)    => 0,
       abs(:a)   => abs(:a),
-      abs(NaN)  => NaN,
+      abs(nan)  => nan,
     },
 
     'various' => {
-      x.mul(op1.mul(x)) => x*(op1*x),
+      x.mul(op12.mul(x)) => x*(op12*x),
     },
 
     'matrix' => {
@@ -164,8 +164,8 @@ module Sy
     },
 
     'exp' => {
-      exp(oo)  => NaN,
-      exp(-oo) => NaN,
+      exp(oo)  => nan,
+      exp(-oo) => nan,
     },
 
     'ln' => {
@@ -189,8 +189,10 @@ module Sy
     end
   end
 
+  define_fn(:myfunc, [:x])
+  
   reductions = {
-    abs(Sy::Minus.new(NaN))   => NaN,
+    abs(Sy::Minus.new(nan))   => nan,
     abs(-fn(:myfunc, x))      => abs(-fn(:myfunc, x)),
   }
 

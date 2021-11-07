@@ -128,7 +128,7 @@ module Sy
            other.is_subtype?(@@types[:complex])
         return  @@types[:complex]
       else
-        raise 'No common type for ' + to_s + ' and ' + other.to_s
+        raise "No common type for #{self} and #{other}"
       end
     end
 
@@ -143,7 +143,7 @@ module Sy
         # FIXME: Hack. This is probably not true. 
         return self
       else
-        raise 'Types ' + to_s + ' and ' + other.to_s + ' cannot be summed.'
+        raise "Types #{self} and #{other} cannot be summed."
       end
     end
 
@@ -163,7 +163,7 @@ module Sy
            dimn == other.dimm
         return 'matrix'.to_t(dimm: dimm, dimn: other.dimn)
       else
-        raise 'Types ' + to_s + ' and ' + other.to_s + ' cannot be multiplied'
+        raise "Types #{self} and #{other} cannot be multiplied"
       end
     end
     

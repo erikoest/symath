@@ -1,7 +1,7 @@
-require 'sy/function'
+require 'sy/operator'
 
 module Sy
-  class Sum < Function
+  class Sum < Operator
     def self.compose_with_simplify(a, b)
       a = a.to_m
       b = b.to_m
@@ -69,13 +69,13 @@ module Sy
       
       # NaN add to NaN
       if a.is_nan? or b.is_nan?
-        return :NaN.to_m
+        return :nan.to_m
       end
 
       if Sy.setting(:complex_arithmetic)
         # +- oo +- oo = NaN
         if (a.is_finite? == false and b.is_finite? == false)
-          return :NaN.to_m
+          return :nan.to_m
         end
 
         # oo + n = n + oo = NaN
@@ -87,7 +87,7 @@ module Sy
         if (a.is_finite? == false and b.is_finite? == false)
           if (a.is_positive? and b.is_negative?) or
             (a.is_negative? and b.is_positive?)
-            return :NaN.to_m
+            return :nan.to_m
           end
         end
 

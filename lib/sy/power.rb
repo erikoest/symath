@@ -1,7 +1,7 @@
-require 'sy/function'
+require 'sy/operator'
 
 module Sy
-  class Power < Function
+  class Power < Operator
     def self.compose_with_simplify(a, b)
       a = a.to_m
       b = b.to_m
@@ -12,7 +12,7 @@ module Sy
             
       # 0**0 = NaN
       if a.is_zero? and b.is_zero?
-        return :NaN.to_m
+        return :nan.to_m
       end
 
       # n**1 = n
@@ -35,23 +35,23 @@ module Sy
 
       # NaN**(..) = NaN, (..)**NaN = NaN
       if a.is_nan? or b.is_nan?
-        return :NaN.to_m
+        return :nan.to_m
       end
 
       # 1**oo = 1**-oo = oo**0 = -oo**0 = NaN
       if a == 1 or b.is_zero?
-        return :NaN.to_m
+        return :nan.to_m
       end
 
       if Sy.setting(:complex_arithmetic)
         if b.is_finite? == false
-          return :NaN.to_m
+          return :nan.to_m
         else
           return :oo.to_m
         end
       else
         if a.is_zero? and b.is_finite? == false
-          return :NaN.to_m
+          return :nan.to_m
         end
 
         # n**-oo = oo**-oo = -oo**-oo = 0
@@ -65,13 +65,13 @@ module Sy
             return :oo.to_m.mul(a.sign**b)
           else
             # -oo**oo = NaN
-            return :NaN.to_m
+            return :nan.to_m
           end
         end
 
         # -n**oo => NaN
         if a.is_finite? and a.is_negative?
-          return :NaN.to_m
+          return :nan.to_m
         end
         
         # The only remaining possibilities:

@@ -169,7 +169,7 @@ module Sy
     end
 
     # Returns variable which differential is based on
-    # TODO: Check name collision with constant symbols (i, e, pi etc.)
+    # TODO: Check name collision with constant definitions (i, e, pi etc.)
     def undiff()
       return Sy::Variable.new(@name, :real)
     end
@@ -207,7 +207,7 @@ module Sy
         return self
       end
     end
-    
+
     def to_s()
       if @type.is_dform?
         return Sy.setting(:d_symbol) + @name.to_s
@@ -244,7 +244,7 @@ end
 class String
   def to_m(type = 'real')
     begin
-      return Sy::ConstantSymbol.new(self)
+      return Sy::Definition.get(self)
     rescue
       return Sy::Variable.new(self, type)
     end
@@ -254,7 +254,7 @@ end
 class Symbol
   def to_m(type = 'real')
     begin
-      return Sy::ConstantSymbol.new(self)
+      return Sy::Definition.get(self)
     rescue
       return Sy::Variable.new(self, type)
     end

@@ -2,19 +2,7 @@ require "sy/version"
 require "sy/parser"
 
 require 'sy/type'
-require 'sy/function'
 require 'sy/operator'
-require 'sy/d'
-require 'sy/int'
-require 'sy/bounds'
-require 'sy/sharp'
-require 'sy/flat'
-require 'sy/hodge'
-require 'sy/grad'
-require 'sy/curl'
-require 'sy/div'
-require 'sy/laplacian'
-require 'sy/codiff'
 require 'sy/sum'
 require 'sy/minus'
 require 'sy/product'
@@ -22,12 +10,10 @@ require 'sy/wedge'
 require 'sy/fraction'
 require 'sy/power'
 require 'sy/variable'
-require 'sy/constantsymbol'
-require 'sy/number'
+require 'sy/definition'
 require 'sy/value'
 require 'sy/matrix'
 require 'sy/equation'
-require 'sy/exteriorderivative'
 require 'sy/poly'
 require 'sy/poly/dup'
 require 'sy/poly/galois'
@@ -67,11 +53,6 @@ module Sy
     :max_calculated_factorial => 100,
   }
 
-  # Empty submodule in which to place function, operator and constant symbols which
-  # then can be extended/included into the code of the library user.
-  module Symbols
-  end
-  
   # Note: No type checking here, although the library code expects the various
   # parameters to be of specific types (boolean, string, etc.). Failure and/or
   # strange behaviour must be expected if they are set to different types.
@@ -88,12 +69,6 @@ module Sy
     return @@global_settings[name]
   end
   
-  @@function_definitions = {
-  }
-
-  @@operator_definitions = {
-  }
-
   @@special_variables = {
     :basis.to_m => 1,
     :g.to_m => 1,
@@ -113,108 +88,6 @@ module Sy
                 [0, 1, 0],
                 [0, 0, 1]].to_m,
   }
-
-  def self.get_functions()
-    return @@function_definitions
-  end
-
-  def self.get_function(f)
-    return @@function_definitions[f.to_sym]
-  end
-  
-  def self.define_function(eq)
-    if !eq.is_definition?
-      raise "#{eq} is not a definition"
-    end
-
-    definition = eq.args[0]
-    exp = eq.args[1]
-
-    # Definition must be a function
-    if !definition.is_a?(Sy::Function)
-      raise "#{definition} is not a function"
-    end
-
-    vars = {}
-    definition.args.each do |a|
-      # Each argument must be a variable
-      if !a.is_a?(Sy::Variable)
-        raise "Function argument #{a} is not a variable"
-      end
-      
-      # All variables must be different
-      if vars.key?(a.name.to_sym)
-        raise "Variable #{a} occurs multiple times"
-      end
-
-      vars[a.name.to_sym] = true
-    end
-
-    if !exp.is_a?(Sy::Value)
-      raise "#{exp} is not a Sy::Value"
-    end
-
-    # FIXME: Check that exp does not contain an operator
-    # FIXME: Check that exp does not contain any free variables
-    # (functions should be composed only of other functions)
-
-    @@function_definitions[definition.name.to_sym] = eq
-  end
-
-  def self.clear_function(name)
-    @@function_definitions.delete(name.to_sym)
-  end
-
-  def self.get_operators()
-    return @@operator_definitions
-  end
-
-  def self.get_operator(o)
-    return @@operator_definitions[o.to_sym]
-  end
-
-  def self.define_operator(eq)
-    if !eq.is_definition?
-      raise "#{eq} is not a definition"
-    end
-
-    definition = eq.args[0]
-    exp = eq.args[1]
-
-    # Each argument must be a variable
-    if !definition.is_a?(Sy::Operator)
-      raise "#{definition} is not an operator"
-    end
-    
-    vars = {}
-    definition.args.each do |a|
-      # Each argument must be a variable
-      if !a.is_a?(Sy::Variable)
-        raise "Function argument #{a} is not a variable"
-      end
-      
-      # All variables must be different
-      if vars.key?(a.name.to_sym)
-        raise "Variable #{a} occurs multiple times"
-      end
-
-      vars[a.name.to_sym] = true
-    end
-    
-    if !exp.is_a?(Sy::Value)
-      raise "#{exp} is not a Sy::Value"
-    end
-
-    # FIXME: Check that exp contains at least one operator
-    # (otherwise it is a function)
-    # FIXME: Check that exp does not contain free variables
-
-    @@operator_definitions[definition.name.to_sym] = eq
-  end
-
-  def self.clear_operator(name)
-    @@opertor_definitions[name.to_sym]
-  end
 
   def self.define_equation(exp1, exp2)
     return Sy::Equation.new(exp1, exp2)
@@ -263,29 +136,19 @@ module Sy
     @@variable_assignments.delete(var.to_m)
   end
 
-  def self.clear_variables()
-    @@variable_assignments.keys.each do |v|
-      next if @@special_variables.key?(v.name.to_sym)
-      
-      @@variable_assignments.delete(v)
-    end
-  end
-
   @@parser = Sy::Parser.new
 
   def self.parse(str)
     return @@parser.parse(str)
   end
 
-  # Calculate basis vectors on startup
-  Sy::Variable.recalc_basis_vectors
-
   # Initialize various static data used by the operation
   # modules.
+  Sy::Definition.init_builtin
+  Sy::Definition::Trig.initialize
   Sy::Operation::Differential.initialize
   Sy::Operation::Integration.initialize
-  Sy::Function::Trig.initialize
-  Sy::Function.init_builtin_functions
-  Sy::Operator.init_builtin_operators
-  Sy::ConstantSymbol.init_constants
+
+  # Calculate basis vectors on startup
+  Sy::Variable.recalc_basis_vectors
 end

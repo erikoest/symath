@@ -2,7 +2,7 @@ require 'spec_helper'
 require 'sy'
 
 module Sy
-  extend Sy::Symbols
+  extend Sy::Definitions
   
   x = :x
   y = :y
@@ -11,12 +11,15 @@ module Sy
   dy = d(y)
   dz = d(z)
 
+  define_fn(:fn123, [:x])
+  define_op(:op123, [:x])
+  
   describe Sy::Operation::Differential, ', error conditions' do
     it 'raises error on d(x, dx)' do
       expect { d(x, dx) }.to raise_error('Var is not allowed to be differential, got dx')
     end
     it 'raises error on d(x, pi)' do
-      expect { d(x, pi) }.to raise_error('Expected variable, got Sy::ConstantSymbol')
+      expect { d(x, pi) }.to raise_error('Expected variable, got Sy::Definition::Constant')
     end
   end
 
@@ -50,12 +53,12 @@ module Sy
   end
 
   describe Sy::Operation::Differential, ', errors' do
-    it "raises error on d(op1, x), op1 is a defined operator" do
-      expect { d(op(:op1, x), x).evaluate }.to raise_error('Cannot calculate differential of expression op1(x)')
+    it "raises error on d(op123, x), op123 is a defined operator" do
+      expect { d(op(:op123, x), x).evaluate }.to raise_error('Cannot calculate differential of expression op123(x)')
     end
 
-    it "raises error on d(fn1, x), fn1 is a defined function" do
-      expect { d(fn(:fn1, x), x).evaluate }.to raise_error('Cannot calculate differential of expression fn1(x)')
+    it "raises error on d(fn123, x), fn123 is a defined function" do
+      expect { d(fn(:fn123, x), x).evaluate }.to raise_error('Cannot calculate differential of expression fn123(x)')
     end
   end
 end

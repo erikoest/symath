@@ -54,11 +54,7 @@ module Sy
       raise ParseError, "\nparse error on function name '#{name}'"
     end
 
-    if Sy::Operator.is_builtin?(name.to_sym)
-      return op(name, *args)
-    else
-      return fn(name, *args)
-    end
+    return sym(name).(*args)
   end
 
   # Create a variable or constant

@@ -16,7 +16,7 @@ module Sy
   da = :a.to_m('dform')
   av = :a.to_m('vector')
 
-  describe Sy::Grad do
+  describe Sy::Definition::Grad do
     g = {
       grad(x1 - x1*x2 + x3**2) => x1v + 2*x3*x3v - x2*x1v - x1*x2v
     }
@@ -28,7 +28,7 @@ module Sy
     end
   end
 
-  describe Sy::Curl do
+  describe Sy::Definition::Curl do
     c = {
       curl(-x2*x1v + x1*x2*x2v + x3*x3v) => x3v + x2*x3v
     }
@@ -50,7 +50,7 @@ module Sy
     end
   end
 
-  describe Sy::Div do
+  describe Sy::Definition::Div do
     d = {
       div(-x2*x1v + x1*x2*x2v + x3*x3v) => x1 + 1
     }
@@ -72,7 +72,7 @@ module Sy
     end
   end
 
-  describe Sy::Laplacian do
+  describe Sy::Definition::Laplacian do
     lap = {
       laplacian(x1**2 + x2**2 + x3**2) => 6.to_m
     }
@@ -84,7 +84,7 @@ module Sy
     end
   end
 
-  describe Sy::CoDiff do
+  describe Sy::Definition::CoDiff do
     cd = {
       codiff(x1**2*(dx1^dx3) + x2**2*(dx3^dx1) + x3**2*(dx1^dx2)) => 2*x1*dx3
     }
@@ -96,7 +96,7 @@ module Sy
     end
   end
 
-  describe Sy::Hodge do
+  describe Sy::Definition::Hodge do
     hdg = {
       hodge(dx1^dx2) => dx3,
       hodge(3) => ((3*dx1)^dx2^dx3),
@@ -114,7 +114,7 @@ module Sy
     end
   end
 
-  describe Sy::Sharp do
+  describe Sy::Definition::Sharp do
     sh = {
       sharp(dx1^dx2) => (x1v^x2v),
       sharp(3*dx2) => 3*x2v,
@@ -131,7 +131,7 @@ module Sy
     end
   end
 
-  describe Sy::Flat do
+  describe Sy::Definition::Flat do
     fl = {
       flat(x1v^x2v) => (dx1^dx2),
       flat(3*x2v) => 3*dx2,

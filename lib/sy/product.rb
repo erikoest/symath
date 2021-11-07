@@ -1,7 +1,7 @@
-require 'sy/function'
+require 'sy/operator'
 
 module Sy
-  class Product < Function
+  class Product < Operator
     def self.compose_with_simplify(a, b)
       a = a.to_m
       b = b.to_m
@@ -73,12 +73,12 @@ module Sy
 
       # NaN multiplies to NaN
       if a.is_nan? or b.is_nan?
-        return :NaN.to_m
+        return :nan.to_m
       end
 
       # oo*0 = 0*oo = NaN
       if a.is_zero? or b.is_zero?
-        return :NaN.to_m
+        return :nan.to_m
       end
 
       if Sy.setting(:complex_arithmetic)

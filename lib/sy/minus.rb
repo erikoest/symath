@@ -1,7 +1,7 @@
-require 'sy/function'
+require 'sy/operator'
 
 module Sy
-  class Minus < Function
+  class Minus < Operator
     def self.compose_with_simplify(a)
       a = a.to_m
 

@@ -1,7 +1,7 @@
-require 'sy/function'
+require 'sy/operator'
 
 module Sy
-  class Fraction < Function
+  class Fraction < Operator
     def self.compose_with_simplify(a, b)
       a = a.to_m
       b = b.to_m
@@ -16,12 +16,12 @@ module Sy
       if b.is_zero?
         if Sy.setting(:complex_arithmetic)
           if a.is_zero?
-            return :NaN.to_m
+            return :nan.to_m
           else
             return :oo.to_m
           end
         else
-          return :NaN.to_m
+          return :nan.to_m
         end
       end
 
@@ -47,12 +47,12 @@ module Sy
 
       # NaN/* = */NaN = NaN
       if a.is_nan? or b.is_nan?
-        return :NaN.to_m
+        return :nan.to_m
       end
       
       # oo/oo = oo/-oo = -oo/oo = NaN
       if a.is_finite? == false and b.is_finite? == false
-        return :NaN.to_m
+        return :nan.to_m
       end
 
       # */0 = NaN
@@ -60,7 +60,7 @@ module Sy
         if Sy.setting(:complex_arithmetic)
           return :oo.to_m
         else
-          return :NaN.to_m
+          return :nan.to_m
         end
       end
 
@@ -121,7 +121,8 @@ module Sy
       end
 
       # Evaluate df/dx expression.
-      if dividend.is_a?(Sy::D) and
+      if dividend.is_a?(Sy::Operator) and
+        dividend.definition.is_a?(Sy::Definition::D)
         # Evaluate if the divisor is a simple dform. The composed form
         # d(x) is accepted as well as the simple dx variable.
         if divisor.is_a?(Sy::Variable) and divisor.is_d?

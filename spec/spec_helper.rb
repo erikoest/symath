@@ -6,11 +6,11 @@ require 'sy'
 
 # Make shortcut symbol methods available to rspec code
 class RSpec::Core::ExampleGroup
-  include Sy::Symbols
+  include Sy::Definitions
 end
 
 class Class
-  include Sy::Symbols
+  include Sy::Definitions
 end
 
 RSpec.configure do |config|

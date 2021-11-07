@@ -59,7 +59,7 @@ module Sy
     end
 
     it "raises error on int(x/2, 2.to_m)" do
-      expect { int(x/2, 2.to_m) }.to raise_error(RuntimeError, 'Expected variable for var, got Sy::Number')
+      expect { int(x/2, 2.to_m) }.to raise_error(RuntimeError, 'Expected variable for var, got Sy::Definition::Number')
     end
 
     it "raises error on int(x/2, x)" do
@@ -72,7 +72,7 @@ module Sy
     end
 
     it "raises error on bounds(x**2, 2, 0, 1)" do
-      expect { bounds(x**2, 2, 0, 1) }.to raise_error(RuntimeError, 'Expected variable for var, got Sy::Number')
+      expect { bounds(x**2, 2, 0, 1) }.to raise_error(RuntimeError, 'Expected variable for var, got Sy::Definition::Number')
     end
 
     it "raises error on bounds(x**2, dx, 0, 1)" do

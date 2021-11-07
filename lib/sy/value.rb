@@ -16,8 +16,10 @@ module Sy
     include Operation::Exterior
     
     @@class_order = [
-      'Sy::Number',
-      'Sy::ConstantSymbol',
+      'Sy::Definition::Number',
+      'Sy::Definition::Constant',
+      'Sy::Definition::Function',
+      'Sy::Definition',
       'Sy::Variable',
       'Sy::Minus',
       'Sy::Power',
@@ -25,24 +27,6 @@ module Sy
       'Sy::Fraction',
       'Sy::Product',
       'Sy::Sum',
-      'Sy::Function::Abs',
-      'Sy::Function::Arccos',
-      'Sy::Function::Arccot',
-      'Sy::Function::Arccsc',
-      'Sy::Function::Arcsec',
-      'Sy::Function::Arcsin',
-      'Sy::Function::Arctan',
-      'Sy::Function::Cos',
-      'Sy::Function::Cot',
-      'Sy::Function::Csc',
-      'Sy::Function::Exp',
-      'Sy::Function::Fact',
-      'Sy::Function::Ln',
-      'Sy::Function::Sec',
-      'Sy::Function::Sin',
-      'Sy::Function::Sqrt',
-      'Sy::Function::Tan',
-      'Sy::Function',
       'Sy::Operator',
     ]
 
@@ -52,6 +36,19 @@ module Sy
       @@class_order_hash[e] = i
     end
 
+    def self.create(*args)
+      if Sy.setting(:compose_with_simplify)
+        return self.compose_with_simplify(*args)
+      else
+        return self.new(*args)
+      end
+    end
+
+    # Compose with simplify. Defaults to composition with no reductions
+    def self.compose_with_simplify(*args)
+      return self.new(*args)
+    end
+    
     def deep_clone()
       return Marshal.load(Marshal.dump(self))
     end
@@ -121,33 +118,6 @@ module Sy
       return false
     end
 
-    # Returns true if this is a function declaration, a operator declaration or
-    # a variable assignment
-    def is_definition?()
-      # The expression must have an equation at the top node
-      return false if !is_a?(Sy::Equation)
-
-      # Is this a variable assigment?
-      return true if args[0].is_a?(Sy::Variable)
-
-      # Or an operator or function?
-      return false if !args[0].is_a?(Sy::Operator)
-
-      vars = {}
-
-      args[0].args.each do |a|
-        # All arguments must be variables
-        return false if !a.is_a?(Sy::Variable)
-        
-        # All argument variables must be unique
-        return false if vars.key?(a.name.to_sym)
-
-        vars[a.name.to_sym] = true
-      end
-
-      return true
-    end
-
     # Reduce expression if possible. Defaults to no reduction
     def reduce()
       return self
@@ -189,19 +159,6 @@ module Sy
       return Sy::Wedge.new(self, other.to_m)
     end
 
-    def self.create(*args)
-      if Sy.setting(:compose_with_simplify)
-        return self.compose_with_simplify(*args)
-      else
-        return self.new(*args)
-      end
-    end
-
-    # Compose with simplify. Defaults to composition with no reductions
-    def self.compose_with_simplify(*args)
-      return self.new(*args)
-    end
-    
     ##
     # Overridden object operators.
     # These operations do some simple reductions.
@@ -305,8 +262,13 @@ module Sy
       if Sy.setting(:inspect_to_s)
         return self.to_s
       else
-        return super.to_s
+        return super.inspect
       end
+    end
+
+    def dump(indent = 0)
+      i = ' '*indent
+      puts i + self.class.to_s + ': ' + self.to_s
     end
   end
 end

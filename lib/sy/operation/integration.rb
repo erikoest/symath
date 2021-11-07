@@ -106,13 +106,13 @@ module Sy::Operation::Integration
       return int_product(var)
     end
 
-    if is_a?(Sy::Function) and @@functions.key?(name.to_sym)
+    if is_a?(Sy::Operator) and @@functions.key?(name.to_sym)
       return int_function(var)
     end
 
     return int_power(var)
   end
-    
+
   def int_failure()    
     raise IntegrationError, 'Cannot find an antiderivative for expression ' + to_s
   end

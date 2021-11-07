@@ -10,6 +10,8 @@ module Sy
   z = :z.to_m
 
   describe Sy::Operation::Match do
+    define_op(:op1, [:x, :y])
+    
     matches = [
       {
         :exp1 => pi,
