@@ -1,6 +1,7 @@
-# This class represents a definition of a constant, variable, operator or number.
-# A function or operator can be used in an expression with and without arguments.
-# In the latter case, they behave as a constant of type function or operator.
+# This class represents a definition of a constant, variable, operator or
+# number. A function or operator can be used in an expression with and without
+# arguments. In the latter case, they behave as a constant of type function or
+# operator.
 
 # A special case of a definition is the lambda function, which is a function
 # with no name but a number of arguments, and an expression. 
@@ -90,6 +91,10 @@ module Sy
 
     def self.defined?(name)
       return @@definitions.has_key?(name.to_sym)
+    end
+
+    def self.definitions()
+      return @@definitions.values
     end
 
     def initialize(name)
@@ -205,8 +210,12 @@ module Sy
   end
 end
 
-def sym(name)
+def definition(name)
   return Sy::Definition.get(name)
+end
+
+def definitions()
+  return Sy::Definition.definitions
 end
 
 require 'sy/definition/constant'

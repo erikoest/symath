@@ -23,7 +23,7 @@ module_eval(<<'...end parser.y/module_eval...', 'parser.y', 46)
       raise ParseError, "\nparse error on function name '#{name}'"
     end
 
-    return sym(name).(*args)
+    return definition(name).(*args)
   end
 
   # Create a variable or constant

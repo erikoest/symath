@@ -26,7 +26,7 @@ module Sy
           arg = "(#{args[0].to_s})"
         end
       else
-        arg = '(...)!'
+        arg = '(...)'
       end
 
       return "#{arg}!"
