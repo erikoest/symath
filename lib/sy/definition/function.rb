@@ -100,19 +100,7 @@ module Sy
 end
 
 def fn(f, *args)
-  # if f is a function definition, return a function call to it.
-  if f.is_a?(Sy::Definition::Function)
-    return f.(*args)
-  end
-
-  # Otherwise, f must be the name of a defined function. Look up the
-  # function and return a call to it.
-  s = Sy::Definition.get(f)
-  if !s.is_function?
-    raise "#{f} is not a function."
-  end
-
-  return s.(*args)
+  return Sy::Operator.create(f, args.map { |a| a.nil? ? a : a.to_m })
 end
 
 def define_fn(name, args, exp = nil)

@@ -7,6 +7,7 @@ class Parser
     left '*' '/' '^'
     left '+' '-'
     left '='
+    unassoc '.'
     CMD
   preclow
 rule
@@ -23,10 +24,10 @@ rule
      | '(' exp ')' '!' { result = function('fact', [val[1]]) }
      | '(' exp ')'     { result = val[1] }
      | '-' exp =UMINUS { result = val[1].neg }
+     | exp '.' '(' args ')' { result = function(val[0], val[3]) }
      | func
 
-  func: NAME '(' ')'      { result = function(val[0], []) }
-      | NAME '(' args ')' { result = function(val[0], val[2]) }
+  func: NAME '(' args ')' { result = function(val[0], val[2]) }
       | '#' '(' exp ')'   { result = function('sharp', [val[2]]) }
       | '#' func          { result = function('sharp', [val[1]]) }
       | '|' exp '|'       { result = function('abs', [val[1]]) }
@@ -48,13 +49,20 @@ module Sy
   def function(name, subnodes)
     args = subnodes
 
-    # If name is a built-in operator, create it rather than a function
-    name = 'flat' if name.eql?('b')
-    if name.include? "'"
-      raise ParseError, "\nparse error on function name '#{name}'"
+    if name.is_a?(String)
+      # Syntactic sugar for 'flat' function
+      name = 'flat' if name.eql?('b')
+
+      if name.include? "'"
+        raise ParseError, "\nparse error on function name '#{name}'"
+      end
+
+      if name == 'lmd'
+        return Sy::Definition::Lmd.new(*args)
+      end
     end
 
-    return definition(name).(*args)
+    return Sy::Operator.create(name, args.map { |a| a.nil? ? a : a.to_m })
   end
 
   # Create a variable or constant
@@ -94,8 +102,8 @@ module Sy
       when /\A[A-Za-z_]+[A-Za-z_0-9]*\'?/
         # name (char + (char|num))
         @q.push [:NAME, $&]
-      when /\A\d+(\.\d+)?/
-        # number (digits.digits)
+      when /\A\d+/
+        # number (digits)
         @q.push [:NUMBER, $&]
       when /\A\*\*/
         # two character operators

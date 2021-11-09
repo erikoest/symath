@@ -11,7 +11,7 @@ module Sy
       super(:codiff, args: [:f], exp: 'hodge(xd(hodge(f)))')
     end
 
-    def evaluate(e)
+    def evaluate_exp(e)
       vars = Sy.get_variable(:basis.to_m).row(0)
       n = vars.length
       k = e.args[0].type.degree

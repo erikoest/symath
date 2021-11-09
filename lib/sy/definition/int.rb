@@ -26,7 +26,7 @@ module Sy
       end
     end
 
-    def evaluate(e)
+    def evaluate_exp(e)
       exp = e.args[0]
       var = e.args[1]
       a = e.args[2]

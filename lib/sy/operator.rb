@@ -3,28 +3,26 @@ require 'set'
 
 module Sy
   class Operator < Value
-    attr_reader :name
+    attr_reader :definition
     attr_accessor :args
 
     # Compose with simplify. Defaults to composition with no reductions
     def self.compose_with_simplify(*args)
-      s = Sy::Definition.get(args[0])
-      ret = s.compose_with_simplify(*args)
-      if ret
-        return ret
-      else
-        return self.new(*args)
+      d = args[0]
+      if d.is_a?(Sy::Definition::Operator)
+        ret = d.compose_with_simplify(*args)
+        if ret
+          return ret
+        end
       end
+      
+      return self.new(*args)
     end
 
-    def definition()
-      if name.is_a?(Sy::Definition)
-        return name
-      else
-        return Sy::Definition.get(name)
-      end
+    def name()
+      return definition.name
     end
-    
+
     # Return arguments 
     def args_assoc()
       if is_associative?
@@ -43,34 +41,36 @@ module Sy
     end
 
     def evaluate()
-      d = definition
-      if d
-        d.evaluate(self)
-      else
-        return self
-      end
+      puts "Evaluating #{self}"
+      definition.evaluate_exp(self)
     end
 
     def arity()
       return @args.length
     end
 
-    def initialize(name, args)
-      if name.is_a?(String)
-        name = name.to_sym
+    def initialize(definition, args)
+      if !definition.is_a?(Sy::Value)
+        definition = Sy::Definition.get(definition)
       end
 
-      @name = name
-      @args = args
+      @definition = definition
+      @args       = args
 
-      d = definition
-      if d
-        d.validate_args(self)
+      if definition.is_a?(Sy::Definition::Operator)
+        definition.validate_args(self)
       end
     end
 
     def to_s()
-      return definition.to_s(@args)
+      if definition.is_a?(Sy::Definition::Operator)
+        return definition.to_s(@args)
+      else
+        # Lambda call
+        arglist = @args.map { |a| a.to_s }.join(',')
+        
+        return "(#{definition}).(#{arglist})"
+      end
     end
 
     def to_latex()
@@ -149,9 +149,7 @@ module Sy
         a.replace(map)
       end
 
-      if name.is_a?(Sy::Definition)
-        name.replace(map)
-      end
+      definition.replace(map)
 
       return self
     end

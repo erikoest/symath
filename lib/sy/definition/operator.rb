@@ -15,6 +15,16 @@ module Sy
       Sy::Definition::Div.new
       Sy::Definition::Laplacian.new
       Sy::Definition::CoDiff.new
+
+      expressions = {
+        :laplace    => 'lmd(int(f.(t)*e**(-s*t),d(t),0,oo),s)',
+        :fourier    => 'lmd(int(f.(x)*e**(-2*pi*i*x*w),d(x),-oo,oo),w)',
+        :invfourier => 'lmd(int(f.(w)*e**(2*pi*i*x*w),d(w),-oo,oo),x)',
+      }
+
+      expressions.each do |name, exp|
+        self.new(name, args: [:f], exp: exp)
+      end
     end
 
     def initialize(name, args: [], exp: nil)
@@ -63,7 +73,7 @@ module Sy
       return true
     end
 
-    def evaluate(e)
+    def evaluate_exp(e)
       if !exp
         # Operator has no expression, return it unchanged.
         return e
@@ -83,7 +93,6 @@ module Sy
 
       # Recursively evaluate the expanded formula.
       return res.recurse('evaluate')
-      # return res
     end
 
     def replace(map)
@@ -133,13 +142,8 @@ module Sy
   end
 end
 
-def op(name, *args)
-  s = Sy::Definition.get(name)
-  if !s.is_operator? or s.is_function?
-    raise "#{name} is not an operator"
-  end
-
-  return s.(*args)  
+def op(o, *args)
+  return Sy::Operator.create(o, args.map { |a| a.nil? ? a : a.to_m })
 end
 
 def define_op(name, args)

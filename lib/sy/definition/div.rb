@@ -8,7 +8,7 @@ module Sy
       super(:div, args: [:f], exp: 'hodge(xd(hodge(b(f))))')
     end
 
-    def evaluate(e)
+    def evaluate_exp(e)
       if Sy.get_variable(:basis.to_m).row(0).length != 3
         raise 'Div is only defined for 3 dimensions'
       end

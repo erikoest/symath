@@ -7,7 +7,7 @@ module Sy
       super(:xd)
     end
 
-    def evaluate(e)
+    def evaluate_exp(e)
       vars = Sy.get_variable(:basis.to_m).row(0)
 
       return e.args[0].d(vars)

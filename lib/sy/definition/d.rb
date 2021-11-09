@@ -34,7 +34,7 @@ module Sy
       return
     end
 
-    def evaluate(e)
+    def evaluate_exp(e)
       vars = e.args[1..-1]
       if vars.length == 0
         # Find first free variable in expression.

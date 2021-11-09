@@ -56,13 +56,6 @@ module Sy
       return self
     end
     
-    def evaluate_REMOVE(e)
-      exp = e.args[0]
-      vars = e.args[1..-1]
-
-      return Sy::Definition::Function.new('', args: vars, exp: exp)
-    end
-
     def to_s(args = nil)
       if !args
         args = @args

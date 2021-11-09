@@ -36,11 +36,15 @@ module Sy
       @@class_order_hash[e] = i
     end
 
-    def self.create(*args)
+    def self.create(definition, *args)
+      if !definition.is_a?(Sy::Value)
+        definition = Sy::Definition.get(definition)
+      end
+      
       if Sy.setting(:compose_with_simplify)
-        return self.compose_with_simplify(*args)
+        return self.compose_with_simplify(definition, *args)
       else
-        return self.new(*args)
+        return self.new(definition, *args)
       end
     end
 
