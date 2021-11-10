@@ -6,8 +6,8 @@ module Sy
       super(:abs)
     end
 
-    def reduce_exp(e)
-      arg = e.args[0]
+    def reduce_call(c)
+      arg = c.args[0]
       if arg.is_nan?
         return :nan.to_m
       # Corner case, -oo is positive with complex arithmetic, so we need a
@@ -17,7 +17,7 @@ module Sy
       elsif arg.is_positive? or arg.is_zero?
         return arg
       else
-        return e
+        return c
       end
     end
 

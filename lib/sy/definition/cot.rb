@@ -6,8 +6,8 @@ module Sy
       super(:cot)
     end
     
-    def reduce_exp(e)
-      return reduce_tan_and_cot(e, 1, -1)
+    def reduce_call(c)
+      return reduce_tan_and_cot(c, 1, -1)
     end
   end
 end

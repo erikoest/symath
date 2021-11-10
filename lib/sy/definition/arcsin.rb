@@ -6,7 +6,7 @@ module Sy
       super(:arcsin)
     end
 
-    def reduce_exp(e)
+    def reduce_call(c)
       # -1         -> -pi/2
       # -sqrt(3)/2 -> -pi/3
       # -sqrt(2)/2 -> -pi/4
@@ -17,7 +17,7 @@ module Sy
       # sqrt(3)/2  -> pi/3
       # 1          -> pi/2
       
-      return e
+      return c
     end
   end
 end

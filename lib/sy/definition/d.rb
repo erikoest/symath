@@ -34,14 +34,14 @@ module Sy
       return
     end
 
-    def evaluate_exp(e)
-      vars = e.args[1..-1]
+    def evaluate_call(c)
+      vars = c.args[1..-1]
       if vars.length == 0
         # Find first free variable in expression.
-        vars = [(e.args[0].variables)[0].to_m]
+        vars = [(c.args[0].variables)[0].to_m]
       end
 
-      return e.args[0].d(vars)
+      return c.args[0].d(vars)
     end
 
     def latex_format()

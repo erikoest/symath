@@ -41,8 +41,7 @@ module Sy
     end
 
     def evaluate()
-      puts "Evaluating #{self}"
-      definition.evaluate_exp(self)
+      definition.evaluate_call(self)
     end
 
     def arity()
@@ -66,7 +65,7 @@ module Sy
       if definition.is_a?(Sy::Definition::Operator)
         return definition.to_s(@args)
       else
-        # Lambda call
+        # Expression call
         arglist = @args.map { |a| a.to_s }.join(',')
         
         return "(#{definition}).(#{arglist})"
@@ -128,7 +127,7 @@ module Sy
     alias eql? ==
 
     def reduce()
-      return definition.reduce_exp(self)
+      return definition.reduce_call(self)
     end
 
     def is_constant?(vars = nil)
@@ -149,7 +148,7 @@ module Sy
         a.replace(map)
       end
 
-      definition.replace(map)
+      @definition = definition.replace(map)
 
       return self
     end

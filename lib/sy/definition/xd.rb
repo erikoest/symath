@@ -7,10 +7,10 @@ module Sy
       super(:xd)
     end
 
-    def evaluate_exp(e)
+    def evaluate_call(c)
       vars = Sy.get_variable(:basis.to_m).row(0)
 
-      return e.args[0].d(vars)
+      return c.args[0].d(vars)
     end
 
     def to_latex(args)

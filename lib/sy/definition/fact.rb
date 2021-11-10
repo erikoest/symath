@@ -6,8 +6,8 @@ module Sy
       super(:fact)
     end
 
-    def reduce_exp(e)
-      arg = e.args[0]
+    def reduce_call(c)
+      arg = c.args[0]
       
       if arg.is_number?
         if arg.value <= Sy.setting(:max_calculated_factorial)
@@ -15,7 +15,7 @@ module Sy
         end
       end
 
-      return e
+      return c
     end
 
     def to_s(args = nil)

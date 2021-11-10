@@ -7,9 +7,9 @@ module Sy
       super(:flat)
     end
 
-    def evaluate_exp(e)
+    def evaluate_call(c)
       # Must normalize input, operation depends on factorized vectors
-      return e.args[0].normalize.flat
+      return c.args[0].normalize.flat
     end
 
     def to_s(args = nil)

@@ -50,7 +50,7 @@ module Sy
       args = args.map { |a| a.nil? ? a : a.to_m }
       return Sy::Operator.new(self, args)
     end
-    
+
     def reduce()
       # FIXME: Reduce if lmd is just a wrapper around a function.
       return self
@@ -60,18 +60,18 @@ module Sy
       if !args
         args = @args
       end
-      
+
       if args.length > 0
         arglist = args.map { |a| a.to_s }.join(',')
       else
         arglist = "..."
       end
 
-      return "[#{exp}](#{arglist})"
+      return "(#{exp}).(#{arglist})"
     end
 
     def latex_format()
-      return "[#{exp}](%s)"
+      return "(#{exp}).(%s)"
     end
   end
 end

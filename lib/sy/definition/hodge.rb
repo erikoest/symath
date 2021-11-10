@@ -7,9 +7,9 @@ module Sy
       super(:hodge)
     end
 
-    def evaluate_exp(e)
+    def evaluate_call(c)
       # Must normalize input, operation depends on factorized vectors
-      return e.args[0].normalize.hodge
+      return c.args[0].normalize.hodge
     end
 
     def latex_format()

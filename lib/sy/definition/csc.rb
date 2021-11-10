@@ -6,8 +6,8 @@ module Sy
       super(:csc)
     end
     
-    def reduce_exp(e)
-      return reduce_sec_and_csc(e, 0)
+    def reduce_call(c)
+      return reduce_sec_and_csc(c, 0)
     end
   end
 end

@@ -15,9 +15,6 @@ module Sy
 
   class Definition < Value
     attr_reader :name
-    # FIXME: Move down to operator class
-    attr_reader :args
-    attr_reader :exp
 
     @@definitions = {}
 
@@ -106,8 +103,8 @@ module Sy
       end
     end
 
-    def reduce_exp(e)
-      return e
+    def reduce_call(c)
+      return c
     end
 
     def variables()
@@ -156,17 +153,6 @@ module Sy
         return name.to_s <=> other.name.to_s
       end
 
-      if arity != other.arity
-        return arity <=> other.arity
-      end
-      
-      (0...arity).to_a.each do |i|
-        diff = args[i] <=> other.args[i]
-        if diff != 0
-          return diff
-        end
-      end
-
       return 0
     end
 
@@ -180,7 +166,7 @@ module Sy
     def is_constant?(vars = nil)
       return true
     end
-    
+
     def to_s()
       return @name.to_s
     end
@@ -200,12 +186,6 @@ module Sy
     def dump(indent = 0)
       i = ' '*indent
       puts i + self.class.to_s + ': ' + self.to_s
-      if args
-        puts i + '  args: ' + args.map { |a| a.to_s }.join(',')
-      end
-      if exp
-        puts i + '  exp: ' + exp.to_s
-      end
     end
   end
 end

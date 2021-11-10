@@ -8,12 +8,12 @@ module Sy
       super(:curl, args: [:f], exp: '#(hodge(xd(b(f))))')
     end
 
-    def evaluate_exp(e)
+    def evaluate_call(c)
       if Sy.get_variable(:basis.to_m).row(0).length != 3
         raise 'Curl is only defined for 3 dimensions'
       end
 
-      return super(e)
+      return super(c)
     end
 
     def latex_format()

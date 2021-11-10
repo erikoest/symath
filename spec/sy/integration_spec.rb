@@ -44,11 +44,10 @@ module Sy
 
     fails = [
       sin(x)*tan(x),
-      dx*x,
-      sin(2*dx*x),
+      x*dx,
+      sin(2*x*dx),
       sin(sin(x)),
-      sin(x.mul(x)),
-      sin(x.add(x)),
+      sin(x**2),
       x**sin(x),
     ]
 

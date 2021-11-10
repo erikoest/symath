@@ -6,8 +6,8 @@ module Sy
       super(:cos)
     end
     
-    def reduce_exp(e)
-      return reduce_sin_and_cos(e, 1)
+    def reduce_call(c)
+      return reduce_sin_and_cos(c, 1)
     end
   end
 end

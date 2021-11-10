@@ -308,8 +308,11 @@ module Sy::Operation::Integration
     # Check exponential functions
     if b.is_constant?(vset)
       (c1, c2) = get_linear_constants(xp, var)
-        
       # b**(c1*x + c2) => b**(c1*x + c2)/(b*ln(c1))
+      if c1.nil?
+        int_failure
+      end
+
       return b**(xp)/(c1*fn(:ln, b))
     end
 

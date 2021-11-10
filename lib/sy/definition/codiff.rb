@@ -11,13 +11,13 @@ module Sy
       super(:codiff, args: [:f], exp: 'hodge(xd(hodge(f)))')
     end
 
-    def evaluate_exp(e)
+    def evaluate_call(c)
       vars = Sy.get_variable(:basis.to_m).row(0)
       n = vars.length
-      k = e.args[0].type.degree
+      k = c.args[0].type.degree
       sign = ((-1)**(n*k + 1)).to_m
 
-      return sign*super(e)
+      return sign*super(c)
     end
 
     def latex_format()

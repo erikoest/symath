@@ -6,8 +6,8 @@ module Sy
       super(:sqrt)
     end
 
-    def reduce_exp(e)
-      arg = e.args[0]
+    def reduce_call(call)
+      arg = call.args[0]
       i = 1.to_m
 
       # Real: sqrt(-n) = NaN
@@ -47,7 +47,7 @@ module Sy
       if i != 1
         return i*fn(:sqrt, arg)
       else
-        return e
+        return call
       end
     end
 

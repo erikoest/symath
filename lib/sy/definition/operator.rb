@@ -2,6 +2,9 @@ require 'sy/definition'
 
 module Sy
   class Definition::Operator < Definition
+    attr_reader :args
+    attr_reader :exp
+
     def self.init_builtin()
       Sy::Definition::D.new
       Sy::Definition::Xd.new
@@ -62,6 +65,26 @@ module Sy
       return true
     end
 
+    alias eql? ==
+
+    def <=>(other)
+      s = super(other)
+      return s if s != 0
+
+      if arity != other.arity
+        return arity <=> other.arity
+      end
+
+      (0...arity).to_a.each do |i|
+        diff = args[i] <=> other.args[i]
+        if diff != 0
+          return diff
+        end
+      end
+
+      return 0
+    end
+
     # The call method, or the .() operator, returns an operator or function
     # object representing the operator or function being applied to a list of
     # arguments.
@@ -73,26 +96,34 @@ module Sy
       return true
     end
 
-    def evaluate_exp(e)
+    # Evaluate the operator in use
+    def evaluate_call(c)
       if !exp
         # Operator has no expression, return it unchanged.
-        return e
+        return c
       end
 
       # Operator has expression. Exand it.
       res = exp.deep_clone
-      if arity != e.arity
-        raise "Cannot evaluate #{name} with #{e.arity} arguments. Expected #{arity}."
+      if arity != c.arity
+        raise "Cannot evaluate #{name} with #{c.arity} arguments. Expected #{arity}."
       end
 
       map = {}
       args.each_with_index do |a, i|
-        map[a] = e.args[i]
+        map[a] = c.args[i]
       end
       res.replace(map)
 
       # Recursively evaluate the expanded formula.
       return res.recurse('evaluate')
+    end
+
+    # Evaluate the operator definition
+    def evaluate()
+      if !exp.nil?
+        @exp = exp.evaluate
+      end
     end
 
     def replace(map)
@@ -106,6 +137,8 @@ module Sy
       @args = @args.map do |a|
         a.replace(map)
       end
+
+      return self
     end
 
     def to_s(args = nil)
@@ -138,6 +171,17 @@ module Sy
       end
 
       return sprintf(latex_format, arglist)
+    end
+
+    def dump(indent = 0)
+      super.dump(indent)
+      i = ' '*indent
+      if args
+        puts i + '  args: ' + args.map { |a| a.to_s }.join(',')
+      end
+      if exp
+        puts i + '  exp: ' + exp.to_s
+      end
     end
   end
 end

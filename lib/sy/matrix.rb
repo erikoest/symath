@@ -231,6 +231,8 @@ module Sy
       return true
     end
 
+    alias eql? ==
+
     def to_s()
       # This will in many cases look rather messy, but we don't have the option
       # to format the matrix over multiple lines.

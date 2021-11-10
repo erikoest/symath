@@ -236,7 +236,7 @@ module Sy
         return @name.to_s
       end
     end
-    
+
     alias eql? ==
   end
 end

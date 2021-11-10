@@ -6,8 +6,8 @@ module Sy
       super(:arccsc)
     end
 
-    def reduce_exp(e)
-      return e
+    def reduce_call(c)
+      return c
     end
   end
 end

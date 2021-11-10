@@ -26,17 +26,19 @@ module Sy
       end
     end
 
-    def evaluate_exp(e)
-      exp = e.args[0]
-      var = e.args[1]
-      a = e.args[2]
-      b = e.args[3]
+    def evaluate_call(c)
+      exp = c.args[0]
+      var = c.args[1]
+      a = c.args[2]
+      b = c.args[3]
+
+      exp = exp.recurse('evaluate')
 
       if a.nil?
-        ret = exp.anti_derivative(var)
+        ret = exp.normalize.anti_derivative(var)
         return ret.nil? ? nil : ret + :C.to_m
       else
-        int = exp.anti_derivative(var)
+        int = exp.normalize.anti_derivative(var)
         return op(:bounds, int, var.undiff, a, b)
       end
     end

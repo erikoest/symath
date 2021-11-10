@@ -6,8 +6,8 @@ module Sy
       super(:exp)
     end
 
-    def reduce_exp(e)
-      arg = e.args[0]
+    def reduce_call(call)
+      arg = call.args[0]
       
       if arg.is_nan?
         return :nan.to_m
@@ -53,7 +53,7 @@ module Sy
                 c *= 2
               elsif dc != 2
                 # Not reducible
-                return e
+                return call
               end
 
               case c % 4
@@ -68,7 +68,7 @@ module Sy
               end
             else
               # Cannot reduce
-              return e
+              return call
             end
           end
 
@@ -79,7 +79,7 @@ module Sy
       else
         ret = 1.to_m
 
-        e.args[0].terms.each do |t|
+        call.args[0].terms.each do |t|
           if t.is_a?(Sy::Minus)
             t = t.args[0]
             minus = true
@@ -96,7 +96,7 @@ module Sy
           end
 
           # Cannot reduce
-          return e
+          return call
         end
 
         return ret

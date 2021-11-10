@@ -6,8 +6,8 @@ module Sy
       super(:ln)
     end
 
-    def reduce_exp(e)
-      arg = e.args[0]
+    def reduce_call(c)
+      arg = c.args[0]
       
       if arg == 1
         return 0.to_m
@@ -42,7 +42,7 @@ module Sy
         end
       end
 
-      return e
+      return c
     end
   end
 end
