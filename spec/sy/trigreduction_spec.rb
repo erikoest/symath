@@ -17,6 +17,18 @@ module Sy
       sec(pi/4)              => sqrt(2)/2,
       csc(0)                 => 1.to_m,
       csc(3*pi/4)            => - sqrt(2)/2,
+      arcsin(-sqrt(3)/2)     => -pi/3,
+      arcsin(1)              => pi/2,
+      arccos(sqrt(2)/2)      => pi/4,
+      arccos(0)              => pi/2,
+      arctan(1)              => pi/4,
+      arctan(sqrt(3))        => pi/3,
+      arccot(sqrt(3))        => pi/6,
+      arccot(sqrt(3)/3)      => pi/3,
+      arcsec(1)              => 0,
+      arcsec(-2*sqrt(3)/3)   => 5*pi/6,
+      arccsc(-2)             => -pi/6,
+      arccsc(sqrt(2))        => pi/4,
     }
 
     exp.each do |from, to|
