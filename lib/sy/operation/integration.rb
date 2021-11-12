@@ -190,64 +190,56 @@ module Sy::Operation::Integration
   end
 
   def get_linear_constants(arg, var)
-    # Check that arg is on the form c1*var + c2. Return the two constants.
+    # If arg is on the form c1*var + c2, return the two constants.
     vu = var.undiff
     vset = [vu].to_set
+    c1 = 0.to_m
     c2 = 0.to_m
 
-    if arg.is_sum_exp?
-      varterm = nil
+    arg.terms.each do |t|
+      if t.is_constant?(vset)
+        c2 += t
+      else
+        # Split term into a constant part and (hopefully) a single factor
+        # which equals to var
+        prodc = 1.to_m
+        has_var = false
 
-      arg.terms.each do |t|
-        if t.is_constant?(vset)
-          c2 += t
-        elsif !varterm.nil?
-          # Found more than one term with variable. Don't know how to
-          # handle this.
+        t.factors.each do |f|
+          if !f.type.is_subtype?(:scalar)
+            # Non-scalar factor. Don't know what to do
+            return
+          end
+
+          if f.is_constant?(vset)
+            prodc *= f
+            next
+          end
+
+          # Found more than one var. Return negative
+          if has_var
+            return
+          end
+
+          # Factor is var. Remember it, but continue to examine the other
+          # factors.
+          if f == vu
+            has_var = true
+            next
+          end
+
+          # Factor is a function of var. Return negative
           return
-        else
-          varterm = t
         end
+
+        c1 += prodc
       end
 
       # Return negative if the whole expression is constant
-      return if varterm.nil?
-
-      # Use the variable term as argument from now on.
-      arg = varterm
+      return if c1 == 0
     end
 
-    # Split exp into a constant part and (hopefully) a single factor
-    # which equals to var
-    prodc = 1.to_m
-    has_var = false
-
-    arg.factors.each do |f|
-      if !f.type.is_subtype?(:scalar)
-        return
-      end
-
-      if f.is_constant?(vset)
-        prodc *= f
-        next
-      end
-
-      # Found more than one var. Return negative
-      if has_var
-        return
-      end
-
-      # Factor is var. Remember it, but continue to examine the other factors.
-      if f == vu
-        has_var = true
-        next
-      end
-
-      # Factor is a function of var. Return negative
-      return
-    end
-
-    return [prodc, c2]
+    return [c1, c2]
   end
 
   def int_inv(var)
@@ -256,7 +248,7 @@ module Sy::Operation::Integration
     xp = exponent
     vu = var.undiff
     vset = [vu].to_set
-    
+
     if base == vu and xp.is_constant?(vset)
       if xp == 1.to_m
         # 1/x => ln|x|

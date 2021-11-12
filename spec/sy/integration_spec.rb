@@ -10,7 +10,7 @@ module Sy
     b = :b.to_m
     capC = :C.to_m
 
-    poly = {
+    exp = {
       x + 3*x**2 + 4*y + 10   => x**3 + x**2/2 + 4*x*y + 10*x + capC,
       y/x                     => y*ln(abs(x)) + capC,
       pi/x**e                 => capC + pi*x**(- e + 1)/(- e + 1),
@@ -23,9 +23,10 @@ module Sy
       (1 - x**2)**(-1.to_m/2) => arcsin(x) + capC,
       sin(x)                  => -cos(x) + capC,
       sin(2*x + 3)            => -cos(2*x + 3)/2 + capC,
+      e**(-a*x + b*x)         => e**(b*x - a*x)/(b - a) + capC,
     }
 
-    poly.each do |from, to|
+    exp.each do |from, to|
       it "integrates '#{from.to_s}' into '#{to.to_s}'" do
         expect(int(from, dx).evaluate.normalize).to be_equal_to to
       end
