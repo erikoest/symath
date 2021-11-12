@@ -4,10 +4,8 @@ module Sy
   class Definition::Arcsin < Definition::Function
     def initialize()
       super(:arcsin)
-    end
 
-    def reduce_call(c)
-      r = {
+      @reductions = {
         -1.to_m         => -:pi/2,
         -fn(:sqrt, 3)/2 => -:pi/3,
         -fn(:sqrt, 2)/2 => -:pi/4,
@@ -18,12 +16,6 @@ module Sy
         fn(:sqrt, 3)/2  => :pi/3,
         1.to_m          => :pi/2,
       }
-
-      if r.has_key?(c.args[0])
-        return r[c.args[0]]
-      end
-      
-      return c
     end
   end
 end

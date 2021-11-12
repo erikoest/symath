@@ -4,10 +4,8 @@ module Sy
   class Definition::Arccot < Definition::Function
     def initialize()
       super(:arccot)
-    end
 
-    def reduce_call(c)
-      r = {
+      @reductions = {
         -fn(:sqrt, 3)   => 5*:pi/6,
         -1.to_m         => 3*:pi/4,
         -fn(:sqrt, 3)/3 => 2*:pi/3,
@@ -16,12 +14,6 @@ module Sy
         1.to_m          => :pi/4,
         fn(:sqrt, 3)    => :pi/6,
       }
-
-      if r.has_key?(c.args[0])
-        return r[c.args[0]]
-      end
-
-      return c
     end
   end
 end

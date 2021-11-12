@@ -4,6 +4,7 @@ module Sy
   class Definition::Function < Definition::Operator
     def self.init_builtin()
       # Define the builtin functions
+      Sy::Definition::Sqrt.new
       Sy::Definition::Sin.new
       Sy::Definition::Cos.new
       Sy::Definition::Tan.new
@@ -20,7 +21,6 @@ module Sy
       Sy::Definition::Exp.new
       Sy::Definition::Abs.new
       Sy::Definition::Fact.new
-      Sy::Definition::Sqrt.new
 
       # Functions defined by an expression
       expressions = {
@@ -41,6 +41,20 @@ module Sy
       expressions.each do |name, exp|
         self.new(name, args: [:x], exp: exp)
       end
+    end
+
+    @reductions = {}
+
+    def reduce_call(c, reductions = nil)
+      if reductions.nil?
+        reductions = @reductions
+      end
+
+      if reductions.has_key?(c.args[0])
+        return reductions[c.args[0]]
+      end
+
+      return c
     end
 
     # Check if expression is a constant fraction of pi and optionally

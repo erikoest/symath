@@ -42,7 +42,8 @@ module Sy
             minus = false
           end
 
-          if t.class.method_defined?('definition') and t.definition.is_a?(Sy::Definition::Ln)
+          if t.class.method_defined?('definition') and
+            t.definition.is_a?(Sy::Definition::Ln)
             # exp(ln(c)) = c
             t2 = t.args[0]
           else
@@ -88,7 +89,8 @@ module Sy
           end
 
           # exp(ln(c)) = c for positive c
-          if t.class.method_defined?('definition') and t.definition.is_a?(Sy::Definition::Ln)
+          if t.class.method_defined?('definition') and
+            t.definition.is_a?(Sy::Definition::Ln)
             if t.args[0].is_number?
               ret = minus ? ret/t.args[0] : ret*t.args[0]
               next

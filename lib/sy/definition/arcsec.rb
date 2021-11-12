@@ -4,10 +4,8 @@ module Sy
   class Definition::Arcsec < Definition::Function
     def initialize()
       super(:arcsec)
-    end
 
-    def reduce_call(c)
-      r = {
+      @reductions = {
         -2.to_m           => 2*:pi/3,
         -fn(:sqrt, 2)     => 3*:pi/4,
         -2*fn(:sqrt, 3)/3 => 5*:pi/6,
@@ -17,12 +15,6 @@ module Sy
         fn(:sqrt, 2)      => :pi/4,
         2.to_m            => :pi/3
       }
-
-      if r.has_key?(c.args[0])
-        return r[c.args[0]]
-      end
-
-      return c
     end
   end
 end

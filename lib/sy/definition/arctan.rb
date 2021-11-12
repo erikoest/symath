@@ -4,10 +4,8 @@ module Sy
   class Definition::Arctan < Definition::Function
     def initialize()
       super(:arctan)
-    end
 
-    def reduce_call(c)
-      r = {
+      @reductions = {
         -fn(:sqrt, 3)   => -:pi/3,
         -1.to_m         => -:pi/4,
         -fn(:sqrt, 3)/3 => -:pi/6,
@@ -16,12 +14,6 @@ module Sy
         1.to_m          => :pi/4,
         fn(:sqrt, 3)    => :pi/3,
       }
-
-      if r.has_key?(c.args[0])
-        return r[c.args[0]]
-      end
-
-      return c
     end
   end
 end

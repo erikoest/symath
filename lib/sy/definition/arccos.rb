@@ -4,10 +4,8 @@ module Sy
   class Definition::Arccos < Definition::Function
     def initialize()
       super(:arccos)
-    end
 
-    def reduce_call(c)
-      r = {
+      @reductions = {
         -1.to_m         => :pi,
         -fn(:sqrt, 3)/2 => 5*:pi/6,
         -fn(:sqrt, 2)/2 => 3*:pi/4,
@@ -18,12 +16,6 @@ module Sy
         fn(:sqrt, 3)/2  => :pi/6,
         1.to_m          => 0.to_m,
       }
-
-      if r.has_key?(c.args[0])
-        return r[c.args[0]]
-      end
-
-      return c
     end
   end
 end

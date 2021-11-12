@@ -30,7 +30,7 @@ module Sy
 
       return "|#{arg}|"
     end
-    
+
     def to_latex(args = nil)
       if args
         arg = args[0].to_latex
