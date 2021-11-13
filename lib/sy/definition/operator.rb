@@ -34,7 +34,7 @@ module Sy
       super(name)
       
       if exp and !exp.is_a?(Sy::Value)
-        exp = exp.to_mexp
+        exp = exp.to_m
       end
 
       @args = args.map { |a| a.to_m }

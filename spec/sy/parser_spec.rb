@@ -41,7 +41,7 @@ module Sy
 
     parse.each do |from, to|
       it "parses '#{from}' into '#{to}'" do
-        expect(from.to_mexp).to be_equal_to to
+        expect(from.to_m).to be_equal_to to
       end
     end
 
@@ -52,7 +52,7 @@ module Sy
 
     error.each do |exp, error|
       it "fails to parse '#{exp}'" do
-        expect { exp.to_mexp }.to raise_error(/error/)
+        expect { exp.to_m }.to raise_error(/error/)
       end
     end
   end

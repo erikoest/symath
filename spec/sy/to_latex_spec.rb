@@ -60,7 +60,7 @@ module Sy
 
     # Equation
     it 'equation to latex' do
-      expect('x = 2'.to_mexp.to_latex).to be == 'x = 2'
+      expect('x = 2'.to_m.to_latex).to be == 'x = 2'
     end
 
     # Differential, integral

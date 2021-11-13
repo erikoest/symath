@@ -8,10 +8,10 @@ module Sy
     define_op(:cd, [:x])
 
     z = :z.to_m
-    e1 = 'y + 2*x + 3 = 4'.to_mexp
-    e2 = '2*y + 2*x + 1 = 2'.to_mexp
-    e3 = '- y + x = 2'.to_mexp
-    e1_clone = 'y + 2*x + 3 = 4'.to_mexp
+    e1 = 'y + 2*x + 3 = 4'.to_m
+    e2 = '2*y + 2*x + 1 = 2'.to_m
+    e3 = '- y + x = 2'.to_m
+    e1_clone = 'y + 2*x + 3 = 4'.to_m
 
     def1 = eq(:x.to_m, :y.to_m + 2)
     def2 = eq(fn(:ab, :b), :b)

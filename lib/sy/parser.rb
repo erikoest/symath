@@ -30,22 +30,22 @@ module_eval(<<'...end parser.y/module_eval...', 'parser.y', 47)
       end
     end
 
-    return Sy::Operator.create(name, args.map { |a| a.nil? ? a : a.to_m })
+    return Sy::Operator.create(name, args.map { |a| a.nil? ? a : a })
   end
 
   # Create a variable or constant
   def named_node(name)
     if name.length >= 2 and name.match(/^d/)
       name = name[1..-1]
-      return name.to_m('dform')
+      return name.to_sym.to_m('dform')
     end
 
     if name.match(/\'$/)
       name = name[0..-2]
-      return name.to_m('vector')
+      return name.to_sym.to_m('vector')
     end
 
-    return name.to_m
+    return name.to_sym.to_m
   end
 	
   def parse(str)

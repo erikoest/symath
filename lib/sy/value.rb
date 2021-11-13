@@ -365,7 +365,7 @@ class Symbol
 end
 
 class String
-  def to_mexp()
+  def to_m()
     return Sy.parse(self)
   end
 end

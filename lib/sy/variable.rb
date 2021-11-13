@@ -241,16 +241,6 @@ module Sy
   end
 end
 
-class String
-  def to_m(type = 'real')
-    begin
-      return Sy::Definition.get(self)
-    rescue
-      return Sy::Variable.new(self, type)
-    end
-  end
-end
-
 class Symbol
   def to_m(type = 'real')
     begin
