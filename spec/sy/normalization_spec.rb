@@ -9,9 +9,9 @@ module Sy
   a = :a.to_m
   b = :b.to_m
   
-  dx = :x.to_m(:dform)
-  dy = :y.to_m(:dform)
-  dz = :z.to_m(:dform)
+  dx = :dx.to_m(:dform)
+  dy = :dy.to_m(:dform)
+  dz = :dz.to_m(:dform)
 
   op12 = :op12.to_m(Sy::Type.new('operator'))
 

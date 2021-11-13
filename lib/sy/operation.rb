@@ -12,7 +12,7 @@ module Sy::Operation
   # Call method recursively down the arguments of the expression
   # and call self_method on self.
   def recurse(method, self_method = method)
-    if is_a?(Sy::Definition) or is_a?(Sy::Variable) or is_a?(Sy::Matrix)
+    if is_a?(Sy::Definition) or is_a?(Sy::Matrix)
       if self_method.nil?
         return self
       else

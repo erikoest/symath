@@ -6,7 +6,7 @@ module Sy
 
     a = :a.to_m
     b = :b.to_m
-    da = :a.to_m('dform')
+    da = :da.to_m('dform')
     xv = :x.to_m('vector')
     yv = :y.to_m('vector')
     xc = :x.to_m('covector')

@@ -5,12 +5,12 @@ module Sy
   x = :x
   y = :y
   z = :z
-  dx = :x.to_m('dform')
-  dy = :y.to_m('dform')
-  dz = :z.to_m('dform')
-  xv = :x.to_m('vector')
-  yv = :y.to_m('vector')
-  zv = :z.to_m('vector')
+  dx = :dx.to_m('dform')
+  dy = :dy.to_m('dform')
+  dz = :dz.to_m('dform')
+  xv = :xv.to_m('vector')
+  yv = :yv.to_m('vector')
+  zv = :zv.to_m('vector')
  
   define_fn(:myfun, [:x, :y])
 
@@ -32,7 +32,7 @@ module Sy
       'x!'            => fact(x),
       '123!'          => fact(123),
       'dx^dy^dz'      => ((dx^dy)^dz),
-      "x'^y'^z'"      => ((xv^yv)^zv),
+      "xv'^yv'^zv'"   => ((xv^yv)^zv),
       '|x + y|'       => abs(x + y),
       '#dx'           => sharp(dx),
       '#(dx^dy)'      => sharp(dx^dy),

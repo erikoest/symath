@@ -4,12 +4,12 @@ require 'sy/definition/function'
 module Sy
   class Definition::Lmd < Definition::Function
     def initialize(exp, *vars)
-      super('', args: vars, exp: exp)
+      super('', args: vars, exp: exp, define_symbol: false)
     end
 
     def compose_with_simplify(exp, vars)
       vars.each do |v|
-        if !v.is_a?(Sy::Variable)
+        if !v.is_a?(Sy::Definition::Variable)
           raise "Expected variable, got #{v.class.name}"
         end
 
@@ -32,7 +32,7 @@ module Sy
       end
 
       exp.args.each do |a|
-        if !a.is_a?(Sy::Variable)
+        if !a.is_a?(Sy::Definition::Variable)
           return
         end
 

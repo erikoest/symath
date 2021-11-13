@@ -9,7 +9,6 @@ require 'sy/product'
 require 'sy/wedge'
 require 'sy/fraction'
 require 'sy/power'
-require 'sy/variable'
 require 'sy/definition'
 require 'sy/value'
 require 'sy/matrix'
@@ -106,7 +105,7 @@ module Sy
     value = value.to_m
     
     # Check that name is a variable
-    if !var.is_a?(Sy::Variable)
+    if !var.is_a?(Sy::Definition::Variable)
       raise "#{var} is not a variable"
     end
 
@@ -119,7 +118,7 @@ module Sy
     # Re-calculate basis vectors if the basis or the metric tensor
     # changes
     if var.name.to_sym == :g or var.name.to_sym == :basis
-      Sy::Variable.recalc_basis_vectors
+      Sy::Definition::Variable.recalc_basis_vectors
     end
   end
 
@@ -129,7 +128,7 @@ module Sy
       @@variable_assignments[:basis.to_m] = basis
     end
 
-    Sy::Variable.recalc_basis_vectors
+    Sy::Definition::Variable.recalc_basis_vectors
   end
 
   def self.clear_variable(var)
@@ -150,5 +149,5 @@ module Sy
   Sy::Operation::Integration.initialize
 
   # Calculate basis vectors on startup
-  Sy::Variable.recalc_basis_vectors
+  Sy::Definition::Variable.recalc_basis_vectors
 end

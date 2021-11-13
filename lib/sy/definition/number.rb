@@ -3,7 +3,7 @@ require 'sy/definition'
 module Sy
   class Definition::Number < Definition
     def initialize(name)
-      super(name.to_s)
+      super(name.to_s, false)
     end
 
     def value()

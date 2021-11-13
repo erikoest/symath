@@ -55,7 +55,8 @@ module Sy::Operation::Match
         if n == 1
           m0 = select1[0].match(args2[0], freevars, boundvars)
         else
-          if args2[0].is_a?(Sy::Variable) and freevars.include?(args2[0])
+          if args2[0].is_a?(Sy::Definition::Variable) and
+            freevars.include?(args2[0])
             # Register match.
             m0 = [{ args2[0] => build_assoc_op(select1, opclass) }]
           else
@@ -104,8 +105,9 @@ module Sy::Operation::Match
     # Traverse self and exp in parallel. Match subexpressions recursively,
     # and match end nodes one by one. The two value nodes are compared for
     # equality and each argument are matched recursively.
-    # Definition: Just match nodes by exact comparison
-    if exp.is_a?(Sy::Definition)
+    # Constant or operator: Just match nodes by exact comparison
+    if exp.is_a?(Sy::Definition) and
+      !exp.is_a?(Sy::Definition::Variable)
       # Node is a definition. Exact match is required
       if (self == exp)
         # Return match with no variable bindings
@@ -119,7 +121,7 @@ module Sy::Operation::Match
     # the freevars set and add it to the boundvars set together with the
     # expression it matches. If it is a bound variable, we require that
     # the expression matches the binding.
-    if exp.is_a?(Sy::Variable)
+    if exp.is_a?(Sy::Definition::Variable)
       # Node is a variable
       if freevars.include?(exp)
         # Node is a free variable. Return binding.

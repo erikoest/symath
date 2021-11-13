@@ -125,10 +125,10 @@ module Sy
         dividend.definition.is_a?(Sy::Definition::D)
         # Evaluate if the divisor is a simple dform. The composed form
         # d(x) is accepted as well as the simple dx variable.
-        if divisor.is_a?(Sy::Variable) and divisor.is_d?
+        if divisor.is_a?(Sy::Definition::Variable) and divisor.is_d?
           v = divisor.undiff
         elsif divisor.is_a?(Sy::D) and
-             divisor.args[0].is_a?(Sy::Variable) and
+             divisor.args[0].is_a?(Sy::Definition::Variable) and
              divisor.args[0].type.is_scalar?
           v = divisor.args[0]
         else

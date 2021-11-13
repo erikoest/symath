@@ -11,7 +11,7 @@ module Sy
     def validate_args(e)
       var = e.args[1]
       
-      if !var.is_a?(Sy::Variable)
+      if !var.is_a?(Sy::Definition::Variable)
         raise "Expected variable for var, got " + var.class.name
       end
 

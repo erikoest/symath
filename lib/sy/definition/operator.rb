@@ -30,9 +30,9 @@ module Sy
       end
     end
 
-    def initialize(name, args: [], exp: nil)
-      super(name)
-      
+    def initialize(name, args: [], exp: nil, define_symbol: true)
+      super(name, define_symbol)
+
       if exp and !exp.is_a?(Sy::Value)
         exp = exp.to_m
       end

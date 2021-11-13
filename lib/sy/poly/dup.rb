@@ -56,7 +56,7 @@ module Sy
             end
 
             var = f.base
-            if !var.is_a?(Sy::Variable)
+            if !var.is_a?(Sy::Definition::Variable)
               raise error
             end
 

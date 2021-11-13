@@ -399,7 +399,7 @@ module Sy::Operation::Normalization
       # FIXME: We could do that. If so, we must get the dimension
       # of the variable and swap sign only if dim(f1)*dim(f2) is
       # odd.
-      if f1.is_a?(Sy::Variable) and f2.is_a?(Sy::Variable)
+      if f1.is_a?(Sy::Definition::Variable) and f2.is_a?(Sy::Definition::Variable)
         # Order vector factors
         if f2 < f1
           swap_factors
@@ -426,7 +426,7 @@ module Sy::Operation::Normalization
       # end up at the same place and can be combined.
       f1 = f1.power(1) if !f1.is_a?(Sy::Power)
       f2 = f2.power(1) if !f2.is_a?(Sy::Power)
-      
+
       # Order scalar factors
       if f2 < f1
         swap_factors

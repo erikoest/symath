@@ -9,11 +9,11 @@ module Sy
   x2v = :x2.to_m('vector')
   x3v = :x3.to_m('vector')
 
-  dx1 = :x1.to_m('dform')
-  dx2 = :x2.to_m('dform')
-  dx3 = :x3.to_m('dform')
+  dx1 = :dx1.to_m('dform')
+  dx2 = :dx2.to_m('dform')
+  dx3 = :dx3.to_m('dform')
 
-  da = :a.to_m('dform')
+  da = :da.to_m('dform')
   av = :a.to_m('vector')
 
   describe Sy::Definition::Grad do

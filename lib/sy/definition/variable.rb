@@ -2,7 +2,7 @@ require 'sy/value'
 require 'sy/type'
 
 module Sy
-  class Variable < Value
+  class Definition::Variable < Definition
 
     # Return parity of permutation. Even number of permutations give
     # 1 and odd number gives -1
@@ -47,10 +47,21 @@ module Sy
       brow = b.row(0)
       dim = brow.length
 
+      dmap = brow.map do |bb|
+        "d#{bb.name}".to_sym.to_m('dform')
+      end
+
+      vmap = brow.map do |bb|
+        bb.name.to_sym.to_m('vector')
+      end
+
       # Hash up the order of the basis vectors
-      @@basis_order = (0..dim - 1).map do |i|
-        [brow[i].name.to_sym, i]
-      end.to_h
+      @@basis_order = {}
+
+      (0..dim - 1).each do |i|
+        @@basis_order[brow[i].name.to_sym] = i
+        @@basis_order["d#{brow[i].name}".to_sym] = i
+      end
 
       # Calculate all possible permutations of all possible combinations of
       # the basis vectors (including no vectors).
@@ -60,7 +71,7 @@ module Sy
         (0..dim - 1).to_a.permutation(d).each do |p|
           if p.length == 0
             @@norm_map[1.to_m] = 1.to_m
-            @@hodge_map[1.to_m] = brow.map { |bb| bb.name.to_m('dform') }.inject(:^)
+            @@hodge_map[1.to_m] = dmap.inject(:^)
             next
           end
 
@@ -69,11 +80,11 @@ module Sy
           norm = p.sort
           sign = permutation_parity(p)
 
-          dform = p.map { |i| brow[i].name.to_m('dform') }.inject(:^)
-          vect = p.map { |i| brow[i].name.to_m('vector') }.inject(:^)
+          dform = p.map { |i| dmap[i] }.inject(:^)
+          vect = p.map { |i| vmap[i] }.inject(:^)
 
-          dnorm = sign*(norm.map { |i| brow[i].name.to_m('dform') }.inject(:^))
-          vnorm = sign*(norm.map { |i| brow[i].name.to_m('vector') }.inject(:^))
+          dnorm = sign*(norm.map { |i| dmap[i] }.inject(:^))
+          vnorm = sign*(norm.map { |i| vmap[i] }.inject(:^))
 
           @@norm_map[dform] = dnorm
           @@norm_map[vect] = vnorm
@@ -86,8 +97,8 @@ module Sy
             hdd = sign
             hdv = sign
           else
-            hdd = sign*dsign*(dual.map { |i| brow[i].name.to_m('dform') }.inject(:^))
-            hdv = sign*dsign*(dual.map { |i| brow[i].name.to_m('vector') }.inject(:^))
+            hdd = sign*dsign*(dual.map { |i| dmap[i] }.inject(:^))
+            hdv = sign*dsign*(dual.map { |i| vmap[i] }.inject(:^))
           end
 
           @@hodge_map[dform] = hdd
@@ -96,18 +107,16 @@ module Sy
       end
 
       # Calculate the musical isomorphisms. Hash up the mappings both ways.
-      v = brow.map { |bb| bb.name.to_m('vector') }
-      d = brow.map { |bb| bb.name.to_m('dform') }
+      flat = (g*Sy::Matrix.new(dmap).transpose).evaluate.normalize.col(0)
+      sharp = (g.inverse*Sy::Matrix.new(vmap).transpose).evaluate.
+                normalize.col(0)
 
-      flat = (g*Sy::Matrix.new(d).transpose).evaluate.normalize.col(0)
-      sharp = (g.inverse*Sy::Matrix.new(v).transpose).evaluate.normalize.col(0)
-
-      @@flat_map = (0..dim - 1).map { |i| [v[i], flat[i]] }.to_h
-      @@sharp_map = (0..dim - 1).map { |i| [d[i], sharp[i]] }.to_h
+      @@flat_map = (0..dim - 1).map { |i| [vmap[i], flat[i]] }.to_h
+      @@sharp_map = (0..dim - 1).map { |i| [dmap[i], sharp[i]] }.to_h
     end
 
-    # Return the hodge dual of an expression consisting only of basis vectors or basis
-    # dforms
+    # Return the hodge dual of an expression consisting only of basis vectors
+    # or basis dforms
     def self.hodge_dual(exp)
       if !@@hodge_map.key?(exp)
         raise 'No hodge dual for ' + exp.to_s
@@ -120,18 +129,14 @@ module Sy
     attr_reader :type
   
     def initialize(name, t = 'real')
-      @name = name
+      super(name, false)
       @type = t.to_t
-    end
-
-    def hash()
-      return @name.to_s.hash
     end
 
     def ==(other)
       return false if self.class.name != other.class.name
       return false if @type != other.type
-      return @name.to_s == other.name.to_s
+      return @name == other.name
     end
 
     def <=>(other)
@@ -146,9 +151,12 @@ module Sy
       if type.is_subtype?('vector') or type.is_subtype?('dform')
         bv1 = @@basis_order.key?(@name)
         bv2 = @@basis_order.key?(other.name)
-      if !bv1 and bv2
+
+        if !bv1 and bv2
+          # Order basis vectors higher than other vectors
           return 1
-       elsif bv1 and !bv2
+        elsif bv1 and !bv2
+          # Order basis vectors higher than other vectors
           return -1
         elsif bv1 and bv2
           return @@basis_order[@name] <=> @@basis_order[other.name]
@@ -169,13 +177,17 @@ module Sy
     end
 
     # Returns variable which differential is based on
-    # TODO: Check name collision with constant definitions (i, e, pi etc.)
     def undiff()
-      return Sy::Variable.new(@name, :real)
+      n = "#{@name}"
+      if n[0] == 'd'
+        n = n[1..-1]
+      end
+
+      n.to_sym.to_m(:real)
     end
     
     def to_d()
-      return @name.to_m(:dform)
+      return "d#{@name}".to_sym.to_m(:dform)
     end
 
     # Return the vector dual of the dform
@@ -210,7 +222,7 @@ module Sy
 
     def to_s()
       if @type.is_dform?
-        return Sy.setting(:d_symbol) + @name.to_s
+        return Sy.setting(:d_symbol) + undiff.to_s
       elsif @type.is_vector?
         return @name.to_s + Sy.setting(:vector_symbol)
       elsif @type.is_covector?
@@ -244,9 +256,12 @@ end
 class Symbol
   def to_m(type = 'real')
     begin
+      # Look up the already defined symbol
+      # (we might want to check that it is a constant or variable)
       return Sy::Definition.get(self)
     rescue
-      return Sy::Variable.new(self, type)
+      # Not defined. Define it now.
+      return Sy::Definition::Variable.new(self, type)
     end
   end
 end

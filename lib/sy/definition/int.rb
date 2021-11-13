@@ -13,7 +13,7 @@ module Sy
       b = e.args[3]
 
       if !var.nil?
-        if !var.is_a?(Sy::Variable)
+        if !var.is_a?(Sy::Definition::Variable)
           raise "Expected variable for var, got " + var.class.name
         end
 

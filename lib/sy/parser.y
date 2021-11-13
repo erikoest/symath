@@ -68,7 +68,6 @@ module Sy
   # Create a variable or constant
   def named_node(name)
     if name.length >= 2 and name.match(/^d/)
-      name = name[1..-1]
       return name.to_sym.to_m('dform')
     end
 
@@ -79,7 +78,7 @@ module Sy
 
     return name.to_sym.to_m
   end
-	
+
   def parse(str)
     @q = []
 

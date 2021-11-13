@@ -36,7 +36,6 @@ module_eval(<<'...end parser.y/module_eval...', 'parser.y', 47)
   # Create a variable or constant
   def named_node(name)
     if name.length >= 2 and name.match(/^d/)
-      name = name[1..-1]
       return name.to_sym.to_m('dform')
     end
 

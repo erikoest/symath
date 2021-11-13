@@ -11,7 +11,7 @@ module Sy
       # Arguments 1, 2, ... are supposed to be variables to differentiate
       # over.
       e.args[1..-1].each do |v|
-        if !v.is_a?(Sy::Variable)
+        if !v.is_a?(Sy::Definition::Variable)
           raise "Expected variable, got #{v.class.name}"
         end
 
@@ -25,7 +25,7 @@ module Sy
       exp = args[0]
       vars = args[1..-1]
 
-      if exp.is_a?(Sy::Variable) and
+      if exp.is_a?(Sy::Definition::Variable) and
         exp.type.is_scalar? and
         vars.length == 0
         return exp.to_d

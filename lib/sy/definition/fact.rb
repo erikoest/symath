@@ -20,7 +20,8 @@ module Sy
 
     def to_s(args = nil)
       if args
-        if args[0].is_a?(Sy::Variable) or self.is_a?(Sy::Definition::Constant)
+        if args[0].is_a?(Sy::Definition::Variable) or
+          args[0].is_a?(Sy::Definition::Constant)
           arg = args[0].to_s
         else
           arg = "(#{args[0].to_s})"
@@ -34,7 +35,8 @@ module Sy
 
     def to_latex(args = nil)
       if args
-        if args[0].is_a?(Sy::Variable) or self.is_a?(Sy::Definition::Constant)
+        if args[0].is_a?(Sy::Definition::Variable) or
+          args[0].is_a?(Sy::Definition::Constant)
           arg = args[0].to_latex
         else
           arg = "(#{args[0].to_latex})"

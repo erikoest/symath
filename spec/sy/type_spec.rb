@@ -8,9 +8,9 @@ module Sy
     vx = :x.to_m('vector')
     vy = :y.to_m('vector')
     vz = :z.to_m('vector')
-    dx = :x.to_m('dform')
-    dy = :y.to_m('dform')
-    dz = :z.to_m('dform')
+    dx = :tx.to_m('dform')
+    dy = :ty.to_m('dform')
+    dz = :tz.to_m('dform')
     m53 = :m.to_m(Sy::Type.new('matrix', dimn: 3, dimm: 5))
     m32 = :m.to_m(Sy::Type.new('matrix', dimn: 2, dimm: 3))
 
@@ -27,7 +27,7 @@ module Sy
     end
 
     it 'wedge product of mixed vector and dform' do
-      w = :a.to_m('vector').wedge(:b.to_m('dform'))
+      w = :a.to_m('vector').wedge(:db.to_m('dform'))
       expect(w.type).to be == 'tensor'.to_t(indexes: ['u', 'l'])
     end
 
@@ -37,7 +37,7 @@ module Sy
     end
 
     it 'wedge product of mixed scalar and dform' do
-      w = :a.to_m('dform').wedge(:b.to_m)
+      w = :da.to_m('dform').wedge(:b.to_m)
       expect(w.type).to be == 'dform'.to_t
     end
 

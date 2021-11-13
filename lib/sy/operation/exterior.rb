@@ -9,7 +9,7 @@ module Sy::Operation::Exterior
   def flat()
     res = recurse('flat', nil)
 
-    if res.is_a?(Sy::Variable)
+    if res.is_a?(Sy::Definition::Variable)
       if res.type.is_subtype?('vector')
         return res.lower_vector
       end
@@ -22,7 +22,7 @@ module Sy::Operation::Exterior
   def sharp()
     res = recurse('sharp', nil)
 
-    if res.is_a?(Sy::Variable)
+    if res.is_a?(Sy::Definition::Variable)
       if res.type.is_subtype?('dform')
         return res.raise_dform
       end
@@ -57,7 +57,7 @@ module Sy::Operation::Exterior
         end
       end
       
-      h = Sy::Variable.hodge_dual(v.inject(1.to_m, :*))
+      h = Sy::Definition::Variable.hodge_dual(v.inject(1.to_m, :*))
       return s.inject(1.to_m, :*)*h
     end
   end

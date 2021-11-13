@@ -18,9 +18,10 @@ module Sy
     @@class_order = [
       'Sy::Definition::Number',
       'Sy::Definition::Constant',
+      'Sy::Definition::Variable',
       'Sy::Definition::Function',
+      'Sy::Definition::Operator',
       'Sy::Definition',
-      'Sy::Variable',
       'Sy::Minus',
       'Sy::Power',
       'Sy::Wedge',

@@ -94,11 +94,11 @@ module Sy
       return @@definitions.values
     end
 
-    def initialize(name)
+    def initialize(name, define_symbol = true)
       @name = name.to_sym
-      
+
       # Create a method for the definition if it's not a number or lambda
-      if !is_number? and name.to_s != ''
+      if define_symbol
         self.class.define(name, self)
       end
     end
@@ -128,9 +128,7 @@ module Sy
     end
     
     def hash()
-      h = @name.hash
-
-      return h
+      return @name.hash
     end
 
     def ==(other)
@@ -198,6 +196,7 @@ def definitions()
   return Sy::Definition.definitions
 end
 
+require 'sy/definition/variable'
 require 'sy/definition/constant'
 require 'sy/definition/number'
 require 'sy/definition/operator'
