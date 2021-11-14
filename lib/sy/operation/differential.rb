@@ -14,74 +14,86 @@ module Sy::Operation::Differential
 
   # Module initialization
   def self.initialize()
-    # Map of single argument functions to their derivative. By convention,
-    # the free variable name is :a
-    # FIXME: This does not work if the function definition 'a' exists.
-    #        Use lambda operators.
+    # Map of single argument functions to their derivative.
+    # FIXME: Check whether this still works if the symbol a is defined?
     @@functions = {
       # Exponential and trigonometric functions
-      :exp => fn(:exp, :a.to_m),
-      :ln  => 1.to_m/:a.to_m,
+      :exp => definition(:exp),
+      :ln  => lmd(1.to_m/:a.to_m, :a),
       # Trigonometric functions
-      :sin => fn(:cos, :a.to_m),
-      :cos => - fn(:sin, :a.to_m),
-      :tan => 1.to_m + fn(:tan, :a.to_m)**2,
-      :cot => - (1.to_m + fn(:cot, :a.to_m)**2),
-      :sec => fn(:sec, :a.to_m)*fn(:tan, :a.to_m),
-      :csc => - fn(:cot, :a.to_m)*fn(:csc, :a.to_m),
+      :sin => definition(:cos),
+      :cos => lmd(- fn(:sin, :a), :a),
+      :tan => lmd(1.to_m + fn(:tan, :a)**2, :a),
+      :cot => lmd(- (1.to_m + fn(:cot, :a)**2), :a),
+      :sec => lmd(fn(:sec, :a)*fn(:tan, :a), :a),
+      :csc => lmd(- fn(:cot, :a.to_m)*fn(:csc, :a.to_m), :a),
       # Inverse trigonometric functions
-      :arcsin => 1.to_m/fn(:sqrt, 1.to_m - :a.to_m**2),
-      :arccos => - 1.to_m/fn(:sqrt, 1.to_m - :a.to_m**2),
-      :arctan => 1.to_m/fn(:sqrt, 1.to_m + :a.to_m**2),
-      :arcsec => 1.to_m/(fn(:abs, :a.to_m)*fn(:sqrt, :a.to_m**2 - 1)),
-      :arccsc => - 1.to_m/(fn(:abs, :a.to_m)*fn(:sqrt, :a.to_m**2 - 1)),
-      :arccot => - 1.to_m/(1.to_m + :a.to_m**2),
+      :arcsin => lmd(1.to_m/fn(:sqrt, 1.to_m - :a.to_m**2), :a),
+      :arccos => lmd(- 1.to_m/fn(:sqrt, 1.to_m - :a.to_m**2), :a),
+      :arctan => lmd(1.to_m/fn(:sqrt, 1.to_m + :a.to_m**2), :a),
+      :arcsec => lmd(1.to_m/(fn(:abs, :a)*fn(:sqrt, :a.to_m**2 - 1)), :a),
+      :arccsc => lmd(- 1.to_m/(fn(:abs, :a)*fn(:sqrt, :a.to_m**2 - 1)), :a),
+      :arccot => lmd(- 1.to_m/(1.to_m + :a.to_m**2), :a),
       # Hyperbolic functions
-      :sinh => fn(:cosh, :a.to_m),
-      :cosh => fn(:sinh, :a.to_m),
-      :tanh => fn(:sech, :a.to_m)**2,
-      :sech => - fn(:tanh, :a.to_m)*fn(:sech, :a.to_m),
-      :csch => - fn(:coth, :a.to_m)*fn(:csch, :a.to_m),
-      :coth => - fn(:csch, :a.to_m)**2,
+      :sinh => definition(:cosh),
+      :cosh => definition(:sinh),
+      :tanh => lmd(fn(:sech, :a)**2, :a),
+      :sech => lmd(- fn(:tanh, :a)*fn(:sech, :a), :a),
+      :csch => lmd(- fn(:coth, :a)*fn(:csch, :a), :a),
+      :coth => lmd(- fn(:csch, :a)**2, :a),
       # Inverse hyperbolic functions
-      :arsinh => 1.to_m/fn(:sqrt, :a.to_m**2 + 1),
-      :arcosh => 1.to_m/fn(:sqrt, :a.to_m**2 - 1),
-      :artanh => 1.to_m/(1.to_m - :a.to_m**2),
-      :arsech => - 1.to_m/(:a.to_m*fn(:sqrt, 1.to_m - :a.to_m**2)),
-      :arcsch => - 1.to_m/(fn(:abs, :a.to_m)*fn(:sqrt, :a.to_m**2 + 1)),
-      :arcoth => 1.to_m/(1.to_m - :a.to_m**2),
+      :arsinh => lmd(1.to_m/fn(:sqrt, :a.to_m**2 + 1), :a),
+      :arcosh => lmd(1.to_m/fn(:sqrt, :a.to_m**2 - 1), :a),
+      :artanh => lmd(1.to_m/(1.to_m - :a.to_m**2), :a),
+      :arsech => lmd(- 1.to_m/(:a.to_m*fn(:sqrt, 1.to_m - :a.to_m**2)), :a),
+      :arcsch => lmd(- 1.to_m/(fn(:abs, :a.to_m)*fn(:sqrt, :a.to_m**2 + 1)), :a),
+      :arcoth => lmd(1.to_m/(1.to_m - :a.to_m**2), :a),
     }
   end
 
   def d(vars)
+    # Cannot (currently) differentiate a function definition, only a
+    # function call
+    if self.is_a?(Sy::Definition::Function)
+      return d_failure
+    end
+
+    # d(c) = 0 for constant c
     if is_constant?(vars)
       return 0.to_m
     end
 
+    # d(v) = dv for variable v
     if vars.member?(self)
       return to_d
     end
-      
+
+    # d(a + b + ...) = d(a) + d(b) + ...
     if is_a?(Sy::Sum)
       return term1.d(vars) + term2.d(vars)
     end
 
+    # d(-a) = -d(a)
     if is_a?(Sy::Minus)
       return -argument.d(vars)
     end
 
+    # Product rule
     if is_a?(Sy::Product)
       return d_product(vars)
     end
 
+    # Fraction rule
     if is_a?(Sy::Fraction)
       return d_fraction(vars)
     end
 
+    # Power rule
     if is_a?(Sy::Power)
       return d_power(vars)
     end
 
+    # Derivative of function
     return d_function(vars)
   end
 
@@ -108,20 +120,52 @@ module Sy::Operation::Differential
                                    base.d(vars))
   end
 
+  def d_function_def(vars)
+    if name != '' and @@functions.key?(name)
+      f = @@functions[name]
+      if vars.member?(f.args[0])
+        return @@functions[name]
+      else
+        return 0.to_m
+      end
+    end
+
+    if !exp.nil?
+      return d(exp, args.select { |v| vars.member?(v) })
+    end
+
+    d_failure
+  end
+
   def d_function(vars)
     if !self.is_a?Sy::Operator
       d_failure
     end
-    
-    if !@@functions.key?(name.to_sym)
-      d_failure
+
+    if name != '' and @@functions.key?(name.to_sym)
+      d = @@functions[name.to_sym]
+      dcall = d.(args[0]).evaluate
+      return _d_wedge(dcall, args[0].d(vars))
     end
-    
-    d = @@functions[name.to_sym].deep_clone
-    d.replace({ :a.to_m => args[0] })
-    return _d_wedge(d, args[0].d(vars))
+
+    if !definition.exp.nil?
+      # FIXME: Permit more than one variable
+      d = definition.exp.deep_clone
+      ret = d.deep_clone
+
+      replace_map = {}
+
+      args.each_with_index do |a, i|
+       replace_map[definition.args[i]] = a
+      end
+
+      ret.replace(replace_map)
+      return ret.d(vars)
+    end
+
+    d_failure
   end
-  
+
   # Apply wedge product or ordinary product between two expressions,
   # depending on whether or not they have vector parts.
   def _d_wedge(exp1, exp2)

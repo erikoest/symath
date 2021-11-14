@@ -1,5 +1,6 @@
 require 'sy/value'
 require 'sy/definition/operator'
+require 'sy/definition/function'
 
 module Sy
   class Definition::D < Definition::Operator
@@ -8,7 +9,7 @@ module Sy
     end
 
     def description()
-      return 'd(f, x, y, ...) - differential of f with respect to variables x, y, ...'
+      return 'd(f) - differential of f with respect to its input variables'
     end
     
     def validate_args(e)
@@ -39,13 +40,19 @@ module Sy
     end
 
     def evaluate_call(c)
-      vars = c.args[1..-1]
-      if vars.length == 0
+      e = c.args[0]
+
+      # If argument is a function, differentiate on all function
+      # arguments.
+      if e.is_a?(Sy::Definition::Function)
+        vars = e.args
+        e = e.(*vars)
+      else
         # Find first free variable in expression.
-        vars = [(c.args[0].variables)[0].to_m]
+        vars = [(e.variables)[0].to_m]
       end
 
-      return c.args[0].d(vars)
+      return e.d(vars)
     end
 
     def latex_format()

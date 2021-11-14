@@ -80,7 +80,7 @@ module Sy
   end
 end
 
-def lmd(exp, args)
+def lmd(exp, *args)
   # Create a lamda (nameless) function.
-  return Sy::Definition::Lmd.new(exp, args)
+  return Sy::Definition::Lmd.new(exp, *args)
 end

@@ -25,11 +25,11 @@ module Sy
 
   describe Sy::Operation::Differential, ', simple polynomials' do
     poly = {
-      d(3*x**2)                      => 6*x*dx,
-      d(x + 3*x**2 + 4*y + 10)       => 6*x*dx + dx,
-      d(3*x + 2*y**3 + 5*z**4, x, y) => 6*y**2*dy + 3*dx,
-      d(3*x*z*(dx^dy) + 2*z*dz, z)   => (((3*x)*dx)^dy)^dz,
-      d(3/x, x)                      => -3/x**2*dx,
+      d(3*x**2)                             => 6*x*dx,
+      d(x + 3*x**2 + 4*y + 10)              => 6*x*dx + dx,
+      d(lmd(3*x + 2*y**3 + 5*z**4, :x, :y)) => 6*y**2*dy + 3*dx,
+      d(lmd(3*x*z*(dx^dy) + 2*z*dz, :z))    => (((3*x)*dx)^dy)^dz,
+      d(lmd(3/x, :x))                       => -3/x**2*dx,
     }
 
     poly.each do |from, to|
