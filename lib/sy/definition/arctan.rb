@@ -15,5 +15,9 @@ module Sy
         fn(:sqrt, 3)    => :pi/3,
       }
     end
+
+    def description()
+      return 'arctan(x) - inverse trigonometric tangent'
+    end
   end
 end

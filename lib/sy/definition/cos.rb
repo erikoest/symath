@@ -6,6 +6,10 @@ module Sy
       super(:cos)
     end
     
+    def description()
+      return "cos(x) - trigonometric cosine"
+    end
+
     def reduce_call(c)
       return reduce_sin_and_cos(c, 1)
     end

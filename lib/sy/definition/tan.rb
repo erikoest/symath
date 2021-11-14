@@ -6,6 +6,10 @@ module Sy
       super(:tan)
     end
     
+    def description()
+      return 'tan(x) - trigonometric tangent'
+    end
+
     def reduce_call(c)
       return reduce_tan_and_cot(c, 0, 1)
     end

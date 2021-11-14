@@ -6,6 +6,10 @@ module Sy
     def initialize()
       super(:int)
     end
+
+    def description()
+      return 'int(f, x, a, b) - integral of f [over variable x [from a to b]]'
+    end
     
     def validate_args(e)
       var = e.args[1]

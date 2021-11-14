@@ -6,6 +6,10 @@ module Sy
       super(:sec)
     end
     
+    def description()
+      return 'sec(x) - trigonometric secant'
+    end
+
     def reduce_call(c)
       return reduce_sec_and_csc(c, 0)
     end

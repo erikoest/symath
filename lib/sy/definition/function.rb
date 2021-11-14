@@ -23,24 +23,65 @@ module Sy
       Sy::Definition::Fact.new
 
       # Functions defined by an expression
-      expressions = {
-        :sinh => '(e**x - e**-x)/2',
-        :cosh => '(e**x + e**-x)/2',
-        :tanh => '(e**x - e**-x)/(e**x + e**-x)',
-        :coth => '(e**x + e**-x)/(e**x - e**-x)',
-        :sech => '2/(e**x + e**-x)',
-        :csch => '2/(e**x - e**-x)',
-        :arsinh => 'ln(x + sqrt(x**2 + 1))',
-        :arcosh => 'ln(x + sqrt(x**2 - 1))',
-        :artanh => 'ln((1 + x)/(1 - x))/2',
-        :arcoth => 'ln((x + 1)/(x - 1))/2',
-        :arsech => 'ln((1/x + sqrt(x**-2 - 1)))',
-        :arcsch => 'ln((1/x + sqrt(x**-2 + 1)))',
-      }
+      expressions = [
+        { :name => 'sinh',
+          :exp  => '(e**x - e**-x)/2',
+          :desc => 'hyperbolic sine',
+        },
+        { :name => 'cosh',
+          :exp  => '(e**x + e**-x)/2',
+          :desc => 'hyperbolic cosine',
+        },
+        { :name => 'tanh',
+          :exp  => '(e**x - e**-x)/(e**x + e**-x)',
+          :desc => 'hyperbolic tangent',
+        },
+        { :name => 'coth',
+          :exp  => '(e**x + e**-x)/(e**x - e**-x)',
+          :desc => 'hyperbolic cotangent',
+        },
+        { :name => 'sech',
+          :exp  => '2/(e**x + e**-x)',
+          :desc => 'hyperbolic secant',
+        },
+        { :name => 'csch',
+          :exp  => '2/(e**x - e**-x)',
+          :desc => 'hyperbolic cosecant',
+        },
+        { :name => 'arsinh',
+          :exp  => 'ln(x + sqrt(x**2 + 1))',
+          :desc => 'inverse hyperbolic sine',
+        },
+        { :name => 'arcosh',
+          :exp  => 'ln(x + sqrt(x**2 - 1))',
+          :desc => 'inverse hyperbolic cosine',
+        },
+        { :name => 'artanh',
+          :exp  => 'ln((1 + x)/(1 - x))/2',
+          :desc => 'inverse hyperbolic tangent',
+        },
+        { :name => 'arcoth',
+          :exp  => 'ln((x + 1)/(x - 1))/2',
+          :desc => 'inverse hyperbolic cotangent',
+        },
+        { :name => 'arsech',
+          :exp  => 'ln((1/x + sqrt(x**-2 - 1)))',
+          :desc => 'inverse hyperbolic secant',
+        },
+        { :name => 'arcsch',
+          :exp  => 'ln((1/x + sqrt(x**-2 + 1)))',
+          :desc => 'inverse hyperbolic cosecant',
+        },
+      ]
 
-      expressions.each do |name, exp|
-        self.new(name, args: [:x], exp: exp)
+      expressions.each do |e|
+        self.new(e[:name], args: [:x], exp: e[:exp],
+                 description: "#{e[:name]}(x) - #{e[:desc]}")
       end
+    end
+
+    def self.functions()
+      return self.definitions.grep(Sy::Definition::Function)
     end
 
     @reductions = {}

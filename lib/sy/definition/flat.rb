@@ -7,6 +7,10 @@ module Sy
       super(:flat)
     end
 
+    def description()
+      return 'flat(f) - musical lower/flat/b isomorphic operator'
+    end
+
     def evaluate_call(c)
       # Must normalize input, operation depends on factorized vectors
       return c.args[0].normalize.flat

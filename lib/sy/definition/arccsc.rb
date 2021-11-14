@@ -16,5 +16,9 @@ module Sy
         2.to_m            => :pi/6,
       }
     end
+
+    def description()
+      return 'arccsc(x) - inverse trigonometric cosecant'
+    end
   end
 end

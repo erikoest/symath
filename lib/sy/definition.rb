@@ -15,6 +15,7 @@ module Sy
 
   class Definition < Value
     attr_reader :name
+    attr_reader :description
 
     @@definitions = {}
 
@@ -94,12 +95,18 @@ module Sy
       return @@definitions.values
     end
 
-    def initialize(name, define_symbol = true)
+    def initialize(name, define_symbol: true, description: nil)
       @name = name.to_sym
 
       # Create a method for the definition if it's not a number or lambda
       if define_symbol
         self.class.define(name, self)
+      end
+
+      if description.nil?
+        @description = self.to_s
+      else
+        @description = description
       end
     end
 
@@ -179,11 +186,6 @@ module Sy
       else
         return super.inspect
       end
-    end
-
-    def dump(indent = 0)
-      i = ' '*indent
-      puts i + self.class.to_s + ': ' + self.to_s
     end
   end
 end

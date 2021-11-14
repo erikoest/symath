@@ -1,6 +1,9 @@
 # Sy
 
-Symbolic math library for Ruby. This gem is only intended as a coding excercise.
+Rudimentary symbolic math library for Ruby. Caveat: This gem is mainly
+intended as a coding excercise. The current state of the project is
+'under construction'. There are currently too many bugs to list, and
+many of the operations behave strangely.
 
 # Installation
 
@@ -25,96 +28,206 @@ Using the library:
 require 'Sy'
 ```
 
-### Simple example
+### Simple introduction
 
-The Sy library is a framework for building and manipulating symbolic mathematical expressions. A symbolic expression can be composed by first converting numbers and symbols into math objects, using the method '.to_m'. The math objects can then be combined using the operators 'x', '-', '*', '/' and '**':
+A convenient way to explore the Sy library is using the interactive
+ruby interpreter, irb:
 
-```
-require 'Sy'
-
-a = 1.to_m
-b = 3.to_m
-x = :x.to_m
-
-exp = x**b + a/b
-```
-
-A variable can be made either from a symbol or from a string. The two are equivalent:
+The Sy library is a framework for building and manipulating symbolic
+mathematical expressions. A symbolic expression can be composed by
+first converting numbers and symbols into math objects, using the
+method '.to_m'. The math objects can then be combined using the
+operators 'x', '-', '*', '/' and '**':
 
 ```
-a_from_str = 'a'.to_m
-a_from_sym = :a.to_m
+> # Load the sy library
+> require 'sy'
+=> false
+> # Add the symbols module to your environment
+> extend Sy::Definitions
+=> main
 ```
 
-Once you have a math object, you can combine it with numbers, symbols and strings. They will then implicitly be converted by the '.to_m' method during the composition. In the following example, it is necessary to convert the 1.to_m since the fraction has preceedence over the sum, so 1/3 is evaluated before the sum x**3 + 1/3:
+You can now say, for example:
 
 ```
-x = :x.to_m
-exp = x**3 + 1.to_m/3
+> # Simplify an expression
+> sin(:x) + 2*sin(:x)
+=> 3*sin(:x)
+> # Derivative of tan(2*x + 3)
+> (d(tan(2*:x + 3))/d(:x)).evaluate
+=> 2*(tan(2*x + 3)**2 + 1)
 ```
 
-A complete symbolic expression can also be created from a string using the '.to_math' method. The expression can be converted back to a string by the '.to_s' method.
+Ruby symbols, :x in the above example, are converted to symbolic math
+variables and ruby numbers to symbolic math numbers. Functions,
+operators and constants (e, pi, i, etc.) are available as methods
+through the Sy::Definitions module. In some cases it is necessary to
+tell ruby that your number or symbol is to be treated as a symbolic
+object, using the to_m method:
 
 ```
-exp = 'x**3 + 1/3'.to_mexp
-puts exp.to_s  -->  'x*'3 + 1/3'
+> # Ruby integer math
+> 3**4
+=> 81
+> # Sy symbolic math
+> 3.to_m**4
+=> 3**4
+> (3.to_m**4).normalize
+=> 81
 ```
 
-Use a function in an expression by first creating the function object by the 'fn' method, then applying it to one or more arguments. In a string expression, a function can be used directly. In both cases, the function must already be known to the system.
+An complete expression can also be converted from a string, using the
+same to_m method:
 
 ```
-fn(:sin).(:pi)
-'sin(pi)'.to_mexp
+> 'ln(e) + sin(pi/2)'.to_m
+=> ln(e) + sin(pi/2)
+> 'ln(e) + sin(pi/2)'.to_m.normalize
+=> 2
 ```
 
-An operator can be used in the same way.
+### String representaton of symbolic objects
+
+Symbolic math objects, inheriting from Sy::Value, all have a to_s
+method which returns a string representation of the object. The string
+representation is compatible with the String.to_m method which
+converts a string representation into a symbolic object:
 
 ```
-op(:d).(:sin)
-'d(sin)'.to_mexp
+> (ln(e) + sin(pi/2)).to_s
+=> "ln(e) + sin(pi/2)"
+> 'ln(e) + sin(pi/2)'.to_m
+=> ln(e) + sin(pi/2)
 ```
 
-All functions, operators and constants are available as ruby methods in the module
-Sy::Symbols which can be extended or included in your code:
+Sy::Value overrides the Object.inspect method, returning the to_s
+representation rather than the more verbose and less readable
+Object.inspect output. This behaviour can be disabled with the setting
+'inspect_to_s':
 
 ```
-extend Sy::Symbols
-
-sin(pi) --> 0
-d(sin) --> cos*dx
+> Sy.setting(:inspect_to_s, false)
+=> false
+> ln(e) + sin(pi/2)
+=> "#<Sy::Sum:0x000055e8a1d93b38 @definition=\"\\\"#<Sy::Definition......"
 ```
 
-Various forms of derivation are available as an operators.
+### Simplification and normalizing
 
+Simple reduction rules are automatically applied when composing an
+expression. These can be disabled with the setting
+'compose_with_simplify'. More thorough reductions are done by the use
+of the normalize method.
+
+```
+> e*e*e*e
+=> e**4
+> Sy.setting(:compose_with_simplify, false)
+=> false
+> e*e*e*e
+=> e*e*e*e
+> sin(pi/2).normalize
+=> 1
+```
+
+### Functions
+
+The library comes with a number of built-in function, which the system
+knows how to derivate and integrate over. The built-in functions also
+have a number of reduction rules which are applied by the reduce
+method and also as part of the 'normalize' method. A list of the
+defined functions is returned by the functions method. The description
+method gives a small description of the function:
+
+```
+> Sy::Definition::Function.functions
+=> [sqrt, sin, cos, tan, sec, csc, cot, arcsin, arccos, arctan, arcsec, arccsc, arccot, ln, exp, abs, fact, sinh, cosh, tanh, coth, sech, csch, arsinh, arcosh, artanh, arcoth, arsech, arcsch]
+> sin.description
+```
+
+### Defining functions
+
+User-defined functions can be added by the method define_fn:
+
+```
+> define_fn('poly', [:x, :y], :x**3 + :y**2 + 1)
+=> poly
+```
+
+The user-defined function will afterwards get a method in the
+Sy::Definitions module so it can be used in expressions like the
+built-in functions. Functions defined by an expression can be
+evaluated by the evaluate method, which returns the expression with
+each free variable replaced with the input arguments to the function:
+
+```
+> poly(2, 3).evaluate
+=> 2**3 + 3**2 + 1
+poly(3).evaluate.normalize
+=> 18
+```
+
+### Lambda functions
+
+A nameless user-defined function can be created using the lmd
+method. The method returns a function object which does not have a
+name, but otherwise works as a function. This is often useful when
+defining operators (see 'defining operators' section below). The
+lambda function can be called using the call method or the ruby 'call'
+operator '()':
+
+```
+> l = lmd(:x**3 + :y**2 + 1, [:x, :y])
+> l.(2, 3)
+=> (x**3 + y**2 + 1).(2,3)
+```
+
+### Operators
+
+The library also has some built-in operators. A list of the defined
+operators is returned by the operators method. The description method
+gives a small description of the operator:
+
+```
+> Sy::Definition::Operator.operators
+=> [+, -, *, /, **, ^, =, d, xd, int, bounds, sharp, flat, hodge, grad, curl, div, laplacian, codiff, laplace, fourier, invfourier]
+> codiff.description
+=> "codiff(f) - codifferential of function f"
+```
+
+### Defining operators
+
+...
+
+### Evaluating functions and operators
+
+Evaluating a functions or operators which is defined by an expression
+returns the expression with each free variable replaced with input
+arguments. Functions which do not have an expression will typically
+evaluate to itself (no reduction). Most operators which do not have an
+expression has a built in evaluation, and returns a function or
+expression according to the operator.
+
+### Derivation
 Derivative of a function:
 
 ```
-d = op(:d)
-d(sin)/d(:x)  --> cos
+> (d(sin(:x))/d(:x)).evaluate
+=> cos(:x)
 ```
 
 Differential:
 
 ```
-d(:sin)  --> cos*dx
-```
-
-Partial derivative [f: f(x, y)]:
-
-```
-dpart(:f, :x) ---> df/dx
-```
-
-Total derivative [f : f(x, y)]:
-
-```
-dtot(:f)  --> [dpart(:f, :x), dpart(:f, :y)]
+> d(sin(:x)).evaluate
+=> cos*dx
 ```
 
 Exterior derivative [f : f(x1, x2, x3)]:
 
 ```
-dext(:f) --> f1'*dx1 + f2'*dx2 + f3'*dx3
+xd(:f) --> f1'*dx1 + f2'*dx2 + f3'*dx3
 ```
 
 Integration is available as an operator.
@@ -127,130 +240,62 @@ Definite integral:
 
 defint(:f, :dx, :a, :b)
 
-A function can be defined using the def method:
+### Complex numbers and quaternions
 
-```
-def(:f, args: [:x, :y, :z], exp: [:x**3 + :y**2 + :z + 1])
-```
+...
 
-An operator can be defined in the same way:
+### Exterior algebra
 
-```
-def(:o, args: [:f, :g], exp: [op(:d).(:f)])
-```
+...
 
-### Math objects
+### Vectors and matrices
 
-A symbolic mathematical expression is represented as an object which can be assigned to a variable. Primitive entities are instansiated 
+...
 
-### Primitive entities
+### Methods for manipulating expressions
 
-#### Number
+#### Normalization
 
-Instansiating a number:
+#### Variable replacement
 
-#### Constant
+#### Matching and pattern replacement
 
-Instansiating a constant:
+#### Factorization
 
-  - Built in constants
+#### Expand product
 
-#### Variable
+### Settings
 
-Instansiating a variable:
-
-#### Operator
-
-Instansiating an operator:
-
-  - Operator definition
-  - Operator call
-  - Built in operators
-
-##### Operator call
-
-#### Function
-
-Instansiating vectors and matrices:
-
-### Expression composition
-
-a + b (addition)
-a - b (subtraction)
-- a   (negation
-a * b (multiplication)
-  - operator algebra
-a / b (division)
-a**b  (power)
-a^b   (wedge product)
-
-### Stringify
-
-### Compose from string
-
-### Methods to manipulate expressions
-
-  - Normalization
-  - Derivation
-  - Integration
-  - Variable replacement
-  - Pattern replacement
-  - Factorization
-  - Expand product
-
-
-The method to_m can be used to transform integers and strings/symbols
-into symbolic math numbers and variables, respectively. The names pi,
-e, i, sq2 and phi have special meanings and will create the
-corresponding math constants rather than free variables. The method
-fn(name, *args) can be used to create a function object. Some of the
-function names have special meanings, so e.g. creating functions named
-'sin' or 'exp' will create the sine and exponential functions. Other
-unrecognized names will just create an unknown function of that name.
-
-Creating a number:
-    ten = 10.to_m
-
-Creating variable:
-    x = :x.to_m
-    x = 'x'.to_m
-
-Creating math constants:
-    pi = :pi.to_m
-    e = 'e'.to_m
-
-Creating a known function:
-    s = fn(:sin, x)
-    s = fn(:exp, :x)
-
-Creating an unknown function:
-    s = fn(:myfunc, x, ten)
-
-The base value object overrides the standard math operations for ruby (+, -, *, /, **, etc.) so value objects
-can be combined into more complex expressions using these. The right side argument is converted into a
-math object if it is an integr, a string or a symbol.
-
-Composing expressions:
-    sum = 10.to_m + :x.to_m**3
-    power = :x.to_m**:y
-
-The value objects implement the to_s method for turning an expression into a string.
-    (10.to_m + :x.to_m**3).to_s  # => '10 + x^3'
+...
 
 ## Development
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+After checking out the repo, run `bin/setup` to install
+dependencies. Then, run `rake spec` to run the tests. You can also run
+`bin/console` for an interactive prompt that will allow you to
+experiment.
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+To install this gem onto your local machine, run `bundle exec rake
+install`. To release a new version, update the version number in
+`version.rb`, and then run `bundle exec rake release`, which will
+create a git tag for the version, push git commits and tags, and push
+the `.gem` file to [rubygems.org](https://rubygems.org).
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/sy. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
+Bug reports and pull requests are welcome on GitHub at
+https://github.com/[USERNAME]/sy. This project is intended to be a
+safe, welcoming space for collaboration, and contributors are expected
+to adhere to the [Contributor
+Covenant](http://contributor-covenant.org) code of conduct.
 
 ## License
 
-The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
+The gem is available as open source under the terms of the [MIT
+License](https://opensource.org/licenses/MIT).
 
 ## Code of Conduct
 
-Everyone interacting in the Sy project’s codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/[USERNAME]/sy/blob/master/CODE_OF_CONDUCT.md).
+Everyone interacting in the Sy project’s codebases, issue trackers,
+chat rooms and mailing lists is expected to follow the [code of
+conduct](https://github.com/[USERNAME]/sy/blob/master/CODE_OF_CONDUCT.md).

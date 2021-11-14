@@ -19,26 +19,42 @@ module Sy
       Sy::Definition::Laplacian.new
       Sy::Definition::CoDiff.new
 
-      expressions = {
-        :laplace    => 'lmd(int(f.(t)*e**(-s*t),d(t),0,oo),s)',
-        :fourier    => 'lmd(int(f.(x)*e**(-2*pi*i*x*w),d(x),-oo,oo),w)',
-        :invfourier => 'lmd(int(f.(w)*e**(2*pi*i*x*w),d(w),-oo,oo),x)',
-      }
+      expressions = [
+        { :name => 'laplace',
+          :exp  => 'lmd(int(f.(t)*e**(-s*t),d(t),0,oo),s)',
+          :desc => 'laplace transform',
+        },
+        { :name => 'fourier',
+          :exp  => 'lmd(int(f.(x)*e**(-2*pi*i*x*w),d(x),-oo,oo),w)',
+          :desc => 'fourier transform',
+        },
+        { :name => 'invfourier',
+          :exp  => 'lmd(int(f.(w)*e**(2*pi*i*x*w),d(w),-oo,oo),x)',
+          :desc => 'inverse fourier transform',
+        },
+      ]
 
-      expressions.each do |name, exp|
-        self.new(name, args: [:f], exp: exp)
+      expressions.each do |e|
+        self.new(e[:name], args: [:f], exp: e[:exp],
+                 description: "#{e[:name]}(f) - #{e[:desc]}")
       end
     end
 
-    def initialize(name, args: [], exp: nil, define_symbol: true)
-      super(name, define_symbol)
+    def self.operators()
+      return self.definitions.select do |d|
+        d.is_operator? and !d.is_function?
+      end
+    end
 
+    def initialize(name, args: [], exp: nil, define_symbol: true, description: nil)
       if exp and !exp.is_a?(Sy::Value)
         exp = exp.to_m
       end
 
       @args = args.map { |a| a.to_m }
       @exp = exp
+
+      super(name, define_symbol: define_symbol, description: description)
     end
 
     def compose_with_simplify(*args)
@@ -174,13 +190,14 @@ module Sy
     end
 
     def dump(indent = 0)
-      super.dump(indent)
+      res = super.dump(indent)
       i = ' '*indent
       if args
-        puts i + '  args: ' + args.map { |a| a.to_s }.join(',')
+        arglist = args.map { |a| a.to_s }.join(',')
+        res = "#{res}\n#{i}  args: #{arglist}"
       end
       if exp
-        puts i + '  exp: ' + exp.to_s
+        res = "#{res}\n{i}   exp: #{exp}"
       end
     end
   end

@@ -6,6 +6,10 @@ module Sy
       super(:abs)
     end
 
+    def description()
+      return 'abs(x) - absolute value'
+    end
+
     def reduce_call(c)
       arg = c.args[0]
       if arg.is_nan?

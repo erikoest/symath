@@ -3,7 +3,11 @@ require 'sy/definition'
 module Sy
   class Definition::Number < Definition
     def initialize(name)
-      super(name.to_s, false)
+      super(name.to_s, define_symbol: false)
+    end
+
+    def description()
+      return "#{name} - natural number"
     end
 
     def value()
@@ -25,7 +29,7 @@ module Sy
     def is_number?()
       return true
     end
-    
+
     def is_zero?()
       return value() == 0
     end

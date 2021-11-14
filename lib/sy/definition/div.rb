@@ -8,6 +8,10 @@ module Sy
       super(:div, args: [:f], exp: 'hodge(xd(hodge(b(f))))')
     end
 
+    def description()
+      return 'div(f) - divergence of vector field f'
+    end
+
     def evaluate_call(c)
       if Sy.get_variable(:basis.to_m).row(0).length != 3
         raise 'Div is only defined for 3 dimensions'

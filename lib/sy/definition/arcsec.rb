@@ -16,5 +16,9 @@ module Sy
         2.to_m            => :pi/3
       }
     end
+
+    def description()
+      return 'arcsec(x) - inverse trigonometric secant'
+    end
   end
 end

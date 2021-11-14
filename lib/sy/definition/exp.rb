@@ -6,6 +6,10 @@ module Sy
       super(:exp)
     end
 
+    def description()
+      return 'exp(x) - exponential function (e**x)'
+    end
+
     def reduce_call(call)
       arg = call.args[0]
       

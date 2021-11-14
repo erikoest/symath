@@ -8,6 +8,10 @@ module Sy
       super(:grad, args: [:f], exp: '#(xd(f))')
     end
 
+    def description()
+      return 'grad(f) - gradient of scalar field f'
+    end
+
     def to_latex(args)
       if !args
         args = @args

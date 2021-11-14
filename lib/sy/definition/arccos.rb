@@ -17,5 +17,9 @@ module Sy
         1.to_m          => 0.to_m,
       }
     end
+
+    def description()
+      return 'arccos(x) - inverse trigonometric cosine'
+    end
   end
 end

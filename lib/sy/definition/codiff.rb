@@ -11,6 +11,10 @@ module Sy
       super(:codiff, args: [:f], exp: 'hodge(xd(hodge(f)))')
     end
 
+    def description()
+      return 'codiff(f) - codifferential of function f'
+    end
+
     def evaluate_call(c)
       vars = Sy.get_variable(:basis.to_m).row(0)
       n = vars.length

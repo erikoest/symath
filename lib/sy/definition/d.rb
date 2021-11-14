@@ -6,6 +6,10 @@ module Sy
     def initialize()
       super(:d)
     end
+
+    def description()
+      return 'd(f, x, y, ...) - differential of f with respect to variables x, y, ...'
+    end
     
     def validate_args(e)
       # Arguments 1, 2, ... are supposed to be variables to differentiate

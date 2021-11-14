@@ -15,5 +15,9 @@ module Sy
         fn(:sqrt, 3)    => :pi/6,
       }
     end
+
+    def description()
+      return 'arccot(x) - inverse trigonometric cotangent'
+    end
   end
 end

@@ -67,6 +67,10 @@ module Sy
 
     return @@global_settings[name]
   end
+
+  def self.settings()
+    return @@global_settings
+  end
   
   @@special_variables = {
     :basis.to_m => 1,

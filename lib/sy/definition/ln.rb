@@ -24,6 +24,10 @@ module Sy
       }
     end
 
+    def description()
+      return 'ln(x) - natural logarithm'
+    end
+
     def reduce_call(c)
       arg = c.args[0]
 

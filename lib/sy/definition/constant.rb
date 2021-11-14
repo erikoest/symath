@@ -11,6 +11,17 @@ module Sy
       :oo  => '\infty',
     };
 
+    @@descriptions = {
+      :pi  => 'ratio of cirle cirumference/diameter (3.14159265...)',
+      :e   => 'eulers number (2.71828182...)',
+      :phi => 'golden ratio (1.61803398...)',
+      :nan => "'not a number', i.e. an invalid value",
+      :oo  => 'positive infinity',
+      :i   => 'imaginary unit, first basic quaternion',
+      :j   => 'second basic quaternion',
+      :k   => 'third basic quaternion',
+    }
+
     @@unit_quaternions = [:i, :j, :k].to_set
 
     def self.init_builtin()
@@ -23,6 +34,14 @@ module Sy
       self.new(:i)
       self.new(:j)
       self.new(:k)
+    end
+
+    def self.constants()
+      return self.definitions.grep(Sy::Definition::Constant)
+    end
+
+    def description()
+      return "#{@name} - #{@@descriptions[@name]}"
     end
 
     def is_nan?()

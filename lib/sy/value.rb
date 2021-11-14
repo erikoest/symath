@@ -273,7 +273,7 @@ module Sy
 
     def dump(indent = 0)
       i = ' '*indent
-      puts i + self.class.to_s + ': ' + self.to_s
+      return "#{i}#{self.class}: #{self}"
     end
   end
 end

@@ -7,6 +7,10 @@ module Sy
       super('', args: vars, exp: exp, define_symbol: false)
     end
 
+    def description()
+      return "{self.to_s} - Lambda function of expression #{exp}"
+    end
+
     def compose_with_simplify(exp, vars)
       vars.each do |v|
         if !v.is_a?(Sy::Definition::Variable)

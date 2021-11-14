@@ -8,6 +8,10 @@ module Sy
       super(:laplacian, args: [:f], exp: 'hodge(xd(hodge(xd(f))))')
     end
 
+    def description()
+      return 'laplacian(f) - laplacian of function f'
+    end
+
     def to_latex(args)
       if !args
         args = @args

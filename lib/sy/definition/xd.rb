@@ -7,6 +7,10 @@ module Sy
       super(:xd)
     end
 
+    def description()
+      return 'd(f) - exterior derivative of f'
+    end
+
     def evaluate_call(c)
       vars = Sy.get_variable(:basis.to_m).row(0)
 

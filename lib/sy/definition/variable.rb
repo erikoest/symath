@@ -129,8 +129,12 @@ module Sy
     attr_reader :type
   
     def initialize(name, t = 'real')
-      super(name, false)
       @type = t.to_t
+      super(name, define_symbol: false)
+    end
+
+    def description()
+      return "#{name} - free variable"
     end
 
     def ==(other)

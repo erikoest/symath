@@ -7,6 +7,10 @@ module Sy
       super(:hodge)
     end
 
+    def description()
+      return 'hodge(f) - hodge star operator'
+    end
+
     def evaluate_call(c)
       # Must normalize input, operation depends on factorized vectors
       return c.args[0].normalize.hodge

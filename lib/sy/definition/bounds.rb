@@ -8,6 +8,10 @@ module Sy
             exp: fn(lmd(:ex.to_m, :v), :b) - fn(lmd(:ex.to_m, :v), :a))
     end
 
+    def description()
+      return 'bounds(ex, x, a, b) - bounds operator, (ex)[x=b] - (ex)[x=a]'
+    end
+
     def validate_args(e)
       var = e.args[1]
       

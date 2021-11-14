@@ -78,10 +78,12 @@ module Sy
 
     def dump(indent = 0)
       i = ' '*indent
-      puts i + self.class.to_s + ': ' + name.to_s
-      args.each do |a|
+      ret = super(indent)
+      arglist = args.map do |a|
         a.dump(indent + 2)
       end
+
+      return ret + "\n" + arglist.join("\n")
     end
 
     def hash()

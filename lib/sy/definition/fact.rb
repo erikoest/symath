@@ -6,6 +6,10 @@ module Sy
       super(:fact)
     end
 
+    def description()
+      return 'fact(x) - factorial'
+    end
+
     def reduce_call(c)
       arg = c.args[0]
       

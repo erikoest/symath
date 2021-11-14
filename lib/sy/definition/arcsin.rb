@@ -17,5 +17,9 @@ module Sy
         1.to_m          => :pi/2,
       }
     end
+
+    def description()
+      return 'arcsin(x) - inverse trigonometric sine'
+    end
   end
 end

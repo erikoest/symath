@@ -6,6 +6,10 @@ module Sy
       super(:sqrt)
     end
 
+    def description()
+      return 'sqrt(x) - square root'
+    end
+
     def reduce_call(call)
       arg = call.args[0]
       i = 1.to_m
