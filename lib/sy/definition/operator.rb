@@ -38,6 +38,10 @@ module Sy
         self.new(e[:name], args: [:f], exp: e[:exp],
                  description: "#{e[:name]}(f) - #{e[:desc]}")
       end
+
+      e = op(:d, lmd(:f, :t))/op(:d, :t)
+      self.new('dpart', args: [:f, :t], exp: e,
+               description: 'dpart - partial derivative')
     end
 
     def self.operators()
@@ -46,7 +50,8 @@ module Sy
       end
     end
 
-    def initialize(name, args: [], exp: nil, define_symbol: true, description: nil)
+    def initialize(name, args: [], exp: nil, define_symbol: true,
+                   description: nil)
       if exp and !exp.is_a?(Sy::Value)
         exp = exp.to_m
       end
@@ -132,14 +137,8 @@ module Sy
       res.replace(map)
 
       # Recursively evaluate the expanded formula.
-      return res.recurse('evaluate')
-    end
-
-    # Evaluate the operator definition
-    def evaluate()
-      if !exp.nil?
-        @exp = exp.evaluate
-      end
+      ret = res.recurse('evaluate')
+      return ret
     end
 
     def replace(map)
@@ -190,14 +189,14 @@ module Sy
     end
 
     def dump(indent = 0)
-      res = super.dump(indent)
+      res = super(indent)
       i = ' '*indent
       if args
         arglist = args.map { |a| a.to_s }.join(',')
         res = "#{res}\n#{i}  args: #{arglist}"
       end
       if exp
-        res = "#{res}\n{i}   exp: #{exp}"
+        res = "#{res}\n#{i}  exp: #{exp}"
       end
     end
   end
@@ -207,8 +206,12 @@ def op(o, *args)
   return Sy::Operator.create(o, args.map { |a| a.nil? ? a : a.to_m })
 end
 
-def define_op(name, args)
-  return Sy::Definition::Operator.new(name, args: args)
+def define_op(name, args, exp = nil)
+  if exp
+    return Sy::Definition::Operator.new(name, args: args, exp: exp)
+  else
+    return Sy::Definition::Operator.new(name, args: args)
+  end
 end
 
 require 'sy/definition/d'

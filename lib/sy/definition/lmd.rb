@@ -48,6 +48,17 @@ module Sy
       return exp
     end
 
+    # Evaluate the operator definition
+    # FIXME: Is it right to evaluate the definition exp?
+    def evaluate()
+      if name == '' and !exp.nil?
+        e = exp.evaluate
+        return lmd(e, self.args)
+      end
+
+      return self
+    end
+
     # For a lambda function, the call returns a function with a reference
     # to our own lambda function definition.
     def call(*args)

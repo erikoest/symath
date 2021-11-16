@@ -127,7 +127,7 @@ module Sy
         # d(x) is accepted as well as the simple dx variable.
         if divisor.is_a?(Sy::Definition::Variable) and divisor.is_d?
           v = divisor.undiff
-        elsif divisor.is_a?(Sy::D) and
+        elsif divisor.is_a?(Sy::Definition::D) and
              divisor.args[0].is_a?(Sy::Definition::Variable) and
              divisor.args[0].type.is_scalar?
           v = divisor.args[0]

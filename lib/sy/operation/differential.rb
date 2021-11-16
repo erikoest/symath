@@ -12,6 +12,10 @@ module Sy::Operation::Differential
   # operation returns the differential and not the derivative, so the
   # resulting expression is a differential form.
 
+  # FIXME. The differential method should work on a function and return
+  # a lambda with :x/:dx as free variable, for each variable of the
+  # input function.
+
   # Module initialization
   def self.initialize()
     # Map of single argument functions to their derivative.
@@ -52,10 +56,8 @@ module Sy::Operation::Differential
   end
 
   def d(vars)
-    # Cannot (currently) differentiate a function definition, only a
-    # function call
     if self.is_a?(Sy::Definition::Function)
-      return d_failure
+      return d_function_def(vars)
     end
 
     # d(c) = 0 for constant c
@@ -121,17 +123,14 @@ module Sy::Operation::Differential
   end
 
   def d_function_def(vars)
-    if name != '' and @@functions.key?(name)
-      f = @@functions[name]
-      if vars.member?(f.args[0])
-        return @@functions[name]
-      else
-        return 0.to_m
-      end
+    if name != '' and @@functions.key?(name.to_sym)
+      df = @@functions[name.to_sym]
+      dfcall = df.(args[0]).evaluate
+      return _d_wedge(dfcall, args[0].d(vars))
     end
 
     if !exp.nil?
-      return d(exp, args.select { |v| vars.member?(v) })
+      return self.(*args).evaluate.d(vars)
     end
 
     d_failure
@@ -143,24 +142,13 @@ module Sy::Operation::Differential
     end
 
     if name != '' and @@functions.key?(name.to_sym)
-      d = @@functions[name.to_sym]
-      dcall = d.(args[0]).evaluate
-      return _d_wedge(dcall, args[0].d(vars))
+      df = @@functions[name.to_sym]
+      dfcall = df.(args[0]).evaluate
+      return _d_wedge(dfcall, args[0].d(vars))
     end
 
     if !definition.exp.nil?
-      # FIXME: Permit more than one variable
-      d = definition.exp.deep_clone
-      ret = d.deep_clone
-
-      replace_map = {}
-
-      args.each_with_index do |a, i|
-       replace_map[definition.args[i]] = a
-      end
-
-      ret.replace(replace_map)
-      return ret.d(vars)
+      return definition.(*args).evaluate.d(vars)
     end
 
     d_failure

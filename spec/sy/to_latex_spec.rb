@@ -71,14 +71,14 @@ module Sy
       expect(xd(a).to_latex).to be == '\mathrm{d}(a)'
     end
     it 'unbound integral to latex' do
-      expect(int(a, da).to_latex).to be == '\int a\,\mathrm{d}a'
+      expect(int(a).to_latex).to be == '\int a\,\mathrm{d}a'
     end
     it 'unbound integral of sum to latex' do
-      expect(int(a + b, da).to_latex).to be ==
+      expect(int(a + b).to_latex).to be ==
         '\int \\left(a + b\\right)\,\mathrm{d}a'
     end
     it 'bound integral to latex' do
-      expect(int(a, da, 1.to_m, 10.to_m).to_latex).to be ==
+      expect(int(a, 1.to_m, 10.to_m).to_latex).to be ==
         '\int_{1}^{10} a\,\mathrm{d}a'
     end
     it 'bounds operator to latex' do

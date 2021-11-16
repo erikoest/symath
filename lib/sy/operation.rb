@@ -16,7 +16,8 @@ module Sy::Operation
       if self_method.nil?
         return self
       else
-        return self.send(self_method)
+        ret = self.send(self_method)
+        return ret
       end
     end
 

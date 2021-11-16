@@ -217,6 +217,15 @@ module Sy
     end
 
     def replace(map)
+      if is_d?
+        u = undiff
+        if map.key?(u)
+          return op(:d, map[u].deep_clone)
+        else
+          return self
+        end
+      end
+
       if map.key?(self)
         return map[self].deep_clone
       else

@@ -83,7 +83,7 @@ module Sy
         a.dump(indent + 2)
       end
 
-      return ret + "\n" + arglist.join("\n") + "\n" + d
+      return ret + "\n" + arglist.join("\n")
     end
 
     def hash()

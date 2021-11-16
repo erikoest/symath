@@ -46,7 +46,6 @@ module Sy
       # arguments.
       if e.is_a?(Sy::Definition::Function)
         vars = e.args
-        e = e.(*vars)
       else
         # Find first free variable in expression.
         vars = [(e.variables)[0].to_m]

@@ -83,11 +83,11 @@ module Sy
       expect(int(a).to_s).to be == 'int(a)'
     end
     it 'unbound integral with variable to s' do
-      expect(int(a, da).to_s).to be == 'int(a,da)'
+      expect(int(a).to_s).to be == 'int(a)'
     end
     it 'bound integral to s' do
-      expect(int(a, da, 1.to_m, 10.to_m).to_s).to be ==
-        'int(a,da,1,10)'
+      expect(int(a, 1.to_m, 10.to_m).to_s).to be ==
+        'int(a,1,10)'
     end
     it 'bounds operator to s' do
       expect(bounds(a, b, 1, 2).to_s).to be ==

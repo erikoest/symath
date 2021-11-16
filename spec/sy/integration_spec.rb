@@ -28,13 +28,13 @@ module Sy
 
     exp.each do |from, to|
       it "integrates '#{from.to_s}' into '#{to.to_s}'" do
-        expect(int(from, dx).evaluate.normalize).to be_equal_to to
+        expect(int(lmd(from, x).(x)).evaluate.normalize).to be_equal_to to
       end
     end
 
     bound = {
-      int(3*x**3 - x, dx, 2, 4)         => 174,
-      int(3*cos(x)*sin(x), dx, 0, pi/2) => 3.to_m/2,
+      int(3*x**3 - x, 2, 4)         => 174,
+      int(3*cos(x)*sin(x), 0, pi/2) => 3.to_m/2,
     }
 
     bound.each do |from, to|
@@ -54,21 +54,13 @@ module Sy
 
     fails.each do |f|
         it "fails to integrate '#{f.to_s}'" do
-          expect { int(f, dx).evaluate }.to raise_error("Cannot find an antiderivative for expression #{f.to_s}")
+          expect { int(lmd(f, x).(x)).evaluate }.to raise_error("Cannot find an antiderivative for expression #{f.to_s}")
         end
     end
 
-    it "raises error on int(x/2, 2.to_m)" do
-      expect { int(x/2, 2.to_m) }.to raise_error(RuntimeError, 'Expected variable for var, got Sy::Definition::Number')
-    end
-
-    it "raises error on int(x/2, x)" do
-      expect { int(x/2, x) }.to raise_error(RuntimeError, 'Expected var to be a differential, got x')
-    end
-
     it "raises error on int(x/2, dx, 0)" do
-      expect { int(x/2, dx, 0) }.to raise_error(RuntimeError, 'A cannot be defined without b and vica versa.')
-      expect { op(:int, x/2, dx, nil, 0) }.to raise_error(RuntimeError, 'A cannot be defined without b and vica versa.')
+      expect { int(x/2, 0) }.to raise_error(RuntimeError, 'A cannot be defined without b and vica versa.')
+      expect { op(:int, x/2, nil, 0) }.to raise_error(RuntimeError, 'A cannot be defined without b and vica versa.')
     end
 
     it "raises error on bounds(x**2, 2, 0, 1)" do

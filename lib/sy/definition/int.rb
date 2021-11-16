@@ -8,33 +8,34 @@ module Sy
     end
 
     def description()
-      return 'int(f, x, a, b) - integral of f [over variable x [from a to b]]'
+      return 'int(f, a, b) - integral of f [from a to b]'
     end
     
     def validate_args(e)
-      var = e.args[1]
-      a = e.args[2]
-      b = e.args[3]
+      a = e.args[1]
+      b = e.args[2]
 
-      if !var.nil?
-        if !var.is_a?(Sy::Definition::Variable)
-          raise "Expected variable for var, got " + var.class.name
-        end
-
-        if !var.is_d?
-          raise "Expected var to be a differential, got " + var.to_s
-        end
-      end
       if (!a.nil? and b.nil?) or (a.nil? and !b.nil?)
         raise "A cannot be defined without b and vica versa."
       end
     end
 
+    def get_variable(exp)
+      if exp.is_a?(Sy::Operator) and
+        exp.definition.is_function?
+        v = exp.definition.args[0]
+      else
+        v = (exp.variables)[0].to_m
+      end
+
+      return v.to_d
+    end
+
     def evaluate_call(c)
       exp = c.args[0]
-      var = c.args[1]
-      a = c.args[2]
-      b = c.args[3]
+      var = get_variable(exp)
+      a = c.args[1]
+      b = c.args[2]
 
       exp = exp.recurse('evaluate')
 
@@ -58,9 +59,9 @@ module Sy
         exp = args[0].to_latex
       end
 
-      var = args[1]
-      a = args[2]
-      b = args[3]
+      var = get_variable(args[0])
+      a = args[1]
+      b = args[2]
 
       if a.nil?
         return "\\int #{exp}\\,#{var.to_latex}"
