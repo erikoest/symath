@@ -31,13 +31,7 @@ require 'Sy'
 ### Simple introduction
 
 A convenient way to explore the Sy library is using the interactive
-ruby interpreter, irb:
-
-The Sy library is a framework for building and manipulating symbolic
-mathematical expressions. A symbolic expression can be composed by
-first converting numbers and symbols into math objects, using the
-method '.to_m'. The math objects can then be combined using the
-operators 'x', '-', '*', '/' and '**':
+Ruby interpreter, irb:
 
 ```
 > # Load the sy library
@@ -54,17 +48,19 @@ You can now say, for example:
 > # Simplify an expression
 > sin(:x) + 2*sin(:x)
 => 3*sin(:x)
-> # Derivative of tan(2*x + 3)
-> (d(tan(2*:x + 3))/d(:x)).evaluate
-=> 2*(tan(2*x + 3)**2 + 1)
+> # Derivative of tan(2*y + 3)
+> (d(tan(2*:y + 3))/d(:y)).evaluate
+=> 2*(tan(2*y + 3)**2 + 1)
 ```
 
-Ruby symbols, :x in the above example, are converted to symbolic math
-variables and ruby numbers to symbolic math numbers. Functions,
-operators and constants (e, pi, i, etc.) are available as methods
-through the Sy::Definitions module. In some cases it is necessary to
-tell ruby that your number or symbol is to be treated as a symbolic
-object, using the to_m method:
+Ruby symbols, :x and :y in the above example, are converted to
+symbolic math variables and Ruby numbers are converted to symbolic
+math numbers. Functions, operators and constants (e, pi, i, etc.) are
+available as methods through the Sy::Definitions module. In some cases
+it is necessary to tell Ruby that your number or symbol is to be
+understood as a symbolic object, and not just a Ruby number or
+symbol. Use the to_m method to explicitly convert them to symbolic
+bjects:
 
 ```
 > # Ruby integer math
@@ -144,6 +140,7 @@ method gives a small description of the function:
 > Sy::Definition::Function.functions
 => [sqrt, sin, cos, tan, sec, csc, cot, arcsin, arccos, arctan, arcsec, arccsc, arccot, ln, exp, abs, fact, sinh, cosh, tanh, coth, sech, csch, arsinh, arcosh, artanh, arcoth, arsech, arcsch]
 > sin.description
+=> "sin(x) - trigonometric sine"
 ```
 
 ### Defining functions
@@ -155,16 +152,16 @@ User-defined functions can be added by the method define_fn:
 => poly
 ```
 
-The user-defined function will afterwards get a method in the
-Sy::Definitions module so it can be used in expressions like the
-built-in functions. Functions defined by an expression can be
+The user-defined function will now be available as a method in the
+Sy::Definitions module and can be used in expressions, just as the
+built in functions. Functions defined by an expression can be
 evaluated by the evaluate method, which returns the expression with
 each free variable replaced with the input arguments to the function:
 
 ```
 > poly(2, 3).evaluate
 => 2**3 + 3**2 + 1
-poly(3).evaluate.normalize
+> poly(3).evaluate.normalize
 => 18
 ```
 
@@ -174,7 +171,7 @@ A nameless user-defined function can be created using the lmd
 method. The method returns a function object which does not have a
 name, but otherwise works as a function. This is often useful when
 defining operators (see 'defining operators' section below). The
-lambda function can be called using the call method or the ruby 'call'
+lambda function can be called using the call method or the Ruby 'call'
 operator '()':
 
 ```
@@ -198,7 +195,16 @@ gives a small description of the operator:
 
 ### Defining operators
 
-...
+User-defined operators can be added by the method define_op:
+
+```
+# FIXME: This does not currently work
+> define_op('d2', [:f, :x], d(d(:f)/d(:x))/d(:x))
+=> d2
+```
+
+The user-defined function will now be available as a method in the
+Sy::Definitions module and can be used in expressions.
 
 ### Evaluating functions and operators
 
@@ -210,47 +216,93 @@ expression has a built in evaluation, and returns a function or
 expression according to the operator.
 
 ### Derivation
-Derivative of a function:
 
-```
-> (d(sin(:x))/d(:x)).evaluate
-=> cos(:x)
-```
-
-Differential:
+The d-operator returns the differential of a function or expresson. If
+a function is given, the differential is made over all the free
+variables of the function. If an expression is given, the operator
+differentiates over the first free variable found in the
+expression. Wrapping the expression into a lambda function makes it
+possible to differentiate on other variables:
 
 ```
 > d(sin(:x)).evaluate
-=> cos*dx
+=> cos(x)*dx
+> d(:x**2 + :y**3 + 1).evaluate.normalize
+=> 2*x*dx
+> d(lmd(:x**2 + :y**3 + 1, :y)).evaluate.normalize
+=> 3*y**2*dy
+> d(lmd(:x**2 + :y**3 + 1, :x, :y)).evaluate.normalize
+=> 3*y**2*dy + 2*x*dx
 ```
+
+As a special case, the notatonal form d(f)/d(x) is recognized as the
+derivative of f with regards to x. This is calculated as d(lmd(f,
+x))/d(x)
+
+The partial derivative is available as well as 'syntactic sugar':
+
+```
+> dpart(:x**2 + :y**3 + 1, :x).evaluate.normalize
+=> 2*x
+> dpart(:x**2 + :y**3 + 1, :y).evaluate.normalize
+=> 3*y**2
+```
+
+### Integration
+
+Integration is available as the int-operator. With one argument, the
+operator evaluates to the antiderivative of the expression:
+
+```
+> int(2**:x).evaluate
+=> 2**x/ln(2) + C
+```
+
+The variable 'C' is used by convention to represent the free constant
+factor of each antiderivative.
+
+With three arguments, the int-operator evaluates to the definite
+integral from a to b. Evaluating once returns the 'bounds operator'
+which is defined as b(f, a, b) = f(b) - f(a). It can be evaluated once
+more in order to return the final result:
+
+```
+> int(2**:x, 3, 4).evaluate
+=> [2**x/ln(2)](3,4)
+> int(2**:x, 3, 4).evaluate.evaluate
+=> 2**4/ln(2) - 2**3/ln(2)
+```
+
+### Complex numbers and quaternions
+
+TBD
+
+### Exterior algebra
+
+TBD
+
+D-forms. Algebra of vectors and d-forms.
 
 Exterior derivative [f : f(x1, x2, x3)]:
 
 ```
-xd(:f) --> f1'*dx1 + f2'*dx2 + f3'*dx3
+> xd(:f)
+=> f1'*dx1 + f2'*dx2 + f3'*dx3
 ```
 
-Integration is available as an operator.
+Musical isomorphisms
 
-Indefinite integral (antiderivative):
+Hodge star operator
 
-int(:f, :dx)
-
-Definite integral:
-
-defint(:f, :dx, :a, :b)
-
-### Complex numbers and quaternions
-
-...
-
-### Exterior algebra
-
-...
+Gradient
+Curl
+Divergence
+Laplacian
+Codifferential
 
 ### Vectors and matrices
 
-...
+TBD
 
 ### Methods for manipulating expressions
 
