@@ -22,7 +22,8 @@ module Sy
 
     def get_variable(exp)
       if exp.is_a?(Sy::Operator) and
-        exp.definition.is_function?
+        exp.definition.is_function? and
+        exp.definition.args.length > 0
         v = exp.definition.args[0]
       else
         v = (exp.variables)[0].to_m
@@ -37,14 +38,15 @@ module Sy
       a = c.args[1]
       b = c.args[2]
 
-      exp = exp.recurse('evaluate')
+      exp = exp.evaluate
 
       if a.nil?
         ret = exp.normalize.anti_derivative(var)
         return ret.nil? ? nil : ret + :C.to_m
       else
         int = exp.normalize.anti_derivative(var)
-        return op(:bounds, int, var.undiff, a, b)
+        # TODO: Setting for evaluating the bounds expression?
+        return op(:bounds, int, var.undiff, a, b).evaluate
       end
     end
 

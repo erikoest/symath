@@ -13,7 +13,7 @@ module Sy
 
     def evaluate_call(c)
       # Must normalize input, operation depends on factorized vectors
-      return c.args[0].normalize.hodge
+      return c.args[0].evaluate.normalize.hodge
     end
 
     def latex_format()

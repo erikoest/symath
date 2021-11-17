@@ -95,7 +95,7 @@ module Sy
         return argument.matrix_neg
       end
 
-      return self
+      return super
     end
 
     def type()

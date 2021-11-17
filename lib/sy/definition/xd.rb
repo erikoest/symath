@@ -14,7 +14,7 @@ module Sy
     def evaluate_call(c)
       vars = Sy.get_variable(:basis.to_m).row(0)
 
-      return c.args[0].d(vars)
+      return c.args[0].evaluate.d(vars)
     end
 
     def to_latex(args)

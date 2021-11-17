@@ -144,7 +144,7 @@ module Sy
         return term1.matrix_add(term2)
       end
 
-      return self
+      return super
     end
 
     def type()

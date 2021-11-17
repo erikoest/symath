@@ -117,9 +117,12 @@ module Sy::Operation::Differential
   end
 
   def d_power(vars)
-    return _d_wedge(_d_wedge(self, fn(:ln, base)), exponent.d(vars)) +
-           _d_wedge(_d_wedge(exponent, base**(exponent - 1)),
-                                   base.d(vars))
+    if (exponent.is_constant?(vars))
+      return _d_wedge(_d_wedge(exponent, base**(exponent - 1)), base.d(vars))
+    else
+      return _d_wedge(_d_wedge(self, fn(:ln, base)), exponent.d(vars)) +
+        _d_wedge(_d_wedge(exponent, base**(exponent - 1)), base.d(vars))
+    end
   end
 
   def d_function_def(vars)

@@ -13,7 +13,7 @@ module Sy
 
     def evaluate_call(c)
       # Must normalize input, operation depends on factorized vectors
-      return c.args[0].normalize.sharp
+      return c.args[0].evaluate.normalize.sharp
     end
     
     def to_s(args = nil)

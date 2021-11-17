@@ -198,9 +198,10 @@ gives a small description of the operator:
 User-defined operators can be added by the method define_op:
 
 ```
-# FIXME: This does not currently work
 > define_op('d2', [:f, :x], d(d(:f)/d(:x))/d(:x))
 => d2
+> d2(:x**3 + 2, :x).evaluate
+=> 6*x
 ```
 
 The user-defined function will now be available as a method in the

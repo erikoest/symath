@@ -39,7 +39,7 @@ module Sy
 
     bound.each do |from, to|
       it "integrates '#{from.to_s}' into '#{to.to_s}'" do
-        expect(from.evaluate.evaluate.normalize).to be_equal_to to
+        expect(from.evaluate.normalize).to be_equal_to to
       end
     end
 

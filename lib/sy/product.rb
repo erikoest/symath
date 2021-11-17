@@ -147,8 +147,7 @@ module Sy
         return factor2.matrix_mul(factor1)
       end
 
-      # Don't evaluate product
-      return definition.evaluate_call(self)
+      return super
     end
 
     def type()

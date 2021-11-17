@@ -41,6 +41,11 @@ module Sy
     end
 
     def evaluate()
+      # Hack: Don't evaluate arguments if the operator is the integral.
+      # this is taken care of inside the definition.
+      if name != :int
+        @args = @args.map { |a| a.evaluate }
+      end
       definition.evaluate_call(self)
     end
 

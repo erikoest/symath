@@ -132,10 +132,10 @@ module Sy
              divisor.args[0].type.is_scalar?
           v = divisor.args[0]
         else
-          return self
+          return super
         end
 
-        diff = dividend.args[0].d([v]).normalize
+        diff = dividend.args[0].evaluate.d([v]).normalize
         # Hack: We must divide all terms by dv since the simplification does
         # not recognize factors common to each term
         ret = 0
@@ -147,7 +147,7 @@ module Sy
         return ret
       end
 
-      return self
+      return super
     end
 
     def type()

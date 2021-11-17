@@ -137,8 +137,8 @@ module Sy
       res.replace(map)
 
       # Recursively evaluate the expanded formula.
-      ret = res.recurse('evaluate')
-      return ret
+      res = res.evaluate
+      return res
     end
 
     def replace(map)
