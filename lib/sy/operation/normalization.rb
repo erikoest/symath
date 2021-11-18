@@ -46,6 +46,10 @@ module Sy::Operation::Normalization
       return normalize_matrix
     end
 
+    if is_a?(Sy::Definition::Operator) and !@exp.nil?
+      @exp = @exp.normalize
+    end
+
     return recurse('normalize', 'reduce')
   end
 

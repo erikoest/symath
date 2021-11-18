@@ -80,8 +80,19 @@ module Sy
       end
     end
 
+    @@not_mentioned_funcs = {
+      :+   => true,
+      :-   => true,
+      :*   => true,
+      :/   => true,
+      :**  => true,
+      :'=' => true,
+    }
+
     def self.functions()
-      return self.definitions.grep(Sy::Definition::Function)
+      return self.definitions.select { |f|
+        f.is_function? and !@@not_mentioned_funcs[f.name]
+      }
     end
 
     @reductions = {}

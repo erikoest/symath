@@ -49,9 +49,10 @@ module Sy
       else
         # Find first free variable in expression.
         vars = [(e.variables)[0].to_m]
+        e = lmd(e, *vars)
       end
 
-      return e.d(vars)
+      return lmd(e.d(vars), *vars)
     end
 
     def latex_format()

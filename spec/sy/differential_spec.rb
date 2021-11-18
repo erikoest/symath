@@ -25,11 +25,11 @@ module Sy
 
   describe Sy::Operation::Differential, ', simple polynomials' do
     poly = {
-      d(3*x**2)                             => 6*x*dx,
-      d(x + 3*x**2 + 4*y + 10)              => 6*x*dx + dx,
-      d(lmd(3*x + 2*y**3 + 5*z**4, :x, :y)) => 6*y**2*dy + 3*dx,
-      d(lmd(3*x*z*(dx^dy) + 2*z*dz, :z))    => (((3*x)*dx)^dy)^dz,
-      d(lmd(3/x, :x))                       => -3/x**2*dx,
+      d(3*x**2)                             => lmd(6*x*dx, x),
+      d(x + 3*x**2 + 4*y + 10)              => lmd(6*x*dx + dx, x),
+      d(lmd(3*x + 2*y**3 + 5*z**4, :x, :y)) => lmd(6*y**2*dy + 3*dx, x, y),
+      d(lmd(3*x*z*(dx^dy) + 2*z*dz, :z))    => lmd((((3*x)*dx)^dy)^dz, z),
+      d(lmd(3/x, :x))                       => lmd(-3/x**2*dx, x),
     }
 
     poly.each do |from, to|
@@ -41,8 +41,8 @@ module Sy
 
   describe Sy::Operation::Differential, ', exponential functions' do
     exp = {
-      d(exp(x**2))       => 2*x*exp(x**2)*dx,
-      d(ln(3*x + x**2))  => (2*x*dx + 3*dx)/(x**2 + 3*x),
+      d(exp(x**2))       => lmd(2*x*exp(x**2)*dx, x),
+      d(ln(3*x + x**2))  => lmd((2*x*dx + 3*dx)/(x**2 + 3*x), x),
     }
 
     exp.each do |from, to|

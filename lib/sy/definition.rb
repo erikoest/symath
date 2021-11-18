@@ -31,15 +31,15 @@ module Sy
     }
 
     def self.init_builtin()
-      # Create the builtin operators. The constructor will define the
-      # operators so they can be used in expressions.
-      Sy::Definition::Operator.new(:+)
-      Sy::Definition::Operator.new(:-)
-      Sy::Definition::Operator.new(:*)
-      Sy::Definition::Operator.new(:/)
-      Sy::Definition::Operator.new(:**)
-      Sy::Definition::Operator.new(:^)
-      Sy::Definition::Operator.new(:'=')
+      # Create the builtin algebraic functions. The constructor will
+      # define the functions so they can be used in expressions.
+      Sy::Definition::Function.new(:+)
+      Sy::Definition::Function.new(:-)
+      Sy::Definition::Function.new(:*)
+      Sy::Definition::Function.new(:/)
+      Sy::Definition::Function.new(:**)
+      Sy::Definition::Function.new(:^)
+      Sy::Definition::Function.new(:'=')
 
       Sy::Definition::Constant.init_builtin
       Sy::Definition::Function.init_builtin
