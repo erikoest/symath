@@ -182,7 +182,7 @@ module Sy
 
     def inspect()
       if Sy.setting(:inspect_to_s)
-        return "#{name}"
+        return to_s
       else
         return super.inspect
       end
