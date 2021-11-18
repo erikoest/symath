@@ -18,7 +18,7 @@ Then execute:
 
 Or install it yourself as:
 
-    $ gem install sy
+    $ gem install symath
 
 ## Usage
 
@@ -34,7 +34,7 @@ A convenient way to explore the SyMath library is using the interactive
 Ruby interpreter, irb:
 
 <pre>
-  > # Load the sy library
+  > # Load the symath library
   > require 'symath'
   => false
   > # Add the symbols module to your environment
@@ -599,7 +599,7 @@ the `.gem` file to [rubygems.org](https://rubygems.org).
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at
-https://github.com/[USERNAME]/sy. This project is intended to be a
+https://github.com/erikoest/symath. This project is intended to be a
 safe, welcoming space for collaboration, and contributors are expected
 to adhere to the [Contributor
 Covenant](http://contributor-covenant.org) code of conduct.
