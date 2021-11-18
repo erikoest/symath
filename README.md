@@ -1,9 +1,8 @@
 # Sy
 
-Rudimentary symbolic math library for Ruby. Caveat: This gem is mainly
-intended as a coding excercise. The current state of the project is
-'under construction'. There are currently too many bugs to list, and
-some of the operations behave strangely.
+Rudimentary symbolic math library for Ruby. This gem is mainly intended
+as a coding excercise. The operations have not been optimized for speed.
+The current state of the project is 'under construction'.
 
 # Installation
 
@@ -13,7 +12,7 @@ Add this line to your application's Gemfile:
 gem 'sy'
 ```
 
-And then execute:
+Then execute:
 
     $ bundle
 
@@ -205,10 +204,13 @@ each free variable replaced with the input arguments to the function:
 
 A nameless user-defined function can be created using the lmd
 method. The method returns a function object which does not have a
-name, but otherwise works as a function. This is often useful when
-defining operators (see 'defining operators' section below). The
-lambda function can be called using the call method or the Ruby 'call'
-operator '()':
+name, but otherwise works as a function. The lambda function has
+important usages in operators. Since they eturn a function as the
+result, it will typically be a lambda function. Also, the lambda
+function can be used for wrapping an expression into a function before
+doing an integral or derivative, in this way telling which variables
+the operator should work on. The lambda function can be called using
+the call method or the Ruby 'call' operator '()':
 
 <pre>
   > l = lmd(:x**3 + :y**2 + 1, :x, :y)
@@ -222,14 +224,16 @@ operator '()':
 
 ### Operators
 
-The library also has some built-in operators. A list of the defined
+The library has some built-in operators, i.e. functions which take
+functions as arguments and return functions. A list of the defined
 operators is returned by the operators method. The description method
 gives a small description of the operator:
 
 <pre>
   > Sy::Definition::Operator.operators
-  => [+, -, *, /, **, ^, =, d, xd, int, bounds, sharp, flat, hodge,
-      grad, curl, div, laplacian, codiff, laplace, fourier, invfourier]
+=> [d(...), xd(...), int(...), [f](b,), #(), b(), hodge(...), grad(f),
+    curl(f), div(f), laplacian(f), codiff(f), laplace(f), fourier(f),
+    invfourier(f), dpart(f,t)]
   > codiff.description
   => "codiff(f) - codifferential of function f"
 </pre>
@@ -257,29 +261,36 @@ evaluate to itself (no reduction). Most operators which do not have an
 expression has a built in evaluation, and returns a function or
 expression according to the operator.
 
-### Derivation
+### Derivative
 
 The d-operator returns the differential of a function or expresson. If
 a function is given, the differential is made over all the free
 variables of the function. If an expression is given, the operator
 differentiates over the first free variable found in the
 expression. Wrapping the expression into a lambda function makes it
-possible to differentiate on other variables:
+possible to say which variables to differentiate over. Note that the
+differential is an operator, so it returns the result in a a lambda
+function, and not just the expression.
 
 <pre>
   > d(sin(:x)).evaluate
-  => cos(x)*dx
+  => cos(x)*dx.(x)
   > d(:x**2 + :y**3 + 1).evaluate.normalize
-  => 2*x*dx
+  => (2*x*dx).(x)
   > d(lmd(:x**2 + :y**3 + 1, :y)).evaluate.normalize
-  => 3*y**2*dy
+  => (3*y**2*dy).(y)
   > d(lmd(:x**2 + :y**3 + 1, :x, :y)).evaluate.normalize
-  => 3*y**2*dy + 2*x*dx
+  => (3*y**2*dy + 2*x*dx).(x,y)
 </pre>
 
 As a special case, the notatonal form d(f)/d(x) is recognized as the
 derivative of f with regards to x. This is calculated as d(lmd(f,
-x))/d(x)
+x))/d(x). This evaluates to the derivative expression:
+
+<pre>
+  > (d(:y**2 + :x**3 + 1)/d(:x)).evaluate
+  => 3*x**2
+</pre>
 
 The partial derivative is available as well as 'syntactic sugar':
 
@@ -323,10 +334,10 @@ reduction rules are available for the quaternions as well.
 
 ### Exterior algebra
 
-Disclamer: Exterior algebra and differential forms are not well
-understood by the author of this library. The following has not been
-reviewed by anyone who understand the subject, and may very well
-contain a lot of misunderstandings.
+Caveat: Exterior algebra and differential forms are not well
+understood by the author of this code. The following has not been
+reviewed by any others who understand the subject better than me, and
+it may very well contain a lot of errors and misunderstandings.
 
 D-forms can be wedged together, forming n-forms (note that the ^
 operator has lower preceedence in Ruby than in math, so parantheses
