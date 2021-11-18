@@ -137,6 +137,10 @@ module Sy
       return "#{name} - free variable"
     end
 
+    def call(*args)
+      return Sy::Operator.create(self, args.map { |a| a.nil? ? a : a.to_m })
+    end
+
     def ==(other)
       return false if self.class.name != other.class.name
       return false if @type != other.type

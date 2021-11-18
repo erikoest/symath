@@ -46,7 +46,7 @@ module Sy
       else
         int = exp.normalize.anti_derivative(var)
         # TODO: Setting for evaluating the bounds expression?
-        return op(:bounds, int, var.undiff, a, b).evaluate
+        return op(:bounds, lmd(int, var.undiff), a, b).evaluate
       end
     end
 

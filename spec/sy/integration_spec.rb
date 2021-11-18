@@ -62,13 +62,5 @@ module Sy
       expect { int(x/2, 0) }.to raise_error(RuntimeError, 'A cannot be defined without b and vica versa.')
       expect { op(:int, x/2, nil, 0) }.to raise_error(RuntimeError, 'A cannot be defined without b and vica versa.')
     end
-
-    it "raises error on bounds(x**2, 2, 0, 1)" do
-      expect { bounds(x**2, 2, 0, 1) }.to raise_error(RuntimeError, 'Expected variable for var, got Sy::Definition::Number')
-    end
-
-    it "raises error on bounds(x**2, dx, 0, 1)" do
-      expect { bounds(x**2, dx, 0, 1) }.to raise_error(RuntimeError, 'Expected var to be a scalar, got dx')
-    end
   end
 end

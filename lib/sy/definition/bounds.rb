@@ -4,24 +4,12 @@ require 'sy/definition/operator'
 module Sy
   class Definition::Bounds < Definition::Operator
     def initialize()
-      super(:bounds, args: [:ex, :v, :a, :b],
-            exp: fn(lmd(:ex.to_m, :v), :b) - fn(lmd(:ex.to_m, :v), :a))
+      super(:bounds, args: [:f, :a, :b],
+            exp: :f.to_m.(:b) - :f.to_m.(:a))
     end
 
     def description()
       return 'bounds(ex, x, a, b) - bounds operator, (ex)[x=b] - (ex)[x=a]'
-    end
-
-    def validate_args(e)
-      var = e.args[1]
-      
-      if !var.is_a?(Sy::Definition::Variable)
-        raise "Expected variable for var, got " + var.class.name
-      end
-
-      if !var.type.is_scalar?
-        raise "Expected var to be a scalar, got " + var.to_s
-      end
     end
 
     def to_s(args = nil)
