@@ -85,12 +85,12 @@ same to_m method:
 
 ### The SyMath::Definitions module
 
-The module SyMath::Definitions is available to be included or extended to
-your code block. It gives a Ruby method for each operator, function
-and constant that exists, so they can be referred to by their name, as
-in the code examples above. If you don't want to use the module,
-functions, operators and constants must be referred to by the fn, op
-and definition methods:
+The module SyMath::Definitions is available to be included or extended
+to your class or code block. It gives a Ruby method for each operator,
+function and constant that exists, so they can be referred to by their
+name, as in the code examples above. If you don't want to use the
+module, functions, operators and constants must be referred to by the
+fn, op and definition methods:
 
 <pre>
   > # Using the SyMath::Definitions methods
@@ -139,7 +139,7 @@ Object.inspect output. This behaviour can be disabled with the setting
   > SyMath.setting(:inspect_to_s, false)
   => false
   > ln(e) + sin(pi/2)
-  => "#&lt;SyMath::Sum:0x000055e8a1d93b38 @definition=\"\\\"#&lt;SyMath::Definition......"
+  => "#&lt;SyMath::Sum:0x000055e8a1d93b38 @definition=..."
 </pre>
 
 ### Simplification and normalizing
@@ -171,9 +171,10 @@ method gives a small description of the function:
 
 <pre>
   > SyMath::Definition::Function.functions
-  => [sqrt, sin, cos, tan, sec, csc, cot, arcsin, arccos, arctan, arcsec,
-      arccsc, arccot, ln, exp, abs, fact, sinh, cosh, tanh, coth, sech,
-      csch, arsinh, arcosh, artanh, arcoth, arsech, arcsch]
+  => [sqrt, sin, cos, tan, sec, csc, cot, arcsin, arccos, arctan,
+      arcsec, arccsc, arccot, ln, exp, abs, fact, sinh, cosh, tanh,
+      coth, sech, csch, arsinh, arcosh, artanh, arcoth, arsech,
+      arcsch]
   > sin.description
   => "sin(x) - trigonometric sine"
 </pre>
@@ -339,12 +340,26 @@ understood by the author of this code. The following has not been
 reviewed by any others who understand the subject better than me, and
 it may very well contain a lot of errors and misunderstandings.
 
+D-forms can be defined in several ways. The following are equal:
+
+<pre>
+  > # Using the to_d method on a scalar variable
+  > :x.to_m.to_d
+  => dx
+  > # Differentiating a scalar variable
+  > d(:x)
+  => dx
+  > # Creating a variable, and specifying the dform type
+  > :dx.to_m('dform')
+  => dx
+</pre>
+
 D-forms can be wedged together, forming n-forms (note that the ^
 operator has lower preceedence in Ruby than in math, so parantheses
 must be used, e.g. when adding):
 
 <pre>
-  d(:x)^d(:y)^d(:z)
+  > d(:x)^d(:y)^d(:z)
   => dx^dy^dz
   > (d(:x)^d(:x)^d(:z)).normalize
   => 0
