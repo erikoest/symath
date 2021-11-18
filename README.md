@@ -3,7 +3,7 @@
 Rudimentary symbolic math library for Ruby. Caveat: This gem is mainly
 intended as a coding excercise. The current state of the project is
 'under construction'. There are currently too many bugs to list, and
-many of the operations behave strangely.
+some of the operations behave strangely.
 
 # Installation
 
@@ -24,37 +24,38 @@ Or install it yourself as:
 ## Usage
 
 Using the library:
-```
-require 'Sy'
-```
+
+<pre>
+  > require 'Sy'
+</pre>
 
 ### Simple introduction
 
 A convenient way to explore the Sy library is using the interactive
 Ruby interpreter, irb:
 
-```
-> # Load the sy library
-> require 'sy'
-=> false
-> # Add the symbols module to your environment
-> extend Sy::Definitions
-=> main
-```
+<pre>
+  > # Load the sy library
+  > require 'sy'
+  => false
+  > # Add the symbols module to your environment
+  > extend Sy::Definitions
+  => main
+</pre>
 
 You can now say, for example:
 
-```
-> # Simplify an expression
-> sin(:x) + 2*sin(:x)
-=> 3*sin(:x)
-> # Derivative of tan(2*y + 3)
-> (d(tan(2*:y + 3))/d(:y)).evaluate
-=> 2*(tan(2*y + 3)**2 + 1)
-```
+<pre>
+  > # Simplify an expression
+  > sin(:x) + 2*sin(:x)
+  => 3*sin(:x)
+  > # Derivative of tan(2*y + 3)
+  > (d(tan(2*:y + 3))/d(:y)).evaluate
+  => 2*(tan(2*y + 3)**2 + 1)
+</pre>
 
-Ruby symbols, :x and :y in the above example, are converted to
-symbolic math variables and Ruby numbers are converted to symbolic
+Ruby symbols, :x and :y in the above example, are converted into
+symbolic math variables and Ruby numbers are converted into symbolic
 math numbers. Functions, operators and constants (e, pi, i, etc.) are
 available as methods through the Sy::Definitions module. In some cases
 it is necessary to tell Ruby that your number or symbol is to be
@@ -62,26 +63,59 @@ understood as a symbolic object, and not just a Ruby number or
 symbol. Use the to_m method to explicitly convert them to symbolic
 bjects:
 
-```
-> # Ruby integer math
-> 3**4
-=> 81
-> # Sy symbolic math
-> 3.to_m**4
-=> 3**4
-> (3.to_m**4).normalize
-=> 81
-```
+<pre>
+  > # Ruby integer math
+  > 3**4
+  => 81
+  > # Sy symbolic math
+  > 3.to_m**4
+  => 3**4
+  > (3.to_m**4).normalize
+  => 81
+</pre>
 
 An complete expression can also be converted from a string, using the
 same to_m method:
 
-```
-> 'ln(e) + sin(pi/2)'.to_m
-=> ln(e) + sin(pi/2)
-> 'ln(e) + sin(pi/2)'.to_m.normalize
-=> 2
-```
+<pre>
+  > 'ln(e) + sin(pi/2)'.to_m
+  => ln(e) + sin(pi/2)
+  > 'ln(e) + sin(pi/2)'.to_m.normalize
+  => 2
+</pre>
+
+### The Sy::Definitions module
+
+The module Sy::Definitions is available to be included or extended to
+your code block. It gives a Ruby method for each operator, function
+and constant that exists, so they can be referred to by their name, as
+in the code examples above. If you don't want to use the module,
+functions, operators and constants must be referred to by the fn, op
+and definition methods:
+
+<pre>
+  > # Using the Sy::Definitions methods
+  > sin(:x)
+  => sin(x)
+  > int(:x)
+  => int(x)
+  > e
+  => e
+  > sin
+  => sin(...)
+  > # Using the generic creator functions
+  > fn(:sin, :x)
+  => sin(x)
+  > op(:int, :x)
+  => int(x)
+  > definition(:e)
+  => e
+  > definition(:sin)
+  => sin(...)
+</pre>
+
+The Sy::Definitions module is updated dynamically after the user has
+defined new functions, operators and constants.
 
 ### String representaton of symbolic objects
 
@@ -90,24 +124,24 @@ method which returns a string representation of the object. The string
 representation is compatible with the String.to_m method which
 converts a string representation into a symbolic object:
 
-```
-> (ln(e) + sin(pi/2)).to_s
-=> "ln(e) + sin(pi/2)"
-> 'ln(e) + sin(pi/2)'.to_m
-=> ln(e) + sin(pi/2)
-```
+<pre>
+  > (ln(e) + sin(pi/2)).to_s
+  => "ln(e) + sin(pi/2)"
+  > 'ln(e) + sin(pi/2)'.to_m
+  => ln(e) + sin(pi/2)
+</pre>
 
 Sy::Value overrides the Object.inspect method, returning the to_s
 representation rather than the more verbose and less readable
 Object.inspect output. This behaviour can be disabled with the setting
 'inspect_to_s':
 
-```
-> Sy.setting(:inspect_to_s, false)
-=> false
-> ln(e) + sin(pi/2)
-=> "#<Sy::Sum:0x000055e8a1d93b38 @definition=\"\\\"#<Sy::Definition......"
-```
+<pre>
+  > Sy.setting(:inspect_to_s, false)
+  => false
+  > ln(e) + sin(pi/2)
+  => "#&lt;Sy::Sum:0x000055e8a1d93b38 @definition=\"\\\"#&lt;Sy::Definition......"
+</pre>
 
 ### Simplification and normalizing
 
@@ -116,16 +150,16 @@ expression. These can be disabled with the setting
 'compose_with_simplify'. More thorough reductions are done by the use
 of the normalize method.
 
-```
-> e*e*e*e
-=> e**4
-> Sy.setting(:compose_with_simplify, false)
-=> false
-> e*e*e*e
-=> e*e*e*e
-> sin(pi/2).normalize
-=> 1
-```
+<pre>
+  > e*e*e*e
+  => e**4
+  > Sy.setting(:compose_with_simplify, false)
+  => false
+  > e*e*e*e
+  => e*e*e*e
+  > sin(pi/2).normalize
+  => 1
+</pre>
 
 ### Functions
 
@@ -136,21 +170,23 @@ method and also as part of the 'normalize' method. A list of the
 defined functions is returned by the functions method. The description
 method gives a small description of the function:
 
-```
-> Sy::Definition::Function.functions
-=> [sqrt, sin, cos, tan, sec, csc, cot, arcsin, arccos, arctan, arcsec, arccsc, arccot, ln, exp, abs, fact, sinh, cosh, tanh, coth, sech, csch, arsinh, arcosh, artanh, arcoth, arsech, arcsch]
-> sin.description
-=> "sin(x) - trigonometric sine"
-```
+<pre>
+  > Sy::Definition::Function.functions
+  => [sqrt, sin, cos, tan, sec, csc, cot, arcsin, arccos, arctan, arcsec,
+      arccsc, arccot, ln, exp, abs, fact, sinh, cosh, tanh, coth, sech,
+      csch, arsinh, arcosh, artanh, arcoth, arsech, arcsch]
+  > sin.description
+  => "sin(x) - trigonometric sine"
+</pre>
 
 ### Defining functions
 
 User-defined functions can be added by the method define_fn:
 
-```
-> define_fn('poly', [:x, :y], :x**3 + :y**2 + 1)
-=> poly
-```
+<pre>
+  > define_fn('poly', [:x, :y], :x**3 + :y**2 + 1)
+  => poly
+</pre>
 
 The user-defined function will now be available as a method in the
 Sy::Definitions module and can be used in expressions, just as the
@@ -158,12 +194,12 @@ built in functions. Functions defined by an expression can be
 evaluated by the evaluate method, which returns the expression with
 each free variable replaced with the input arguments to the function:
 
-```
-> poly(2, 3).evaluate
-=> 2**3 + 3**2 + 1
-> poly(3).evaluate.normalize
-=> 18
-```
+<pre>
+  > poly(2, 3).evaluate
+  => 2**3 + 3**2 + 1
+  > poly(3).evaluate.normalize
+  => 18
+</pre>
 
 ### Lambda functions
 
@@ -174,11 +210,15 @@ defining operators (see 'defining operators' section below). The
 lambda function can be called using the call method or the Ruby 'call'
 operator '()':
 
-```
-> l = lmd(:x**3 + :y**2 + 1, [:x, :y])
-> l.(2, 3)
-=> (x**3 + y**2 + 1).(2,3)
-```
+<pre>
+  > l = lmd(:x**3 + :y**2 + 1, :x, :y)
+  > l.(2, 3)
+  => (x**3 + y**2 + 1).(2,3)
+  > l.(2, 3).evaluate
+  => 2**3 + 3**2 + 1
+  > l.(2, 3).evaluate.normalize
+  => 18
+</pre>
 
 ### Operators
 
@@ -186,23 +226,24 @@ The library also has some built-in operators. A list of the defined
 operators is returned by the operators method. The description method
 gives a small description of the operator:
 
-```
-> Sy::Definition::Operator.operators
-=> [+, -, *, /, **, ^, =, d, xd, int, bounds, sharp, flat, hodge, grad, curl, div, laplacian, codiff, laplace, fourier, invfourier]
-> codiff.description
-=> "codiff(f) - codifferential of function f"
-```
+<pre>
+  > Sy::Definition::Operator.operators
+  => [+, -, *, /, **, ^, =, d, xd, int, bounds, sharp, flat, hodge,
+      grad, curl, div, laplacian, codiff, laplace, fourier, invfourier]
+  > codiff.description
+  => "codiff(f) - codifferential of function f"
+</pre>
 
 ### Defining operators
 
 User-defined operators can be added by the method define_op:
 
-```
-> define_op('d2', [:f, :x], d(d(:f)/d(:x))/d(:x))
-=> d2
-> d2(:x**3 + 2, :x).evaluate
-=> 6*x
-```
+<pre>
+  > define_op('d2', [:f, :x], d(d(:f)/d(:x))/d(:x))
+  => d2
+  > d2(:x**3 + 2, :x).evaluate
+  => 6*x
+</pre>
 
 The user-defined function will now be available as a method in the
 Sy::Definitions module and can be used in expressions.
@@ -225,16 +266,16 @@ differentiates over the first free variable found in the
 expression. Wrapping the expression into a lambda function makes it
 possible to differentiate on other variables:
 
-```
-> d(sin(:x)).evaluate
-=> cos(x)*dx
-> d(:x**2 + :y**3 + 1).evaluate.normalize
-=> 2*x*dx
-> d(lmd(:x**2 + :y**3 + 1, :y)).evaluate.normalize
-=> 3*y**2*dy
-> d(lmd(:x**2 + :y**3 + 1, :x, :y)).evaluate.normalize
-=> 3*y**2*dy + 2*x*dx
-```
+<pre>
+  > d(sin(:x)).evaluate
+  => cos(x)*dx
+  > d(:x**2 + :y**3 + 1).evaluate.normalize
+  => 2*x*dx
+  > d(lmd(:x**2 + :y**3 + 1, :y)).evaluate.normalize
+  => 3*y**2*dy
+  > d(lmd(:x**2 + :y**3 + 1, :x, :y)).evaluate.normalize
+  => 3*y**2*dy + 2*x*dx
+</pre>
 
 As a special case, the notatonal form d(f)/d(x) is recognized as the
 derivative of f with regards to x. This is calculated as d(lmd(f,
@@ -242,84 +283,279 @@ x))/d(x)
 
 The partial derivative is available as well as 'syntactic sugar':
 
-```
-> dpart(:x**2 + :y**3 + 1, :x).evaluate.normalize
-=> 2*x
-> dpart(:x**2 + :y**3 + 1, :y).evaluate.normalize
-=> 3*y**2
-```
+<pre>
+  > dpart(:x**2 + :y**3 + 1, :x).evaluate.normalize
+  => 2*x
+  > dpart(:x**2 + :y**3 + 1, :y).evaluate.normalize
+  => 3*y**2
+</pre>
 
 ### Integration
 
 Integration is available as the int-operator. With one argument, the
 operator evaluates to the antiderivative of the expression:
 
-```
-> int(2**:x).evaluate
-=> 2**x/ln(2) + C
-```
+<pre>
+  > int(2**:x).evaluate
+  => 2**x/ln(2) + C
+</pre>
 
-The variable 'C' is used by convention to represent the free constant
-factor of each antiderivative.
+The variable C is used by convention to represent the free constant
+factor of the antiderivative.
 
 With three arguments, the int-operator evaluates to the definite
-integral from a to b. Evaluating once returns the 'bounds operator'
-which is defined as b(f, a, b) = f(b) - f(a). It can be evaluated once
-more in order to return the final result:
+integral from a to b:
 
-```
-> int(2**:x, 3, 4).evaluate
-=> [2**x/ln(2)](3,4)
-> int(2**:x, 3, 4).evaluate.evaluate
-=> 2**4/ln(2) - 2**3/ln(2)
-```
+<pre>
+  > int(2**:x, 3, 4).evaluate.normalize
+  => 8/ln(2)
+</pre>
 
 ### Complex numbers and quaternions
 
-TBD
+The imaginary unit, i, is available as a constant, and can be used for
+composing expressions with complex numbers. Simple reduction rules are
+built in which reduces i*i to -1, and so on.
+
+The basic quaternions, i, j, k are also available as constants. The
+quaternion i is identical to the complex imaginary unit. Some simple
+reduction rules are available for the quaternions as well.
 
 ### Exterior algebra
 
-TBD
+Disclamer: Exterior algebra and differential forms are not well
+understood by the author of this library. The following has not been
+reviewed by anyone who understand the subject, and may very well
+contain a lot of misunderstandings.
 
-D-forms. Algebra of vectors and d-forms.
+D-forms can be wedged together, forming n-forms (note that the ^
+operator has lower preceedence in Ruby than in math, so parantheses
+must be used, e.g. when adding):
 
-Exterior derivative [f : f(x1, x2, x3)]:
+<pre>
+  d(:x)^d(:y)^d(:z)
+  => dx^dy^dz
+  > (d(:x)^d(:x)^d(:z)).normalize
+  => 0
+</pre>
 
-```
-> xd(:f)
-=> f1'*dx1 + f2'*dx2 + f3'*dx3
-```
+A vector variable can be defined using the to_m method, and specifying
+the vector type.
 
-Musical isomorphisms
+<pre>
+  > :v.to_m('vector')
+  => v'
+</pre>
 
-Hodge star operator
+The exterior derivative and related operators all work in a local
+coordinate system defined by set of basic vectors of names :x1, :x2,
+x3. The names can be changed by setting the built-in variable 'basis':
 
-Gradient
-Curl
-Divergence
-Laplacian
-Codifferential
+<pre>
+  > Sy.get_variable('basis')
+  => [x1, x2, x3]
+  > Sy.assign_variable('basis', [:x, :y, :z])
+  => {dx=>x', dy=>y', dz=>z'}
+  > Sy.get_variable('basis')
+  => [x, y, z]
+</pre>
+
+The rest of this section assumes that the following scalars, vectors
+and d-forms are defined:
+
+<pre>
+  > Sy.assign_variable('basis', [:x1, :x2, :x3])
+  => {dx1=>x1', dx2=>x2', dx3=>x3'}
+  > x1  = :x1.to_m
+  > x2  = :x2.to_m
+  > x3  = :x3.to_m
+  > x1v = :x1.to_m('vector')
+  > x2v = :x2.to_m('vector')
+  > x3v = :x3.to_m('vector')
+  > dx1 = :dx1.to_m('dform')
+  > dx2 = :dx2.to_m('dform')
+  > dx3 = :dx3.to_m('dform')
+</pre>
+
+The exterior derivative is available as the xd-operator:
+
+<pre>
+  > xd(:x1 - :x1*:x2 + :x3**2).evaluate
+  => dx1 - (dx1*x2 + x1*dx2) + 2*x3*dx3
+</pre>
+
+The musical isomorphisms are available as the flat and sharp operators:
+
+<pre>
+  > flat(x1v^x2v).evaluate
+  => dx1^dx2
+  > sharp(dx1^dx2).evaluate
+  => x1'^x2'
+</pre>
+
+The flat and sharp operators use the metric tensor in their
+calculations. This is available a the built-in 'g' variable:
+
+<pre>
+  > Sy.get_variable(:g)
+  => [1, 0, 0; 0, 1, 0; 0, 0, 1]
+</pre>
+
+It can be changed using the Sy.assign_variable(:g, [value]) method.
+
+The hodge star operator is available as well:
+
+<pre>
+  > hodge(dx1^dx2).evaluate
+  => dx3
+  > hodge(3).evaluate
+  => 3*dx1^dx2^dx3
+</pre>
+
+Gradient, curl, divergence, laplacian and co-differential are defined
+from the above operators in the usual way:
+
+<pre>
+  > grad(x1 - x1*x2 + x3**2).evaluate
+  => 2*x3*x3' - x2*x1' - x1*x2' + x1'
+  > curl(-x2*x1v + x1*x2*x2v + x3*x3v).evaluate
+  => x2*x3' + x3'
+  > div(-x2*x1v + x1*x2*x2v + x3*x3v).evaluate
+  => x1 + 1
+  > laplacian(x1**2 + x2**2 + x3**2).evaluate
+  => 6
+  > codiff(x1**2*(dx1^dx3) + x2**2*(dx3^dx1) + x3**2*(dx1^dx2)).evaluate
+  => 2*x1*dx3
+</pre>
 
 ### Vectors and matrices
 
-TBD
+Vectors can be defined in the coordinate array form by converting an
+array to a math object, using the to_m method. Matrices can be created
+the same way from two dimensional arrays:
+
+<pre>
+  > m = [[1, 2, 3], [4, 5, 6]].to_m
+  > v = [-3, 4, 1].to_m
+  > m*v.transpose
+  => [1, 2, 3; 4, 5, 6]*[- 3; 4; 1]
+  > (m*v.transpose).evaluate
+  => [8; 14]
+</pre>
+
+The vector and matrix cells can of course contain symbolic expressions
+instead of just numbers.
 
 ### Methods for manipulating expressions
 
+The library contains a few more complex expression manipulation
+methods which are available to all math expression objects inheriting
+from the Sy::Value class (the root class of the expression
+components).
+
 #### Normalization
+
+The normalization method tries to put an expression on a normal form,
+based on some heuristics. 
+
+* Expressions formed by natural numbers are calculated.
+* Fractions of natural numbers are simplified as far as possible.
+* Products of equal factors are collapsed to power expressions.
+* Products of powers with equal base are collapsed.
+* Sums of equal terms are simplified to integer products.
+* Product factors are ordered if permitted by commutativity.
+* Sum terms are ordered.
+
+<pre>
+  > # FIXME: Find some better examples
+  > (:x*4*:x*3*:y*:y**10).normalize
+  => 12*x**2*y**11
+</pre>
 
 #### Variable replacement
 
+The replace method replaces takes a map of 'variable => expression' as
+argument. It looks up all instances of the variables in the original
+expression, and replaces them with the expressions given by the map:
+
+<pre>
+  > (:x**:y).replace({:x.to_m => :a + 2, :y.to_m => :b + 3})
+  => (a + 2)**(b + 3)
+</pre>
+
 #### Matching and pattern replacement
 
-#### Factorization
+The match method can be seen as a 'reverse' operation to
+replace-method covered in the last section. It compares an expression
+to a template expression containing some free variables. It returns an
+array of all possible maps for the free variables in the template so
+that it matches the original expression:
 
-#### Expand product
+<pre>
+  > (:x**2 + :y**2 + 3).match(:a + :b, [:a.to_m, :b.to_m])
+  => [{a=>x**2, b=>y**2 + 3},
+      {a=>y**2, b=>x**2 + 3},
+      {a=>3, b=>x**2 + y**2},
+      {a=>x**2 + y**2, b=>3},
+      {a=>x**2 + 3, b=>y**2},
+      {a=>y**2 + 3, b=>x**2}]
+</pre>
+
+#### Factorization and product expansion
+
+The factorization method has been ripped from the python
+Py-library. It factorizes a polynomial of one variable:
+
+<pre>
+  > (6*:x**2 + 24*:x**3 - 27*:x**4 + 18*:x**5 + 72*:x**6 - 9*:x).factorize
+  => 3*x*(2*x - 1)*(4*x + 3)*(3*x**3 + 1)
+</pre>
+
+The expand method expands the polynomial:
+
+<pre>
+  > (3*:x*(2*:x - 1)*(4*:x + 3)*(3*:x**3 + 1)).expand.normalize
+  => 72*x**6 + 18*x**5 - 27*x**4 + 24*x**3 + 6*x**2 - 9*x
+</pre>
 
 ### Settings
 
-...
+The library has some global settings which change the behaviour of the system:
+
+<pre>
+  > # List all settings
+  > Sy.settings
+  => {
+      # Symbol used when a d-form is created
+      :d_symbol                 => "d",
+      # Symbol used when a vector is stringified
+      :vector_symbol            => "'",
+      # Co-vector symbol used in a tensor type signature
+      :covector_symbol          => ".",
+      # Show all parentheses when stringifying an expression
+      :expl_parentheses         => false,
+      # Put square roots on exponent form
+      :sq_exponent_form         => false,
+      # Put fractions on exponent form
+      :fraction_exponent_form   => false,
+      # In latex strings, insert a product sign between the factors
+      :ltx_product_sign         => false,
+      # Use simplification rules when expressions are composed
+      :compose_with_simplify    => true,
+      # Use oo as complex infinity
+      :complex_arithmetic       => true,
+      # Return to_s representation by the inspect method
+      :inspect_to_s             => true,
+      # Maximum value of factorial which is normalized to a number
+      :max_calculated_factorial => 100
+     }
+  > # Show one setting
+  > Sy.setting(:vector_symbol)
+  => "'"
+  > # Change a setting
+  > Sy.setting(:vector_symbol, '¤')
+  => "¤"
+</pre>
 
 ## Development
 
