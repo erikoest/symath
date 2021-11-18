@@ -1,4 +1,4 @@
-# Sy
+# SyMath
 
 Rudimentary symbolic math library for Ruby. This gem is mainly intended
 as a coding excercise. The operations have not been optimized for speed.
@@ -9,7 +9,7 @@ The current state of the project is 'under construction'.
 Add this line to your application's Gemfile:
 
 ```
-gem 'sy'
+gem 'symath'
 ```
 
 Then execute:
@@ -25,20 +25,20 @@ Or install it yourself as:
 Using the library:
 
 <pre>
-  > require 'Sy'
+  > require 'SyMath'
 </pre>
 
 ### Simple introduction
 
-A convenient way to explore the Sy library is using the interactive
+A convenient way to explore the SyMath library is using the interactive
 Ruby interpreter, irb:
 
 <pre>
   > # Load the sy library
-  > require 'sy'
+  > require 'symath'
   => false
   > # Add the symbols module to your environment
-  > extend Sy::Definitions
+  > extend SyMath::Definitions
   => main
 </pre>
 
@@ -56,7 +56,7 @@ You can now say, for example:
 Ruby symbols, :x and :y in the above example, are converted into
 symbolic math variables and Ruby numbers are converted into symbolic
 math numbers. Functions, operators and constants (e, pi, i, etc.) are
-available as methods through the Sy::Definitions module. In some cases
+available as methods through the SyMath::Definitions module. In some cases
 it is necessary to tell Ruby that your number or symbol is to be
 understood as a symbolic object, and not just a Ruby number or
 symbol. Use the to_m method to explicitly convert them to symbolic
@@ -66,7 +66,7 @@ bjects:
   > # Ruby integer math
   > 3**4
   => 81
-  > # Sy symbolic math
+  > # SyMath symbolic math
   > 3.to_m**4
   => 3**4
   > (3.to_m**4).normalize
@@ -83,9 +83,9 @@ same to_m method:
   => 2
 </pre>
 
-### The Sy::Definitions module
+### The SyMath::Definitions module
 
-The module Sy::Definitions is available to be included or extended to
+The module SyMath::Definitions is available to be included or extended to
 your code block. It gives a Ruby method for each operator, function
 and constant that exists, so they can be referred to by their name, as
 in the code examples above. If you don't want to use the module,
@@ -93,7 +93,7 @@ functions, operators and constants must be referred to by the fn, op
 and definition methods:
 
 <pre>
-  > # Using the Sy::Definitions methods
+  > # Using the SyMath::Definitions methods
   > sin(:x)
   => sin(x)
   > int(:x)
@@ -113,12 +113,12 @@ and definition methods:
   => sin(...)
 </pre>
 
-The Sy::Definitions module is updated dynamically after the user has
+The SyMath::Definitions module is updated dynamically after the user has
 defined new functions, operators and constants.
 
 ### String representaton of symbolic objects
 
-Symbolic math objects, inheriting from Sy::Value, all have a to_s
+Symbolic math objects, inheriting from SyMath::Value, all have a to_s
 method which returns a string representation of the object. The string
 representation is compatible with the String.to_m method which
 converts a string representation into a symbolic object:
@@ -130,16 +130,16 @@ converts a string representation into a symbolic object:
   => ln(e) + sin(pi/2)
 </pre>
 
-Sy::Value overrides the Object.inspect method, returning the to_s
+SyMath::Value overrides the Object.inspect method, returning the to_s
 representation rather than the more verbose and less readable
 Object.inspect output. This behaviour can be disabled with the setting
 'inspect_to_s':
 
 <pre>
-  > Sy.setting(:inspect_to_s, false)
+  > SyMath.setting(:inspect_to_s, false)
   => false
   > ln(e) + sin(pi/2)
-  => "#&lt;Sy::Sum:0x000055e8a1d93b38 @definition=\"\\\"#&lt;Sy::Definition......"
+  => "#&lt;SyMath::Sum:0x000055e8a1d93b38 @definition=\"\\\"#&lt;SyMath::Definition......"
 </pre>
 
 ### Simplification and normalizing
@@ -152,7 +152,7 @@ of the normalize method.
 <pre>
   > e*e*e*e
   => e**4
-  > Sy.setting(:compose_with_simplify, false)
+  > SyMath.setting(:compose_with_simplify, false)
   => false
   > e*e*e*e
   => e*e*e*e
@@ -170,7 +170,7 @@ defined functions is returned by the functions method. The description
 method gives a small description of the function:
 
 <pre>
-  > Sy::Definition::Function.functions
+  > SyMath::Definition::Function.functions
   => [sqrt, sin, cos, tan, sec, csc, cot, arcsin, arccos, arctan, arcsec,
       arccsc, arccot, ln, exp, abs, fact, sinh, cosh, tanh, coth, sech,
       csch, arsinh, arcosh, artanh, arcoth, arsech, arcsch]
@@ -188,7 +188,7 @@ User-defined functions can be added by the method define_fn:
 </pre>
 
 The user-defined function will now be available as a method in the
-Sy::Definitions module and can be used in expressions, just as the
+SyMath::Definitions module and can be used in expressions, just as the
 built in functions. Functions defined by an expression can be
 evaluated by the evaluate method, which returns the expression with
 each free variable replaced with the input arguments to the function:
@@ -230,7 +230,7 @@ operators is returned by the operators method. The description method
 gives a small description of the operator:
 
 <pre>
-  > Sy::Definition::Operator.operators
+  > SyMath::Definition::Operator.operators
 => [d(...), xd(...), int(...), [f](b,), #(), b(), hodge(...), grad(f),
     curl(f), div(f), laplacian(f), codiff(f), laplace(f), fourier(f),
     invfourier(f), dpart(f,t)]
@@ -250,7 +250,7 @@ User-defined operators can be added by the method define_op:
 </pre>
 
 The user-defined function will now be available as a method in the
-Sy::Definitions module and can be used in expressions.
+SyMath::Definitions module and can be used in expressions.
 
 ### Evaluating functions and operators
 
@@ -363,11 +363,11 @@ coordinate system defined by set of basic vectors of names :x1, :x2,
 x3. The names can be changed by setting the built-in variable 'basis':
 
 <pre>
-  > Sy.get_variable('basis')
+  > SyMath.get_variable('basis')
   => [x1, x2, x3]
-  > Sy.assign_variable('basis', [:x, :y, :z])
+  > SyMath.assign_variable('basis', [:x, :y, :z])
   => {dx=>x', dy=>y', dz=>z'}
-  > Sy.get_variable('basis')
+  > SyMath.get_variable('basis')
   => [x, y, z]
 </pre>
 
@@ -375,7 +375,7 @@ The rest of this section assumes that the following scalars, vectors
 and d-forms are defined:
 
 <pre>
-  > Sy.assign_variable('basis', [:x1, :x2, :x3])
+  > SyMath.assign_variable('basis', [:x1, :x2, :x3])
   => {dx1=>x1', dx2=>x2', dx3=>x3'}
   > x1  = :x1.to_m
   > x2  = :x2.to_m
@@ -408,11 +408,11 @@ The flat and sharp operators use the metric tensor in their
 calculations. This is available a the built-in 'g' variable:
 
 <pre>
-  > Sy.get_variable(:g)
+  > SyMath.get_variable(:g)
   => [1, 0, 0; 0, 1, 0; 0, 0, 1]
 </pre>
 
-It can be changed using the Sy.assign_variable(:g, [value]) method.
+It can be changed using the SyMath.assign_variable(:g, [value]) method.
 
 The hodge star operator is available as well:
 
@@ -461,7 +461,7 @@ instead of just numbers.
 
 The library contains a few more complex expression manipulation
 methods which are available to all math expression objects inheriting
-from the Sy::Value class (the root class of the expression
+from the SyMath::Value class (the root class of the expression
 components).
 
 #### Normalization
@@ -535,7 +535,7 @@ The library has some global settings which change the behaviour of the system:
 
 <pre>
   > # List all settings
-  > Sy.settings
+  > SyMath.settings
   => {
       # Symbol used when a d-form is created
       :d_symbol                 => "d",
@@ -561,10 +561,10 @@ The library has some global settings which change the behaviour of the system:
       :max_calculated_factorial => 100
      }
   > # Show one setting
-  > Sy.setting(:vector_symbol)
+  > SyMath.setting(:vector_symbol)
   => "'"
   > # Change a setting
-  > Sy.setting(:vector_symbol, '¤')
+  > SyMath.setting(:vector_symbol, '¤')
   => "¤"
 </pre>
 
@@ -596,6 +596,6 @@ License](https://opensource.org/licenses/MIT).
 
 ## Code of Conduct
 
-Everyone interacting in the Sy project’s codebases, issue trackers,
+Everyone interacting in the SyMath project’s codebases, issue trackers,
 chat rooms and mailing lists is expected to follow the [code of
-conduct](https://github.com/[USERNAME]/sy/blob/master/CODE_OF_CONDUCT.md).
+conduct](https://github.com/erikoest/symath/blob/master/CODE_OF_CONDUCT.md).

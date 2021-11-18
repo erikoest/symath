@@ -2,15 +2,15 @@ require 'simplecov'
 SimpleCov.start
 
 require "bundler/setup"
-require 'sy'
+require 'symath'
 
 # Make shortcut symbol methods available to rspec code
 class RSpec::Core::ExampleGroup
-  include Sy::Definitions
+  include SyMath::Definitions
 end
 
 class Class
-  include Sy::Definitions
+  include SyMath::Definitions
 end
 
 RSpec.configure do |config|
