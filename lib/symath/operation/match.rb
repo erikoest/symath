@@ -102,6 +102,9 @@ module SyMath::Operation::Match
   # match is found, nil is returned. An optional boundvars hash contains a
   # map of variables to expressions which are required to match exactly.
   def match(exp, freevars, boundvars = {})
+    # Mathify free variables
+    freevars = freevars.map { |v| v.to_m }
+
     # Traverse self and exp in parallel. Match subexpressions recursively,
     # and match end nodes one by one. The two value nodes are compared for
     # equality and each argument are matched recursively.
@@ -162,5 +165,39 @@ module SyMath::Operation::Match
     # All value types should be covered at this point, but one never knows.
     raise 'Don\'t know how to compare value type ' + exp.class.to_s
     # :nocov:
+  end
+
+  def match_replace(exp, replace, freevars)
+    # Recursively try to match exp to subexpressions of self. If a match
+    # is found, replace it and return.
+
+    # First try to match the top expression
+    matches = match(exp, freevars)
+    if !matches.nil? and matches.length >= 1
+      # If there are more than one match, pick the first
+      ret = replace.deep_clone
+      ret.replace(matches[0])
+      return ret
+    end
+
+    # No match at top level. Try to match sub expressions.
+    if is_a?(SyMath::Operator)
+      gotmatch = false
+
+      args2 = @args
+
+      args2.each_with_index do |a, i|
+        matched = a.match_replace(exp, replace, freevars)
+        if matched != a
+          args[i] = matched
+          ret = deep_clone
+          ret.args[i] = matched
+          return ret
+        end
+      end
+    end
+
+    # No match.
+    return self
   end
 end

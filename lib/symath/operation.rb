@@ -1,11 +1,11 @@
 module SyMath::Operation
   # Repeat method until there are no changes
-  def iterate(method)
-    ret = deep_clone.send(method)
+  def iterate(method, *args)
+    ret = deep_clone.send(method, *args)
     if ret == self
       return ret
     else
-      return ret.iterate(method)
+      return ret.iterate(method, *args)
     end
   end
 
