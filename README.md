@@ -304,8 +304,15 @@ The partial derivative is available as well as 'syntactic sugar':
 
 ### Integration
 
-Integration is available as the int-operator. With one argument, the
-operator evaluates to the antiderivative of the expression:
+Integration is available as the int-operator. The algorithm is only a
+very simple one, imitating the most basic techniques of finding the
+anti-derivative, combined with a few well known equation patterns. The
+operation also has a limitation when it comes to non-commutable
+terms (matrices, quaternions, etc.). In that case, the result is not
+reliable.
+
+With one argument, the operator evaluates to the antiderivative of the
+expression:
 
 <pre>
   > int(2**:x).evaluate
@@ -525,6 +532,21 @@ that it matches the original expression:
       {a=>x**2 + y**2, b=>3},
       {a=>x**2 + 3, b=>y**2},
       {a=>y**2 + 3, b=>x**2}]
+</pre>
+
+#### Match/replace operation
+
+The match_replace method tries to find an occurence of a pattern in
+the expression, and replaces it if it is found. The method can be used
+together with the iterate method. The latter repeats a method until
+there are no more changes:
+
+<pre>
+  > a = sin(sin(sin(:a + :b) - sin(:f)))
+  > a.match_replace(sin(:x), :e*:x, [:x])
+  => e*sin(sin(a + b) - sin(f))
+  > a.iterate('match_replace', sin(:x), :e*:x, [:x])
+  => e*e*(e*(a + b) - e*f)
 </pre>
 
 #### Factorization and product expansion
