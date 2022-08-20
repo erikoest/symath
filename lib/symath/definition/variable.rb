@@ -125,12 +125,8 @@ module SyMath
       return @@hodge_map[exp]
     end
     
-    attr_reader :name
-    attr_reader :type
-  
     def initialize(name, t = 'real')
-      @type = t.to_t
-      super(name, define_symbol: false)
+      super(name, define_symbol: false, type: t)
     end
 
     def description()
@@ -237,32 +233,26 @@ module SyMath
       end
     end
 
-    def to_s()
-      if @type.is_dform?
-        return SyMath.setting(:d_symbol) + undiff.to_s
-      elsif @type.is_vector?
-        return @name.to_s + SyMath.setting(:vector_symbol)
-      elsif @type.is_covector?
-        return @name.to_s + SyMath.setting(:covector_symbol)
-      elsif @type.is_subtype?('tensor')
-        return @name.to_s + '['.to_s + @type.index_str + ']'.to_s
-      else
-        return @name.to_s
-      end
-    end
-
     def to_latex()
       if type.is_dform?
         return '\mathrm{d}' + undiff.to_latex
       elsif @type.is_vector?
-        return '\vec{'.to_s + @name.to_s + '}'.to_s
+        if SyMath.setting(:braket_syntax)
+          return "\\ket{#{qubit_name}}"
+        else
+          return "\\vec{#{@name}}"
+        end
       elsif @type.is_covector?
         # What is the best way to denote a covector without using indexes?
-        return '\vec{'.to_s + @name.to_s + '}'.to_s
+        if SyMath.setting(:braket_syntax)
+          return "\\bra{#{qubit_name}}"
+        else
+          return "\\vec{#{@name}}"
+        end
       elsif @type.is_subtype?('tensor')
-        return @name.to_s + '['.to_s + @type.index_str + ']'.to_s
+        return "#{@name}[#{@type.index_str}]"
       else
-        return @name.to_s
+        return "#{@name}"
       end
     end
 
@@ -271,11 +261,19 @@ module SyMath
 end
 
 class Symbol
-  def to_m(type = 'real')
+  def to_m(type = nil)
+    if type.nil?
+      # No type supplied. Determine type from value
+      type = SyMath::Definition::Constant.default_type_for_constant(self)
+      if type.nil?
+        type = 'real'
+      end
+    end
+
     begin
       # Look up the already defined symbol
       # (we might want to check that it is a constant or variable)
-      return SyMath::Definition.get(self)
+      return SyMath::Definition.get(self, type)
     rescue
       # Not defined. Define it now.
       return SyMath::Definition::Variable.new(self, type)

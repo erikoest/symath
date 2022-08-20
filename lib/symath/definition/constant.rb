@@ -13,31 +13,58 @@ module SyMath
 
     @@descriptions = {
       :pi  => 'ratio of cirle cirumference/diameter (3.14159265...)',
-      :e   => 'eulers number (2.71828182...)',
+      :e   => "euler's number (2.71828182...)",
       :phi => 'golden ratio (1.61803398...)',
       :nan => "'not a number', i.e. an invalid value",
       :oo  => 'positive infinity',
       :i   => 'imaginary unit, first basic quaternion',
       :j   => 'second basic quaternion',
       :k   => 'third basic quaternion',
+      :q0  => 'qubit value |0>',
+      :q1  => 'qubit value |1>',
+      :qminus => 'qubit value |->',
+      :qpluss => 'qubit value |+>',
     }
 
     @@unit_quaternions = [:i, :j, :k].to_set
 
+    @@builtin_constants = {
+      :pi => 'real',
+      :e  => 'real',
+      :phi => 'real',
+      :nan => 'nonfinite',
+      :oo  => 'nonfinite',
+      :i   => 'imaginary',
+      :j   => 'quaternion',
+      :k   => 'quaternion',
+      :q0  => 'vector',
+      :q1  => 'vector',
+      :qminus => 'vector',
+      :qpluss => 'vector',
+    }
+
+    def self.default_type_for_constant(c)
+      return @@builtin_constants[c]
+    end
+
     def self.init_builtin()
       # Define the builtin constants
-      self.new(:pi)
-      self.new(:e)
-      self.new(:phi)
-      self.new(:nan)
-      self.new(:oo)
-      self.new(:i)
-      self.new(:j)
-      self.new(:k)
+      @@builtin_constants.each do |k, v|
+        self.new(k, v)
+      end
+
+      self.new(:q0, 'covector')
+      self.new(:q1, 'covector')
+      self.new(:qminus, 'covector')
+      self.new(:qpluss, 'covector')
     end
 
     def self.constants()
       return self.definitions.grep(SyMath::Definition::Constant)
+    end
+
+    def initialize(name, t = 'real')
+      super(name, type: t)
     end
 
     def description()
@@ -85,19 +112,6 @@ module SyMath
       }
     
       return qmap[@name][q.name]
-    end
-
-    def type()
-      n = @name
-      if n == :e or n == :pi or n == :phi
-        return 'real'.to_t
-      elsif n == :i
-        return 'imaginary'.to_t
-      elsif is_unit_quaternion?
-        return 'quaternion'.to_t
-      else
-        return 'nonfinite'.to_t
-      end
     end
 
     def to_latex()

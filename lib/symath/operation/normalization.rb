@@ -3,7 +3,7 @@ require 'prime'
 
 module SyMath::Operation::Normalization
   include SyMath::Operation
-  
+
   # This operation provides an expression object with the normalize() method
   # which normalizes an expression:
   #
@@ -36,6 +36,10 @@ module SyMath::Operation::Normalization
 
     if is_prod_exp?
       return normalize_product
+    end
+
+    if is_a?(SyMath::Wedge)
+      return normalize_wedge
     end
 
     if is_a?(SyMath::Power)
@@ -131,6 +135,20 @@ module SyMath::Operation::Normalization
     return e
   end
 
+  def normalize_wedge()
+    ret = nil
+
+    self.wedge_factors.each do |w|
+      if ret.nil?
+        ret = w
+      else
+        ret = ret^w
+      end
+    end
+
+    return ret
+  end
+
   def normalize_power()
     norm = base.normalize.power(exponent.normalize)
     e, sign, changed = norm.reduce_modulo_sign
@@ -202,7 +220,6 @@ module SyMath::Operation::Normalization
 
     while !done
       done = true
-
       ex = head
       prev = nil
 
@@ -222,7 +239,6 @@ module SyMath::Operation::Normalization
         end
 
         sign *= sign2
-
         ex, sign2, changed = ex.combine_factors
         done = false if changed
         sign *= sign2
@@ -340,6 +356,29 @@ module SyMath::Operation::Normalization
       end
     end
 
+    if !f1.type.is_scalar? or !f2.type.is_scalar?
+      if f1.type.is_covector? and f2.type.is_vector?
+        # Reduce pair of covector and vector
+        ret = f1.reduce_braket_pair(f2)
+        if ret.nil?
+          return self, 1, false
+        else
+          return replace_combined_factors(ret), 1, true
+        end
+      elsif f1.type.is_dform? and f2.type.is_dform?
+        # Dforms: dx^dx => 0
+        if f1 == f2
+          return replace_combined_factors(0.to_m), 1, true
+        else
+          return self, 1, false
+        end
+      else
+        # No reduction
+        return self, 1, false
+      end
+    end
+
+    # Only reduce scalars
     if f1.is_a?(SyMath::Power)
       base1 = f1.base
       exp1 = f1.exponent
@@ -357,12 +396,14 @@ module SyMath::Operation::Normalization
     end
 
     if base1 == base2
-      if base1.type.is_subtype?('tensor') and
-        base2.type.is_subtype?('tensor') and
-        (exp1 + exp2).is_number? and
-        (exp1 + exp2).value > 1
-        return replace_combined_factors(0.to_m), 1, true
-      end
+## Replace dx**n => 0 (can be removed. We don't raise power of dforms.
+## Rather, we need to optimize dx^dx => 0)
+#      if base1.type.is_subtype?('tensor') and
+#        base2.type.is_subtype?('tensor') and
+#        (exp1 + exp2).is_number? and
+#        (exp1 + exp2).value > 1
+#        return replace_combined_factors(0.to_m), 1, true
+#      end
       
       return replace_combined_factors(base1**(exp1 + exp2)), 1, true
     end

@@ -33,7 +33,7 @@ module SyMath
       '123!'          => fact(123),
       'dx^dy^dz'      => ((dx^dy)^dz),
       "xv'^yv'^zv'"   => ((xv^yv)^zv),
-      '|x + y|'       => abs(x + y),
+      '|(x + y)|'     => abs(x + y),
       '#dx'           => sharp(dx),
       '#(dx^dy)'      => sharp(dx^dy),
       'b(x*dx + dy)'  => flat(x*dx + dy),

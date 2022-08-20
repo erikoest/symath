@@ -27,10 +27,9 @@ module SyMath
               :vector => 1,
             },
             :nform => {
-              :covector => {
-                :dform => 1,
-              },
+              :dform => 1,
             },
+            :covector => 1,
           },
           # Scalar types
           :quaternion => {
@@ -62,7 +61,7 @@ module SyMath
           end
           @@subtype[k][b] = 1
         end
-        
+
         next unless hiera[k].is_a?(Hash)
 
         fill_subtype_hash(hiera[k], bases + [k])
@@ -140,8 +139,7 @@ module SyMath
       elsif self == other
         return self
       elsif self.is_subtype?('tensor') or other.is_subtype?('tensor')
-        # FIXME: Hack. This is probably not true. 
-        return self
+        return 'tensor'.to_t
       else
         raise "Types #{self} and #{other} cannot be summed."
       end
@@ -152,12 +150,29 @@ module SyMath
       scalar = is_scalar?
       oscalar = other.is_scalar?
       
+      # Do some of these cases belong to the wedge operator?
       if scalar and oscalar
         return common_parent(other)
       elsif scalar
         return other
       elsif oscalar
         return self
+      elsif is_covector? and other.is_covector?
+        # Outer product of covectors
+        # FIXME: Should the result be an n-covector (multilinear form)?
+        return 'covector'.to_t
+      elsif is_nform? and other.is_nform?
+        indexes = self.indexes + other.indexes
+        return 'nform'.to_t(indexes: indexes)
+      elsif is_vector? and other.is_vector?
+        # Outer product of vectors
+        return 'nvector'.to_t
+      elsif is_covector? and other.is_vector?
+        # Inner product of covector and vector
+        return 'scalar'.to_t
+      elsif is_vector? and other.is_covector?
+        # Outer product of vector and covector
+        return 'linop'
       elsif is_subtype?('matrix') and
            other.is_subtype?('matrix') and
            dimn == other.dimm
@@ -166,7 +181,35 @@ module SyMath
         raise "Types #{self} and #{other} cannot be multiplied"
       end
     end
-    
+
+    def wedge(other)
+      if is_subtype?('tensor') and
+         other.is_subtype?('tensor')
+        # Wedge product of two tensor-like object. Determine index signature
+        # and subtype.
+        ix = indexes + other.indexes
+        if (ix - ['u']).empty?
+          ret = 'nvector'
+        elsif (ix - ['l']).empty?
+          ret = 'nform'
+        else
+          ret = 'tensor'
+        end
+
+        return ret.to_t(indexes: ix)
+      end
+
+      if is_scalar?
+        return other
+      end
+
+      if other.is_scalar?
+        return self
+      end
+
+      raise "Types #{self} and #{other} cannot be wedged"
+    end
+
     # Return tensor degree (rank)
     def degree()
       return @indexes.length
@@ -217,7 +260,6 @@ module SyMath
       return is_subtype?('nform')
     end
 
-    # FIXME: What is the difference between a covector and a dform?
     def is_covector?()
       return is_subtype?('covector')
     end

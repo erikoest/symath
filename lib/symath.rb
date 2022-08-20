@@ -7,6 +7,7 @@ require 'symath/sum'
 require 'symath/minus'
 require 'symath/product'
 require 'symath/wedge'
+require 'symath/outer'
 require 'symath/fraction'
 require 'symath/power'
 require 'symath/definition'
@@ -27,6 +28,8 @@ module SyMath
     # Symbol used to represent covector variables
     :covector_symbol => '.',
 
+    # Use (dirac) braket syntax for vectors and covectors
+    :braket_syntax => false,
     # Show all parantheses on +, *, / and ^ operators.
     :expl_parentheses => false,
     # Represent square roots with the root symbol or as a fraction exponent

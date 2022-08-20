@@ -30,11 +30,32 @@ module SyMath
       # a*(-b) => -(a*b)
       return -(a*b.argument) if b.is_a?(SyMath::Minus)
       return -(a.argument*b) if a.is_a?(SyMath::Minus)
-      
+
       if b.is_a?(SyMath::Matrix)
         return self.new(a, b)
       end
-      
+
+      # Tensor-like objects
+      if a.type.is_subtype?(:tensor) and b.type.is_subtype?(:tensor)
+        if a.type.is_subtype?(:nform) and b.type.is_subtype?(:nform)
+          # Expand expression if any of the parts are sum
+          if b.is_sum_exp?
+            return b.terms.map { |f| a.*(f) }.inject(:+)
+          end
+
+          if a.is_sum_exp?
+            return a.terms.map { |f| f.wedge(b) }.inject(:+)
+          end
+
+          return a.wedge(b)
+        end
+
+        if (a.type.is_subtype?(:covector) and b.type.is_subtype?(:covector)) or
+          (a.type.is_subtype?(:vector) and b.type.is_subtype?(:vector))
+          return a.outer(b)
+        end
+      end
+
       if a.base == b.base
         return a.base ** (a.exponent + b.exponent)
       end
@@ -47,19 +68,6 @@ module SyMath
       # a*(1/b) => a*/b
       if b.is_a?(SyMath::Fraction) and b.dividend == 1.to_m
         return a/b.divisor
-      end
-
-      if a.type.is_subtype?(:tensor) and b.type.is_subtype?(:tensor)
-        # Expand expression if any of the parts are sum
-        if b.is_sum_exp?
-          return b.terms.map { |f| a.*(f) }.inject(:+)
-        end
-
-        if a.is_sum_exp?
-          return a.terms.map { |f| f.wedge(b) }.inject(:+)
-        end
-        
-        return a.wedge(b)
       end
 
       return self.new(a, b)
@@ -138,7 +146,7 @@ module SyMath
         factor2.factors.each { |f2| f << f2 }
       end
     end
-    
+
     def evaluate()
       if factor1.is_a?(SyMath::Matrix)
         return factor1.matrix_mul(factor2)
@@ -154,23 +162,80 @@ module SyMath
       return factor1.type.product(factor2.type)
     end
 
+    def mul_symbol()
+      return '*'
+    end
+
+    def mul_symbol_ltx()
+      return '\cdot'
+    end
+
     def to_s()
       if SyMath.setting(:expl_parentheses)
-        return '('.to_s + factor1.to_s + '*' + factor2.to_s + ')'.to_s
-      else
-        return @args.map do |a|
-          if a.is_sum_exp?
-            '(' + a.to_s + ')'
-          else
-            a.to_s
-          end
-        end.join('*')
+        return '('.to_s + factor1.to_s + mul_symbol + factor2.to_s + ')'.to_s
       end
+
+      if SyMath.setting(:braket_syntax)
+        left = factor1.to_s
+        if factor1.is_sum_exp?
+          left = "(#{left})"
+        end
+
+        right = factor2.to_s
+        if factor2.is_sum_exp?
+          right = "(#{right})"
+        end
+
+        if left[-1] == '|' and right[0] == '|'
+          return "#{left}#{right[1..-1]}"
+        elsif (left[-1] == '|' and right[0] == '<') or
+              (left[-1] == '>' and right[0] == '|')
+          return "#{left[0..-2]},#{right[1..-1]}"
+        elsif left == '>' and right == '<'
+          return "#{left}#{right}"
+        else
+          return "#{left} #{right}"
+        end
+      end
+
+      return @args.map do |a|
+        if a.is_sum_exp?
+          '(' + a.to_s + ')'
+        else
+          a.to_s
+        end
+      end.join(mul_symbol)
     end
 
     def to_latex()
-      dot = SyMath.setting(:ltx_product_sign) ? ' \cdot ' : ' ';
-      
+      dot = SyMath.setting(:ltx_product_sign) ? " #{mul_symbol_ltx} " : ' '
+
+      if SyMath.setting(:braket_syntax)
+        left = factor1.to_latex
+        if factor1.is_sum_exp?
+          left = "(#{left})"
+        end
+
+        right = factor2.to_latex
+        if factor2.is_sum_exp?
+          right = "(#{right})"
+        end
+
+        ret = "#{left} #{right}"
+
+        # Combine bra-kets
+        ret = ret.gsub(/\\bra{([^}]+)} \\bra{([^}]+)}/, '\bra{\1, \2}')
+        ret = ret.gsub(/\\ket{([^}]+)} \\ket{([^}]+)}/, '\ket{\1, \2}')
+        ret = ret.gsub(/\\bra{([^}]+)} \\ket{([^}]+)}/, '\braket{\1}{\2}')
+
+        ret = ret.gsub(/\\bra{([^}]+)} \\braket{([^}]+)}{([^}]+)}/,
+                       '\braket{\1, \2}{\3}')
+        ret = ret.gsub(/\\braket{([^}]+)}{([^}]+)} \\ket{([^}]+)}/,
+                       '\braket{\1}{\2, \3}')
+
+        return ret
+      end
+
       return @args.map do |a|
         if a.is_sum_exp?
           '(' + a.to_latex + ')'

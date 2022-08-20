@@ -39,9 +39,10 @@ module SyMath
 
     def self.create(definition, *args)
       if !definition.is_a?(SyMath::Value)
-        definition = SyMath::Definition.get(definition)
+        # Hack: Assume operator type
+        definition = SyMath::Definition.get(definition, 'operator')
       end
-      
+
       if SyMath.setting(:compose_with_simplify)
         return self.compose_with_simplify(definition, *args)
       else
@@ -164,6 +165,10 @@ module SyMath
       return SyMath::Wedge.new(self, other.to_m)
     end
 
+    def outer(other)
+      return SyMath::Outer.new(self, other.to_m)
+    end
+
     ##
     # Overridden object operators.
     # These operations do some simple reductions.
@@ -197,9 +202,7 @@ module SyMath
     end
 
     def ^(other)
-      # Identical with *. We apply * or ^ depending on what
-      # the arguments are.
-      return self*other
+      return SyMath::Wedge.create(self, other)
     end
 
     ##
@@ -234,9 +237,14 @@ module SyMath
     def exponent()
       return 1.to_m
     end
-    
+
     # Return factors in enumerator
     def factors()
+      return [self].to_enum
+    end
+
+    # Return factors of wedge product
+    def wedge_factors()
       return [self].to_enum
     end
 

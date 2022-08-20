@@ -1,8 +1,21 @@
 # SyMath
 
 Rudimentary symbolic math library for Ruby. This gem is mainly intended
-as a coding excercise. The operations have not been optimized for speed.
+as a coding exercise. The operations have not been optimized for speed.
 The current state of the project is 'under construction'.
+
+Supported features:
+  * Composing formulas from +, -, *, / and other standard algebraic operations
+  * Reduction rules
+  * Derivation
+  * Simple heuristic integration (not cad-level)
+  * Simple polynomial factorization with one variable
+  * Complex numbers and quaternions
+  * Exterior algebra and exterior derivative (limited and possibly faulty)
+  * Operator composition algebra (limited)
+  * Vectors and covectors
+  * Braket notation for vectors, covectors and linear operators
+  * Matrices
 
 # Installation
 

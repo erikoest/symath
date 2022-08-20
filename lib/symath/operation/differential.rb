@@ -19,13 +19,12 @@ module SyMath::Operation::Differential
   # Module initialization
   def self.initialize()
     # Map of single argument functions to their derivative.
-    # FIXME: Check whether this still works if the symbol a is defined?
     @@functions = {
       # Exponential and trigonometric functions
-      :exp => definition(:exp),
+      :exp => definition(:exp, 'operator'),
       :ln  => lmd(1.to_m/:a.to_m, :a),
       # Trigonometric functions
-      :sin => definition(:cos),
+      :sin => definition(:cos, 'operator'),
       :cos => lmd(- fn(:sin, :a), :a),
       :tan => lmd(1.to_m + fn(:tan, :a)**2, :a),
       :cot => lmd(- (1.to_m + fn(:cot, :a)**2), :a),
@@ -39,8 +38,8 @@ module SyMath::Operation::Differential
       :arccsc => lmd(- 1.to_m/(fn(:abs, :a)*fn(:sqrt, :a.to_m**2 - 1)), :a),
       :arccot => lmd(- 1.to_m/(1.to_m + :a.to_m**2), :a),
       # Hyperbolic functions
-      :sinh => definition(:cosh),
-      :cosh => definition(:sinh),
+      :sinh => definition(:cosh, 'operator'),
+      :cosh => definition(:sinh, 'operator'),
       :tanh => lmd(fn(:sech, :a)**2, :a),
       :sech => lmd(- fn(:tanh, :a)*fn(:sech, :a), :a),
       :csch => lmd(- fn(:coth, :a)*fn(:csch, :a), :a),
@@ -106,22 +105,22 @@ module SyMath::Operation::Differential
   # For simplicity, just use wedge products all the time. They will be
   # normalized to scalar products afterwards.
   def d_product(vars)
-    return (_d_wedge(factor1.d(vars), factor2) +
-            _d_wedge(factor1, factor2.d(vars)))
+    return ((factor1.d(vars)^factor2) +
+            (factor1^factor2.d(vars)))
   end
 
   def d_fraction(vars)
-    return (_d_wedge(dividend.d(vars), divisor) -
-            _d_wedge(dividend, divisor.d(vars))) /
+    return ((dividend.d(vars)^divisor) -
+            (dividend^divisor.d(vars))) /
            (divisor**2)
   end
 
   def d_power(vars)
     if (exponent.is_constant?(vars))
-      return _d_wedge(_d_wedge(exponent, base**(exponent - 1)), base.d(vars))
+      return ((exponent^base**(exponent - 1))^base.d(vars))
     else
-      return _d_wedge(_d_wedge(self, fn(:ln, base)), exponent.d(vars)) +
-        _d_wedge(_d_wedge(exponent, base**(exponent - 1)), base.d(vars))
+      return ((self^fn(:ln, base))^exponent.d(vars)) +
+        ((exponent^base**(exponent - 1))^base.d(vars))
     end
   end
 
@@ -129,7 +128,7 @@ module SyMath::Operation::Differential
     if name != '' and @@functions.key?(name.to_sym)
       df = @@functions[name.to_sym]
       dfcall = df.(args[0]).evaluate
-      return _d_wedge(dfcall, args[0].d(vars))
+      return (dfcall^args[0].d(vars))
     end
 
     if !exp.nil?
@@ -147,7 +146,7 @@ module SyMath::Operation::Differential
     if name != '' and @@functions.key?(name.to_sym)
       df = @@functions[name.to_sym]
       dfcall = df.(args[0]).evaluate
-      return _d_wedge(dfcall, args[0].d(vars))
+      return (dfcall^args[0].d(vars))
     end
 
     if !definition.exp.nil?
@@ -155,13 +154,5 @@ module SyMath::Operation::Differential
     end
 
     d_failure
-  end
-
-  # Apply wedge product or ordinary product between two expressions,
-  # depending on whether or not they have vector parts.
-  def _d_wedge(exp1, exp2)
-    # The product operator will determine whether this is a scalar
-    # or a wedge product.
-    return (exp1.factors.to_a + exp2.factors.to_a).inject(:*)
   end
 end

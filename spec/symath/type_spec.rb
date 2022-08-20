@@ -61,14 +61,6 @@ module SyMath
       expect((vx^vy^dx^dy).type.degree).to be == 4
     end
 
-    it 'product of vectors is nvector' do
-      expect((vx^vy).type.is_nvector?).to be == true
-    end
-
-    it 'product of vector and dform is not nvector' do
-      expect((vx^dx).type.is_nvector?).to be == false
-    end
-
     it 'product of dforms is nform' do
       expect((dx^dy).type.is_nform?).to be == true
     end
@@ -77,8 +69,8 @@ module SyMath
       expect((vx^dx).type.is_nform?).to be == false
     end
 
-    it 'dform is a covector' do
-      expect(dx.type.is_covector?).to be == true
+    it 'dform is not a covector' do
+      expect(dx.type.is_covector?).to be == false
     end
 
     it '2-form is a pseudovector in a 3d basis' do

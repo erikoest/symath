@@ -42,23 +42,17 @@ module SyMath::Operation::Exterior
           t.hodge
         end
       end.inject(:+)
+    elsif is_prod_exp?
+      # Assume that the wedge expression is always on the right hand side
+      return factor1*factor2.hodge
     else
+      if !self.type.is_subtype?('nform')
+        return self*SyMath::Definition::Variable.hodge_dual(1.to_m)
+      end
+
       # FIXME: If expression is a product of sums, expand the product first
       # (distributive law), then hodge op on the new sum.
-      
-      # Replace nvectors and nforms with their hodge dual
-      s = []
-      v = []
-      factors.each do |f|
-        if f.type.is_vector? or f.type.is_dform?
-          v.push f
-        else
-          s.push f
-        end
-      end
-      
-      h = SyMath::Definition::Variable.hodge_dual(v.inject(1.to_m, :*))
-      return s.inject(1.to_m, :*)*h
+      return SyMath::Definition::Variable.hodge_dual(self)
     end
   end
 end

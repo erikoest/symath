@@ -55,7 +55,7 @@ module SyMath
 
     def initialize(definition, args)
       if !definition.is_a?(SyMath::Value)
-        definition = SyMath::Definition.get(definition)
+        definition = SyMath::Definition.get(definition, 'operator')
       end
 
       @definition = definition

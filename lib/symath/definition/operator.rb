@@ -56,10 +56,12 @@ module SyMath
         exp = exp.to_m
       end
 
+      @reductions = {}
       @args = args.map { |a| a.to_m }
       @exp = exp
 
-      super(name, define_symbol: define_symbol, description: description)
+      super(name, define_symbol: define_symbol, description: description,
+            type: 'operator')
     end
 
     def compose_with_simplify(*args)

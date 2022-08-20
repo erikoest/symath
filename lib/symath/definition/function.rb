@@ -95,8 +95,6 @@ module SyMath
       }
     end
 
-    @reductions = {}
-
     def reduce_call(c, reductions = nil)
       if reductions.nil?
         reductions = @reductions

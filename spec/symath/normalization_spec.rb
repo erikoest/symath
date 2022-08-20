@@ -63,7 +63,6 @@ module SyMath
         y*cos(x),
       i*j*k => -1,
       i*k*j => 1,
-      dx.mul(x).mul(dx) => 0,
     },
 
     'fractions' => {
@@ -89,9 +88,7 @@ module SyMath
       dy.wedge(dx).wedge(dz) =>
         - (dx^dy^dz),
       sin(x).mul(dy).wedge(dx) =>
-        - ((sin(x)*dx)^dy),
-      x.power(3).wedge(dy).mul(e.to_m.power(4)).wedge(dz).wedge(dx) =>
-        (((e**4*x**3*dx)^dy)^dz),
+      - ((sin(x)*dx)^dy),
       dx.add(x.power(1).wedge(dx)) =>
         x*dx + dx,
       (dx.wedge(ln(a.mul(x)))).add((x.wedge(1)).div(a.mul(x)).wedge((0.to_m.wedge(x)).add(a.wedge(dx)))).sub(dx) =>

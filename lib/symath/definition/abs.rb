@@ -32,7 +32,11 @@ module SyMath
         arg = '...'
       end
 
-      return "|#{arg}|"
+      if args and args[0].is_sum_exp?
+        return "|(#{arg})|"
+      else
+        return "|#{arg}|"
+      end
     end
 
     def to_latex(args = nil)

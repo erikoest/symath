@@ -87,7 +87,7 @@ module SyMath
       expect(2*(1/:a)).to be_equal_to 2/:a
     end
 
-    it '((x^y) + (x^b)) + ((a^b) + (a^x))' do
+    it '((x^y) + (x^b))^((a^b) + (a^x))' do
       a = :x.to_m('vector')
       b = :y.to_m('vector')
       c = :a.to_m('vector')
@@ -96,7 +96,7 @@ module SyMath
       sum1 = (a^b) + (a^d)
       sum2 = (c^d) + (c^a)
       p = ((((a^b)^(c^d)) + ((a^d)^(c^d))) + (((a^b)^(c^a)) + ((a^d)^(c^a))))
-      expect(sum1*sum2).to be_equal_to p
+      expect(sum1^sum2).to be_equal_to p
     end
 
     it '2^:b' do

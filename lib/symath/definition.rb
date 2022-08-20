@@ -16,6 +16,7 @@ module SyMath
   class Definition < Value
     attr_reader :name
     attr_reader :description
+    attr_reader :type
 
     @@definitions = {}
 
@@ -46,29 +47,34 @@ module SyMath
       SyMath::Definition::Operator.init_builtin
     end
 
-    def self.get(name)
-      if !@@definitions.has_key?(name.to_sym)
-        raise "#{name} is not defined."
+    def self.get(name, type)
+      if !@@definitions.has_key?(type.to_sym) or
+         !@@definitions[type.to_sym].has_key?(name.to_sym)
+        raise "#{name} (#{type}) is not defined."
       end
 
-      return @@definitions[name.to_sym]
+      return @@definitions[type.to_sym][name.to_sym]
     end
 
-    def self.define(name, s)
-      if @@definitions.has_key?(name.to_sym)
-        raise "#{name} is already defined."
+    def self.define(s)
+      if !@@definitions.has_key?(s.type.name.to_sym)
+        @@definitions[s.type.name.to_sym] = {}
       end
 
-      @@definitions[name.to_sym] = s
+      if @@definitions[s.type.name.to_sym].has_key?(s.name.to_sym)
+        raise "#{name} (#{s.type.name}) is already defined."
+      end
+
+      @@definitions[s.type.name.to_sym][s.name.to_sym] = s
 
       # Create a method for the definition. Without arguments, the method
       # returns the definition object itself. With arguments, it returns
       # the operator/function applied to a list of arguments.
-      if !SyMath::Definitions.private_method_defined?(name) and
-        !SyMath::Definitions.method_defined?(name) and
-        !@@skip_method_def[name.to_sym]
+      if !SyMath::Definitions.private_method_defined?(s.name) and
+        !SyMath::Definitions.method_defined?(s.name) and
+        !@@skip_method_def[s.name.to_sym]
 
-        SyMath::Definitions.define_method :"#{name}" do |*args|
+        SyMath::Definitions.define_method :"#{s.name}" do |*args|
           sym = s
           if args.length > 0
             return sym.call(*args)
@@ -79,28 +85,31 @@ module SyMath
       end
     end
 
-    def self.undefine(name)
-      if !@@definitions.has_key?(name.to_sym)
+    def self.undefine(name, type)
+      if !@@definitions.has_key?(type.to_sym) or
+         !@@definitions[type.to_sym].has_key?(name.to_sym)
         raise "#{name} is not undefined."
       end
 
       @@definitions.delete(name.to_sym)
     end
 
-    def self.defined?(name)
-      return @@definitions.has_key?(name.to_sym)
+    def self.defined?(name, type)
+      return (@@definitions.has_key?(type.to_sym) and
+              @@definitions[type.to_sym].has_key?(name.to_sym))
     end
 
     def self.definitions()
       return @@definitions.values
     end
 
-    def initialize(name, define_symbol: true, description: nil)
+    def initialize(name, define_symbol: true, description: nil, type: 'real')
       @name = name.to_sym
+      @type = type.to_t
 
       # Create a method for the definition if it's not a number or lambda
       if define_symbol
-        self.class.define(name, self)
+        self.class.define(self)
       end
 
       if description.nil?
@@ -108,6 +117,64 @@ module SyMath
       else
         @description = description
       end
+    end
+
+    # Note: We could generalize this method to a reduce_tensor_pair:
+    #   Herm*Herm -> 1
+    #   H|1> -> |+>
+    #   H H|1> -> |0> etc.
+    # We could also define an object for linear operators, covectors and
+    # vectors, then use the reduce_call() method for simplifications.
+
+    # q0 = [1, 0]
+    # q1 = [0, 1]
+    # q- = [1, -1]/sqrt(2)
+    # q+ = [1,  1]/sqrt(2)
+
+    @@braket_reduction_map = {
+      :q0 => {
+        :q1     => 0,
+        :qminus => 1,
+        :qpluss => 1,
+      },
+      :q1 => {
+        :q0     => 0,
+        :qminus => -1,
+        :qpluss => 1,
+      },
+      :qminus => {
+        :q0     => 1,
+        :q1     => -1,
+        :qpluss => 0,
+      },
+      :qpluss => {
+        :q0     => 1,
+        :q1     => 1,
+        :qminus => 0,
+      },
+    }
+
+    def reduce_braket_pair(o)
+      # FIXME: This is true only for unit vectors and covectors
+      # <a|a> = 1
+      if self.name == o.name
+        return 1.to_m
+      end
+
+      # Reduce specific constant qubit pairs
+      if @@braket_reduction_map.has_key?(self.name) and
+         @@braket_reduction_map[self.name].has_key?(o.name)
+        ret = @@braket_reduction_map[self.name][o.name]
+        if (ret != 0)
+          ret = ret.to_m/fn(:sqrt, 2)
+        else
+          ret = ret.to_m
+        end
+
+        return ret
+      end
+
+      return nil
     end
 
     def reduce_call(c)
@@ -141,6 +208,7 @@ module SyMath
     def ==(other)
       o = other.to_m
       return false if self.class.name != o.class.name
+      return false if self.type.name != o.type.name
       return false if @name.to_s != o.name.to_s
       return true
     end
@@ -172,8 +240,38 @@ module SyMath
       return true
     end
 
+    def qubit_name()
+      if @name == :qpluss
+        return '+'
+      elsif @name == :qminus
+        return '-'
+      elsif @name =~ /^q[0-9]+$/
+        return @name[1..-1]
+      else
+        return @name
+      end
+    end
+
     def to_s()
-      return @name.to_s
+      if @type.is_dform?
+        return SyMath.setting(:d_symbol) + undiff.to_s
+      elsif @type.is_vector?
+        if SyMath.setting(:braket_syntax)
+          return "|#{qubit_name}>"
+        else
+          return @name.to_s + SyMath.setting(:vector_symbol)
+        end
+      elsif @type.is_covector?
+        if SyMath.setting(:braket_syntax)
+          return "<#{qubit_name}|"
+        else
+          return @name.to_s + SyMath.setting(:covector_symbol)
+        end
+      elsif @type.is_subtype?('tensor')
+        return @name.to_s + '['.to_s + @type.index_str + ']'.to_s
+      else
+        return @name.to_s
+      end
     end
 
     def to_latex()
@@ -190,8 +288,8 @@ module SyMath
   end
 end
 
-def definition(name)
-  return SyMath::Definition.get(name)
+def definition(name, type)
+  return SyMath::Definition.get(name, type)
 end
 
 def definitions()
