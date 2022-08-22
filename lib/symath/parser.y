@@ -203,7 +203,7 @@ end
       elsif a == '-'
         a = 'qminus'
       elsif a == '+'
-        a = 'qpluss'
+        a = 'qplus'
       end
       a
     end

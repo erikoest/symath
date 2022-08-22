@@ -150,7 +150,15 @@ module SyMath::Operation::Normalization
   end
 
   def normalize_power()
-    norm = base.normalize.power(exponent.normalize)
+    b = base.normalize
+    e = exponent.normalize
+    reduced, sign, chg = b.reduce_power_modulo_sign(e)
+
+    if chg
+      return sign.to_m*reduced
+    end
+
+    norm = b.power(e)
     e, sign, changed = norm.reduce_modulo_sign
     e *= -1 if sign == -1
 
@@ -282,6 +290,10 @@ module SyMath::Operation::Normalization
     dc = nil
     ret = []
 
+    if self == 1
+      return 1.to_m
+    end
+
     self.factors.each do |f|
       if dc.nil?
         if f.is_divisor_factor?
@@ -342,40 +354,10 @@ module SyMath::Operation::Normalization
     end
     f2 = factor2
 
-    # Natural numbers are calculated
-    if f1.is_number? and f2.is_number?
-      return replace_combined_factors((f1.value*f2.value).to_m), 1, true
-    end
+    reduced, sign, chg = f1.reduce_product_modulo_sign(f2)
 
-    if f1.is_unit_quaternion? and f2.is_unit_quaternion?
-      ret = f1.calc_unit_quaternions(f2)
-      if ret.is_a?(SyMath::Minus)
-        return replace_combined_factors(ret.argument), -1, true
-      else
-        return replace_combined_factors(ret), 1, true
-      end
-    end
-
-    if !f1.type.is_scalar? or !f2.type.is_scalar?
-      if f1.type.is_covector? and f2.type.is_vector?
-        # Reduce pair of covector and vector
-        ret = f1.reduce_braket_pair(f2)
-        if ret.nil?
-          return self, 1, false
-        else
-          return replace_combined_factors(ret), 1, true
-        end
-      elsif f1.type.is_dform? and f2.type.is_dform?
-        # Dforms: dx^dx => 0
-        if f1 == f2
-          return replace_combined_factors(0.to_m), 1, true
-        else
-          return self, 1, false
-        end
-      else
-        # No reduction
-        return self, 1, false
-      end
+    if chg
+      return replace_combined_factors(reduced), sign, true
     end
 
     # Only reduce scalars

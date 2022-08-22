@@ -260,6 +260,18 @@ module SyMath
       return self, 1, false
     end
 
+    # Reduce product of self * o, allow sign to change. Return
+    # (reduced exp, sign, changed). Defaults to no change
+    def reduce_product_modulo_sign(o)
+      return 0, 1, false
+    end
+
+    # Reduce power of self ** exp, allow sign to change. Return
+    # (reduced exp, sign, changed). Default to no change
+    def reduce_power_modulo_sign(exp)
+      return 0, 1, false
+    end
+
     # By default, assume an unknown expression to be scalar
     def type()
       return 'scalar'.to_t

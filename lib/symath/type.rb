@@ -14,6 +14,8 @@ module SyMath
       :nonfinite => 1,
       # Operators
       :operator => {
+        # Function
+        :function => 1,
         # Linear operators
         :linop => {
           # Matrices
@@ -149,7 +151,8 @@ module SyMath
     def product(other)
       scalar = is_scalar?
       oscalar = other.is_scalar?
-      
+
+      # FIXME: Collect these mappings in a hash
       # Do some of these cases belong to the wedge operator?
       if scalar and oscalar
         return common_parent(other)
@@ -173,10 +176,18 @@ module SyMath
       elsif is_vector? and other.is_covector?
         # Outer product of vector and covector
         return 'linop'
-      elsif is_subtype?('matrix') and
-           other.is_subtype?('matrix') and
-           dimn == other.dimm
+      elsif is_subtype?('matrix') and other.is_subtype?('matrix')
+        if dimn != other.dimm
+          raise "Types #{self} and #{other} cannot be multiplied"
+        end
+
         return 'matrix'.to_t(dimm: dimm, dimn: other.dimn)
+      elsif is_covector? and other.is_subtype?('linop')
+        return 'covector'.to_t
+      elsif is_subtype?('linop') and other.is_vector?
+        return 'vector'.to_t
+      elsif is_subtype?('linop') and other.is_subtype?('linop')
+        return 'linop'.to_t
       else
         raise "Types #{self} and #{other} cannot be multiplied"
       end

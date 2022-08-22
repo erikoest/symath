@@ -34,6 +34,14 @@ module SyMath
       return value() == 0
     end
 
+    def reduce_product_modulo_sign(o)
+      if o.is_number?
+        return (self.value*o.value).to_m, 1, true
+      end
+
+      return 0, 1, false
+    end
+
     def type()
       return :natural.to_t
     end

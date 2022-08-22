@@ -70,7 +70,7 @@ class TokenQueue
 	push_braket_queue(false)
       end
       return
-    end      
+    end
 
     if @bra or @ket
       @braket_queue.push([t, val])
@@ -144,7 +144,7 @@ module_eval(<<'...end parser.y/module_eval...', 'parser.y', 164)
       elsif a == '-'
         a = 'qminus'
       elsif a == '+'
-        a = 'qpluss'
+        a = 'qplus'
       end
       a
     end

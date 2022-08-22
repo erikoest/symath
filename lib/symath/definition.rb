@@ -48,12 +48,27 @@ module SyMath
     end
 
     def self.get(name, type)
-      if !@@definitions.has_key?(type.to_sym) or
-         !@@definitions[type.to_sym].has_key?(name.to_sym)
-        raise "#{name} (#{type}) is not defined."
+      # No type supplied. Try to determine type from value
+      if type.nil?
+        type = SyMath::Definition::Constant.default_type_for_constant(name)
       end
 
-      return @@definitions[type.to_sym][name.to_sym]
+      # Still no type. Look up various types of definitions in order
+      if type.nil?
+        type = 'any type'
+        types = ['real', 'linop', 'operator']
+      else
+        types = [type]
+      end
+
+      types.each do |t|
+        if @@definitions.has_key?(t.to_sym) and
+           @@definitions[t.to_sym].has_key?(name.to_sym)
+          return @@definitions[t.to_sym][name.to_sym]
+        end
+      end
+
+      raise "#{name} (#{type}) is not defined."
     end
 
     def self.define(s)
@@ -119,62 +134,25 @@ module SyMath
       end
     end
 
-    # Note: We could generalize this method to a reduce_tensor_pair:
-    #   Herm*Herm -> 1
-    #   H|1> -> |+>
-    #   H H|1> -> |0> etc.
-    # We could also define an object for linear operators, covectors and
-    # vectors, then use the reduce_call() method for simplifications.
-
-    # q0 = [1, 0]
-    # q1 = [0, 1]
-    # q- = [1, -1]/sqrt(2)
-    # q+ = [1,  1]/sqrt(2)
-
-    @@braket_reduction_map = {
-      :q0 => {
-        :q1     => 0,
-        :qminus => 1,
-        :qpluss => 1,
-      },
-      :q1 => {
-        :q0     => 0,
-        :qminus => -1,
-        :qpluss => 1,
-      },
-      :qminus => {
-        :q0     => 1,
-        :q1     => -1,
-        :qpluss => 0,
-      },
-      :qpluss => {
-        :q0     => 1,
-        :q1     => 1,
-        :qminus => 0,
-      },
-    }
-
-    def reduce_braket_pair(o)
-      # FIXME: This is true only for unit vectors and covectors
-      # <a|a> = 1
-      if self.name == o.name
-        return 1.to_m
-      end
-
-      # Reduce specific constant qubit pairs
-      if @@braket_reduction_map.has_key?(self.name) and
-         @@braket_reduction_map[self.name].has_key?(o.name)
-        ret = @@braket_reduction_map[self.name][o.name]
-        if (ret != 0)
-          ret = ret.to_m/fn(:sqrt, 2)
-        else
-          ret = ret.to_m
-        end
-
-        return ret
-      end
-
+    def product_reductions()
       return nil
+    end
+
+    def reduce_product_modulo_sign(o)
+      map = product_reductions
+
+      if !map.nil?
+        if map.has_key?(o)
+          ret = map[o]
+          if ret.is_a?(SyMath::Minus)
+            return ret.argument, -1, true
+          else
+            return ret, 1, true
+          end
+        end
+      end
+
+      return self, 1, false
     end
 
     def reduce_call(c)
@@ -241,7 +219,7 @@ module SyMath
     end
 
     def qubit_name()
-      if @name == :qpluss
+      if @name == :qplus
         return '+'
       elsif @name == :qminus
         return '-'

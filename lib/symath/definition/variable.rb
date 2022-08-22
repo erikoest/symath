@@ -262,20 +262,16 @@ end
 
 class Symbol
   def to_m(type = nil)
-    if type.nil?
-      # No type supplied. Determine type from value
-      type = SyMath::Definition::Constant.default_type_for_constant(self)
-      if type.nil?
-        type = 'real'
-      end
-    end
-
     begin
       # Look up the already defined symbol
       # (we might want to check that it is a constant or variable)
       return SyMath::Definition.get(self, type)
     rescue
       # Not defined. Define it now.
+      if type.nil?
+        type = 'real'
+      end
+
       return SyMath::Definition::Variable.new(self, type)
     end
   end

@@ -151,7 +151,9 @@ module SyMath
   # Initialize various static data used by the operation
   # modules.
   SyMath::Definition.init_builtin
+  SyMath::Definition::Constant.initialize
   SyMath::Definition::Trig.initialize
+  SyMath::Definition::QLogicGate.initialize
   SyMath::Operation::Differential.initialize
   SyMath::Operation::Integration.initialize
 

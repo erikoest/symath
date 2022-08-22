@@ -19,6 +19,12 @@ module SyMath
       SyMath::Definition::Laplacian.new
       SyMath::Definition::CoDiff.new
 
+      # QLogic gate operators
+      SyMath::Definition::QX.new
+      SyMath::Definition::QY.new
+      SyMath::Definition::QZ.new
+      SyMath::Definition::QH.new
+
       expressions = [
         { :name => 'laplace',
           :exp  => 'lmd(int(f.(t)*e**(-s*t),d(t),0,oo),s)',
@@ -51,7 +57,7 @@ module SyMath
     end
 
     def initialize(name, args: [], exp: nil, define_symbol: true,
-                   description: nil)
+                   type: 'operator', description: nil)
       if exp and !exp.is_a?(SyMath::Value)
         exp = exp.to_m
       end
@@ -61,11 +67,27 @@ module SyMath
       @exp = exp
 
       super(name, define_symbol: define_symbol, description: description,
-            type: 'operator')
+            type: type)
     end
 
     def compose_with_simplify(*args)
       return
+    end
+
+    def is_involutory?()
+      return false
+    end
+
+    def reduce_power_modulo_sign(exp)
+      if is_involutory? and exp.is_number?
+        if exp.value.even?
+          return 1.to_m, 1.to_m, true
+        else
+          return self, 1.to_m, true
+        end
+      end
+
+      return 0, 1, false
     end
 
     def validate_args(e)
@@ -164,12 +186,16 @@ module SyMath
       end
 
       if args.length > 0
-        arglist = args.map { |a| a.to_s }.join(',')
+        arglist = '(' + args.map { |a| a.to_s }.join(',') + ')'
       else
-        arglist = "..."
+        if SyMath.setting(:braket_syntax)
+          arglist = ''
+        else
+          arglist = '(...)'
+        end
       end
 
-      return "#{@name}(#{arglist})"
+      return "#{@name}#{arglist}"
     end
 
     def latex_format()
@@ -228,3 +254,4 @@ require 'symath/definition/curl'
 require 'symath/definition/div'
 require 'symath/definition/laplacian'
 require 'symath/definition/codiff'
+require 'symath/definition/qlogicgate'
