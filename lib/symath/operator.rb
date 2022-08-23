@@ -40,6 +40,14 @@ module SyMath
       return false
     end
 
+    def multiply_mx()
+      @args = @args.map { |a| a.mul_mx }
+    end
+
+    def calc_mx()
+      @args = @args.map { |a| a.mul_mx }
+    end
+
     def evaluate()
       # Hack: Don't evaluate arguments if the operator is the integral.
       # this is taken care of inside the definition.

@@ -139,7 +139,7 @@ module SyMath
       end
     end
 
-    def evaluate
+    def calc_mx()
       if term1.type.is_matrix?
         return term1.matrix_add(term2)
       end

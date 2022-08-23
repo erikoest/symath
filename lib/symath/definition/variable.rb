@@ -107,8 +107,8 @@ module SyMath
       end
 
       # Calculate the musical isomorphisms. Hash up the mappings both ways.
-      flat = (g*SyMath::Matrix.new(dmap).transpose).evaluate.normalize.col(0)
-      sharp = (g.inverse*SyMath::Matrix.new(vmap).transpose).evaluate.
+      flat = (g*SyMath::Matrix.new(dmap).transpose).mul_mx.normalize.col(0)
+      sharp = (g.inverse*SyMath::Matrix.new(vmap).transpose).mul_mx.
                 normalize.col(0)
 
       @@flat_map = (0..dim - 1).map { |i| [vmap[i], flat[i]] }.to_h

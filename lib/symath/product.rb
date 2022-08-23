@@ -147,15 +147,55 @@ module SyMath
       end
     end
 
-    def evaluate()
-      if factor1.is_a?(SyMath::Matrix)
-        return factor1.matrix_mul(factor2)
-      elsif factor2.is_a?(SyMath::Matrix) and
-           factor1.type.is_scalar?
-        return factor2.matrix_mul(factor1)
+    def calc_mx()
+      f1 = factor1.calc_mx
+      f2 = factor2.calc_mx
+
+      if f1.is_a?(SyMath::Matrix)
+        return f1.matrix_mul(f2)
+      elsif f2.is_a?(SyMath::Matrix) and f1.type.is_scalar?
+        return f2.matrix_mul(f1)
+      else
+        return f1*f2
+      end
+    end
+
+    def mul_mx()
+      f1 = factor1.mul_mx
+      f2 = factor2.mul_mx
+      s = 1.to_m
+
+      if f1.is_a?(SyMath::Minus)
+        s = -s
+        f1 = f1.argument
+      elsif
+        if f1.is_a?(SyMath::Product) and f1.factor1.type.is_scalar?
+          s = s*f1.factor1
+          if f1.factor2.is_a?(SyMath::Matrix)
+            f1 = f1.factor2
+          else
+            return self
+          end
+        end
       end
 
-      return super
+      if f2.is_a?(SyMath::Minus)
+        s = -s
+        f2 = f2.argument
+      elsif f2.is_a?(SyMath::Product) and f2.factor1.type.is_scalar?
+        s = s*f2.factor1
+        if f2.factor2.is_a?(SyMath::Matrix)
+          f2 = f2.factor2
+        else
+          return self
+        end
+      end
+
+      if f1.is_a?(SyMath::Matrix) and f2.is_a?(SyMath::Matrix)
+        return s*f1.matrix_mul(f2)
+      else
+        return self
+      end
     end
 
     def type()

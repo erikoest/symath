@@ -17,24 +17,24 @@ module SyMath
     rz = [[1, 0], [0, -1]].to_m
 
     it 'product of matrices' do
-      expect((m23*m32).evaluate.normalize.to_s).to be == '[- 3, - 4; - 12, - 7]'
+      expect((m23*m32).mul_mx.normalize.to_s).to be == '[- 3, - 4; - 12, - 7]'
     end
 
     it 'product of scalar and matrix' do
-      expect((m23*2).evaluate.normalize.to_s).to be == '[2, 4, 6; 8, 10, 12]'
-      expect((2*m23).evaluate.normalize.to_s).to be == '[2, 4, 6; 8, 10, 12]'
+      expect((m23*2).calc_mx.normalize.to_s).to be == '[2, 4, 6; 8, 10, 12]'
+      expect((2*m23).calc_mx.normalize.to_s).to be == '[2, 4, 6; 8, 10, 12]'
     end
 
     it 'sum of matrices' do
-      expect((s1 + s2).evaluate.normalize.to_s).to be == '[4, 6; - 5, 2]'
+      expect((s1 + s2).calc_mx.normalize.to_s).to be == '[4, 6; - 5, 2]'
     end
 
     it 'subtraction of matrices' do
-      expect((s1 - s2).evaluate.normalize.to_s).to be == '[- 2, - 2; 3, - 6]'
+      expect((s1 - s2).calc_mx.normalize.to_s).to be == '[- 2, - 2; 3, - 6]'
     end
 
     it 'matrix divided by scalar' do
-      expect((s2/2).evaluate.normalize.to_s).to be == '[3/2, 2; - 2, 2]'
+      expect((s2/2).calc_mx.normalize.to_s).to be == '[3/2, 2; - 2, 2]'
     end
 
     it 'trace of matrices' do
@@ -45,25 +45,25 @@ module SyMath
     it 'matrix determinant' do
       expect(s2.determinant.normalize).to be_equal_to 28
       expect(s3.determinant.normalize).to be_equal_to -1
-      expect((s2*s3).evaluate.determinant.normalize).to be_equal_to -28
+      expect((s2*s3).mul_mx.determinant.normalize).to be_equal_to -28
       expect(s4.determinant.normalize).to be_equal_to 54
       expect(s4.transpose.determinant.normalize).to be_equal_to 54
     end
 
     it 'matrix inverse' do
       expect(s2.inverse.normalize.to_s).to be == '[1/7, (- 1)/7; 1/7, 3/28]'
-      expect((s2.inverse*s2).evaluate.normalize.to_s).to be ==
+      expect((s2.inverse*s2).calc_mx.normalize.to_s).to be ==
         '[1, 0; 0, 1]'
-      expect((s3.inverse*s3).evaluate.normalize.to_s).to be ==
+      expect((s3.inverse*s3).calc_mx.normalize.to_s).to be ==
         '[1, 0; 0, 1]'
     end
 
     it 'tests with spin matrices' do
-      expect((rx*rx).evaluate.normalize).to be_equal_to ii
-      expect((ry*ry).evaluate.normalize).to be_equal_to ii
-      expect((rz*rz).evaluate.normalize).to be_equal_to ii
+      expect((rx*rx).mul_mx.normalize).to be_equal_to ii
+      expect((ry*ry).mul_mx.normalize).to be_equal_to ii
+      expect((rz*rz).mul_mx.normalize).to be_equal_to ii
 
-      expect((-i*rx*ry*rz).recurse('evaluate').normalize).to be_equal_to ii
+      expect((-i*rx*ry*rz).calc_mx.normalize).to be_equal_to ii
 
       expect(rx.trace).to be_equal_to 0
       expect(ry.trace).to be_equal_to 0

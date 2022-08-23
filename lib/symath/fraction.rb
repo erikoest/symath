@@ -114,12 +114,16 @@ module SyMath
       end
     end
 
-    def evaluate()
+    def calc_mx()
       # Evaluate matrix division by divding elements
       if dividend.is_a?(SyMath::Matrix)
         return dividend.matrix_div(divisor)
+      else
+        return self
       end
+    end
 
+    def evaluate()
       # Evaluate df/dx expression.
       if dividend.is_a?(SyMath::Operator) and
         dividend.definition.is_a?(SyMath::Definition::D)

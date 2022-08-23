@@ -254,6 +254,17 @@ module SyMath
       return 1
     end
 
+    # Recursively, combine matrices in expression as much as possible by
+    # multiplying and summing them.
+    def calc_mx()
+      return self
+    end
+
+    # Recursively multiply matrices in expression. Leave scalar parts outside.
+    def mul_mx()
+      return self
+    end
+
     # Simple reduction rules, allows sign to change. Returns
     # (reduced exp, sign, changed). Defaults to no change
     def reduce_modulo_sign

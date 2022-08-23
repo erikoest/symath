@@ -90,12 +90,14 @@ module SyMath
       return red, -sign, true
     end
 
-    def evaluate
-      if argument.is_a?(SyMath::Matrix)
-        return argument.matrix_neg
-      end
+    def calc_mx()
+      a = argument.calc_mx
 
-      return super
+      if a.is_a?(SyMath::Matrix)
+        return a.matrix_neg
+      else
+        return -a
+      end
     end
 
     def type()
