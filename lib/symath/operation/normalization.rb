@@ -377,17 +377,10 @@ module SyMath::Operation::Normalization
       exp2 = 1.to_m
     end
 
-    if base1 == base2
-## Replace dx**n => 0 (can be removed. We don't raise power of dforms.
-## Rather, we need to optimize dx^dx => 0)
-#      if base1.type.is_subtype?('tensor') and
-#        base2.type.is_subtype?('tensor') and
-#        (exp1 + exp2).is_number? and
-#        (exp1 + exp2).value > 1
-#        return replace_combined_factors(0.to_m), 1, true
-#      end
-      
-      return replace_combined_factors(base1**(exp1 + exp2)), 1, true
+    if base1.type.is_scalar? and base2.type.is_scalar?
+      if base1 == base2
+        return replace_combined_factors(base1**(exp1 + exp2)), 1, true
+      end
     end
     
     return self, 1, false

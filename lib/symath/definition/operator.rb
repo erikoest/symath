@@ -25,6 +25,7 @@ module SyMath
       SyMath::Definition::QZ.new
       SyMath::Definition::QH.new
       SyMath::Definition::QS.new
+      SyMath::Definition::QCNOT.new
 
       expressions = [
         { :name => 'laplace',

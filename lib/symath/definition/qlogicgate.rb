@@ -8,6 +8,7 @@ module SyMath
       SyMath::Definition::QZ.initialize
       SyMath::Definition::QH.initialize
       SyMath::Definition::QS.initialize
+      SyMath::Definition::QCNOT.initialize
     end
   end
 end
@@ -17,3 +18,4 @@ require 'symath/definition/qy'
 require 'symath/definition/qz'
 require 'symath/definition/qh'
 require 'symath/definition/qs'
+require 'symath/definition/qcnot'

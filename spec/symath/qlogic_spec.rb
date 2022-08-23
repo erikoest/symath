@@ -29,8 +29,18 @@ module SyMath
       'qX qY qZ'    => 'i',
       'qX qZ qY'    => '- i',
       '<0|qY'       => '-i <1|',
+      'qH|0>'       => '|+>',
       'qS qS'       => 'qZ',
       'qS qS qS qS' => '1',
+      'qCNOT|0>'    => '1',
+      'qCNOT|1>'    => 'qX',
+      'qCNOT|0>|0>' => '|0>',
+      'qCNOT|0>|1>' => '|1>',
+      'qCNOT|1>|0>' => '|1>',
+      'qCNOT|1>|1>' => '|0>',
+      'qCNOT|1>|+>' => '|->',
+      'qCNOT|1>|->' => '|+>',
+      '|1>|0>'      => '|1,0>',
     }
 
     exp.each do |from, to|
