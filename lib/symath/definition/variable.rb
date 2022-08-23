@@ -233,6 +233,19 @@ module SyMath
       end
     end
 
+    def reduce_product_modulo_sign(o)
+      if self.type.is_covector? and o.type.is_vector?
+        # <a|a> = 1
+        # FIXME: This is true only for unit vectors and covectors
+        # We need a vector property: is_unitary?
+        if self.name == o.name
+          return 1.to_m, 1, true
+        end
+      end
+
+      return super(o)
+    end
+
     def to_latex()
       if type.is_dform?
         return '\mathrm{d}' + undiff.to_latex

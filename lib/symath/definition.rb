@@ -223,6 +223,10 @@ module SyMath
         return '+'
       elsif @name == :qminus
         return '-'
+      elsif @name == :qright
+        return 'R'
+      elsif @name == :qleft
+        return 'L'
       elsif @name =~ /^q[0-9]+$/
         return @name[1..-1]
       else

@@ -204,6 +204,10 @@ end
         a = 'qminus'
       elsif a == '+'
         a = 'qplus'
+      elsif a == 'R'
+        a = 'qright'
+      elsif a == 'L'
+        a = 'qleft'
       end
       a
     end

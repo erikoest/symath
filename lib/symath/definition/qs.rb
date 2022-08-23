@@ -16,6 +16,18 @@ module SyMath
       }
     end
 
+    def reduce_power_modulo_sign(e)
+      if e.is_number?
+        if e.value % 4 == 0
+          return 1.to_m, 1, true
+        elsif e.value % 2 == 0
+          return :qZ.to_m('linop'), 1, true
+        end
+      end
+
+      return self, 1, true
+    end
+
     def product_reductions()
       return @@product_reductions
     end
