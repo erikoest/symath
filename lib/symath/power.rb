@@ -97,70 +97,20 @@ module SyMath
       return exponent.is_negative_number?
     end
 
-    # Simple reduction rules, allows sign to change. Returns
-    # (reduced exp, sign, changed).
+    # Reduce power of power
+    def reduce_power_modulo_sign(e)
+      # p**q**r reduces to p**(q*r)
+      return self.base.power(self.exponent.mul(e)), 1, true
+    end
+
     def reduce_modulo_sign
       # a to the power of 1 reduces to a
       if exponent == 1
         return base, 1, true
       end
-      
-      # Powers of 1 reduces to 1
-      if base == 1 and exponent.is_finite?
-        return base, 1, true
-      end
 
-      # Power of 0 reduces to 0
-      if base == 0 and exponent.is_finite? and exponent != 0
-        return 0.to_m, 1, true
-      end
-      
       if base != 0 and exponent == 0
         return 1.to_m, 1, true
-      end
-
-      if base == :e
-        fn = fn(:exp, exponent)
-        # FIXME: Merge functions reduce and reduce_modulo_sign
-        red = fn.reduce
-        if red != fn
-          return red, 1, true
-        end
-      end
-
-      # Reduce negative number
-      if base.is_a?(SyMath::Minus)
-        if exponent.is_number?
-          exp = exponent
-        elsif exponent.is_negative_number?
-          exp = exponent.argument
-        else
-          exp = nil
-        end
-
-        if !exp.nil?
-          e, sign, changed = (base.argument**exp).reduce_modulo_sign
-          if exp.value.odd?
-            sign *= -1
-          end
-          return e, sign, true
-        end
-      end
-
-      # Number power of number reduces to number
-      if base.is_number?
-        if exponent.is_number?
-          return (base.value ** exponent.value).to_m, 1, true
-        end
-
-        if exponent.is_negative_number? and exponent.argument.value > 1
-          return (base.value ** exponent.argument.value).to_m.power(-1), 1, true
-        end
-      end
-
-      # p**q**r reduces to p**(q*r)
-      if base.is_a?(SyMath::Power)
-        return base.base.power(base.exponent.mul(exponent)), 1, true
       end
 
       # Reduce positive integer power of vectors and dforms to zero
@@ -169,32 +119,8 @@ module SyMath
         return 0.to_m, 1, true
       end
       
-      # Remaining code reduces only quaternions
-      if !base.is_unit_quaternion?
-        return self, 1, false
-      end
-      
-      # q**n for some unit quaternion
-      # Exponent is 1 or not a number
-      if !exponent.is_number? or exponent == 1
-        return self, 1, false
-      end
-
-      # e is on the form q**n for some integer n >= 2
-      x = exponent.value
-      
-      if x.odd?
-        ret = base
-        x -= 1
-      else
-        ret = 1.to_m
-      end
-
-      if (x/2).odd?
-        return ret, -1, true
-      else
-        return ret, 1, true
-      end
+      # Delegate further reduction rules to the various types of bases
+      return base.reduce_power_modulo_sign(exponent)
     end
 
     def to_s()

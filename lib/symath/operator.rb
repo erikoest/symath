@@ -141,6 +141,10 @@ module SyMath
 
     alias eql? ==
 
+    def reduce_power_modulo_sign(e)
+      return definition.reduce_power_call(self, e)
+    end
+
     def reduce()
       return definition.reduce_call(self)
     end

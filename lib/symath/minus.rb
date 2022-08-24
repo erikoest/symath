@@ -82,7 +82,22 @@ module SyMath
     def reduce_constant_factors()
       return -argument.reduce_constant_factors
     end
-      
+
+    def reduce_power_modulo_sign(e)
+      if e.is_negative_number?
+        e = e.argument
+      elsif !e.is_number?
+        return self, 1, false
+      end
+
+      ret, sign, changed = (argument**e).reduce_modulo_sign
+      if e.value.odd?
+        sign *= -1
+      end
+
+      return ret, sign, true
+    end
+
     # Simple reduction rules, allows sign to change. Returns
     # (reduced exp, sign, changed).
     def reduce_modulo_sign

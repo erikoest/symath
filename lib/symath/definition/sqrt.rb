@@ -55,6 +55,26 @@ module SyMath
       end
     end
 
+    def reduce_power_call(call, e)
+      arg = call.args[0]
+
+      if e.is_a?(SyMath::Minus)
+        sign = -1
+        e = -e
+      else
+        sign = 1
+      end
+
+      if e.is_number?
+        if e.value.even?
+          e = (sign*e.value/2).to_m
+          return arg**e, 1, true
+        end
+      end
+
+      return call, 1, false
+    end
+
     def to_latex(args = nil)
       return '\sqrt{'.to_s + args[0].to_latex + '}'.to_s
     end

@@ -95,6 +95,12 @@ module SyMath
       }
     end
 
+    def initialize(name, args: [], exp: nil, define_symbol: true,
+                   type: 'function', description: nil)
+      super(name, args: args, exp: exp, define_symbol: define_symbol,
+            type: type, description: description)
+    end
+
     def reduce_call(c, reductions = nil)
       if reductions.nil?
         reductions = @reductions
@@ -164,7 +170,9 @@ module SyMath
 end
 
 def fn(f, *args)
-  return SyMath::Operator.create(f, args.map { |a| a.nil? ? a : a.to_m })
+  return SyMath::Operator.create(
+           SyMath::Definition.get(f, 'function'),
+           args.map { |a| a.nil? ? a : a.to_m })
 end
 
 def define_fn(name, args, exp = nil)

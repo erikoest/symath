@@ -40,7 +40,7 @@ module SyMath
     def self.create(definition, *args)
       if !definition.is_a?(SyMath::Value)
         # Hack: Assume operator type
-        definition = SyMath::Definition.get(definition, 'operator')
+        definition = SyMath::Definition.get(definition)
       end
 
       if SyMath.setting(:compose_with_simplify)
@@ -274,13 +274,13 @@ module SyMath
     # Reduce product of self * o, allow sign to change. Return
     # (reduced exp, sign, changed). Defaults to no change
     def reduce_product_modulo_sign(o)
-      return 0, 1, false
+      return 0.to_m, 1, false
     end
 
     # Reduce power of self ** exp, allow sign to change. Return
     # (reduced exp, sign, changed). Default to no change
     def reduce_power_modulo_sign(exp)
-      return 0, 1, false
+      return 0.to_m, 1, false
     end
 
     # By default, assume an unknown expression to be scalar

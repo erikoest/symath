@@ -152,16 +152,15 @@ module SyMath::Operation::Normalization
   def normalize_power()
     b = base.normalize
     e = exponent.normalize
-    reduced, sign, chg = b.reduce_power_modulo_sign(e)
-
-    if chg
-      return sign.to_m*reduced
-    end
 
     norm = b.power(e)
     e, sign, changed = norm.reduce_modulo_sign
-    e *= -1 if sign == -1
 
+    if !changed
+      return norm
+    end
+
+    e *= -1 if sign == -1
     return e
   end
 
@@ -177,7 +176,7 @@ module SyMath::Operation::Normalization
     ret = []
     fact = 1.to_m
     divf = 1.to_m
-    
+
     factors.each do |f|
       if f.type.is_scalar?
         if f.is_divisor_factor?

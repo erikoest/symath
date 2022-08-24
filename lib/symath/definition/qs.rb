@@ -25,7 +25,7 @@ module SyMath
         end
       end
 
-      return self, 1, true
+      return self, 1, false
     end
 
     def product_reductions()

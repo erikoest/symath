@@ -21,10 +21,10 @@ module SyMath::Operation::Differential
     # Map of single argument functions to their derivative.
     @@functions = {
       # Exponential and trigonometric functions
-      :exp => definition(:exp, 'operator'),
+      :exp => definition(:exp, 'function'),
       :ln  => lmd(1.to_m/:a.to_m, :a),
       # Trigonometric functions
-      :sin => definition(:cos, 'operator'),
+      :sin => definition(:cos, 'function'),
       :cos => lmd(- fn(:sin, :a), :a),
       :tan => lmd(1.to_m + fn(:tan, :a)**2, :a),
       :cot => lmd(- (1.to_m + fn(:cot, :a)**2), :a),
@@ -38,8 +38,8 @@ module SyMath::Operation::Differential
       :arccsc => lmd(- 1.to_m/(fn(:abs, :a)*fn(:sqrt, :a.to_m**2 - 1)), :a),
       :arccot => lmd(- 1.to_m/(1.to_m + :a.to_m**2), :a),
       # Hyperbolic functions
-      :sinh => definition(:cosh, 'operator'),
-      :cosh => definition(:sinh, 'operator'),
+      :sinh => definition(:cosh, 'function'),
+      :cosh => definition(:sinh, 'function'),
       :tanh => lmd(fn(:sech, :a)**2, :a),
       :sech => lmd(- fn(:tanh, :a)*fn(:sech, :a), :a),
       :csch => lmd(- fn(:coth, :a)*fn(:csch, :a), :a),

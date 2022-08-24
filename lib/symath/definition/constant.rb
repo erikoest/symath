@@ -203,6 +203,44 @@ module SyMath
       end
     end
 
+    def reduce_power_modulo_sign(e)
+      if self == :e
+        fn = fn(:exp, e)
+        # FIXME: Merge functions reduce and reduce_modulo_sign
+        red = fn.reduce
+        if red != fn
+          return red, 1, true
+        end
+      end
+
+      # Power of unit quaternions
+      if is_unit_quaternion?
+        # q**n for some unit quaternion
+        # Exponent is 1 or not a number
+        if !e.is_number? or e == 1
+          return self, 1, false
+        end
+
+        # e is on the form q**n for some integer n >= 2
+        x = e.value
+
+        if x.odd?
+          ret = base
+          x -= 1
+        else
+          ret = 1.to_m
+        end
+
+        if (x/2).odd?
+          return ret, -1, true
+        else
+          return ret, 1, true
+        end
+      end
+
+      return self, 0, false
+    end
+
     def reduce_product_modulo_sign(o)
       if self.type.is_covector? and o.type.is_vector?
         # <a|a> = 1

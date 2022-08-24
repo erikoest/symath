@@ -89,7 +89,7 @@ module SyMath
         end
       end
 
-      return 0, 1, false
+      return 0.to_m, 1, false
     end
 
     def validate_args(e)

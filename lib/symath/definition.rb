@@ -34,20 +34,20 @@ module SyMath
     def self.init_builtin()
       # Create the builtin algebraic functions. The constructor will
       # define the functions so they can be used in expressions.
-      SyMath::Definition::Function.new(:+)
-      SyMath::Definition::Function.new(:-)
-      SyMath::Definition::Function.new(:*)
-      SyMath::Definition::Function.new(:/)
-      SyMath::Definition::Function.new(:**)
-      SyMath::Definition::Function.new(:^)
-      SyMath::Definition::Function.new(:'=')
+      SyMath::Definition::Operator.new(:+)
+      SyMath::Definition::Operator.new(:-)
+      SyMath::Definition::Operator.new(:*)
+      SyMath::Definition::Operator.new(:/)
+      SyMath::Definition::Operator.new(:**)
+      SyMath::Definition::Operator.new(:^)
+      SyMath::Definition::Operator.new(:'=')
 
       SyMath::Definition::Constant.init_builtin
       SyMath::Definition::Function.init_builtin
       SyMath::Definition::Operator.init_builtin
     end
 
-    def self.get(name, type)
+    def self.get(name, type = nil)
       # No type supplied. Try to determine type from value
       if type.nil?
         type = SyMath::Definition::Constant.default_type_for_constant(name)
@@ -56,7 +56,7 @@ module SyMath
       # Still no type. Look up various types of definitions in order
       if type.nil?
         type = 'any type'
-        types = ['real', 'linop', 'operator']
+        types = ['real', 'function', 'linop', 'operator']
       else
         types = [type]
       end
@@ -153,6 +153,10 @@ module SyMath
       end
 
       return self, 1, false
+    end
+
+    def reduce_power_call(c, e)
+      return c, 1, false
     end
 
     def reduce_call(c)

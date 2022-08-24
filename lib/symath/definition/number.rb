@@ -34,12 +34,34 @@ module SyMath
       return value() == 0
     end
 
+    def reduce_power_modulo_sign(e)
+      # Powers of 1 reduces to 1
+      if self == 1 and e.is_finite?
+        return self, 1, true
+      end
+
+      # Power of 0 reduces to 0
+      if self == 0 and e.is_finite? and e != 0
+        return self, 1, true
+      end
+
+      if e.is_number?
+        return (value ** e.value).to_m, 1, true
+      end
+
+      if e.is_negative_number? and e.argument.value > 1
+        return (value ** e.argument.value).to_m.power(-1), 1, true
+      end
+
+      return 0.to_m, 1, false
+    end
+
     def reduce_product_modulo_sign(o)
       if o.is_number?
         return (self.value*o.value).to_m, 1, true
       end
 
-      return 0, 1, false
+      return 0.to_m, 1, false
     end
 
     def type()

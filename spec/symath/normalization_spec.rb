@@ -99,6 +99,8 @@ module SyMath
       sqrt(-7.to_m)   => nan,
       sqrt(a**(2*b))  => a**b,
       sqrt(-a**(2*b)) => nan,
+      sqrt(a)**2      => a,
+      sqrt(3*a)**4    => (3*a)**2,
     },
 
     'exp' => {
