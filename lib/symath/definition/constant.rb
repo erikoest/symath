@@ -47,6 +47,8 @@ module SyMath
       :qleft  => 'vector',
     }
 
+    @@matrix_form = nil;
+
     def self.default_type_for_constant(c)
       return @@builtin_constants[c]
     end
@@ -165,6 +167,20 @@ module SyMath
           :qS.to_m('linop')      => :qplus.to_m('covector'),
         },
       }
+
+      # FIXME: Move these definitions down to the vector room where they
+      # belong when we have defined the 'vector room' object.
+      @@matrix_form = {
+        :x1     => [1, 0, 0].to_m.transpose,
+        :x2     => [0, 1, 0].to_m.transpose,
+        :x3     => [0, 0, 1].to_m.transpose,
+        :q0     => [1, 0].to_m.transpose,
+        :q1     => [0, 1].to_m.transpose,
+        :qplus  => 1/fn(:sqrt, 2)*[1, 1].to_m.transpose,
+        :qminus => 1/fn(:sqrt, 2)*[1, -1].to_m.transpose,
+        :qright => 1/fn(:sqrt, 2)*[1, :i].to_m.transpose,
+        :qleft  => 1/fn(:sqrt, 2)*[1, -:i].to_m.transpose,
+      }
     end
 
     def initialize(name, t = 'real')
@@ -173,6 +189,17 @@ module SyMath
 
     def description()
       return "#{@name} - #{@@descriptions[@name]}"
+    end
+
+    def to_matrix()
+      if self.type.is_vector? and @@matrix_form.has_key?(self.name)
+        return @@matrix_form[self.name]
+      end
+
+      if self.type.is_covector? or self.type.is_nform and
+        @@matrix_form.has_key?(self.name)
+        return @@matrix_form[self.name].conjugate_transpose
+      end
     end
 
     def is_nan?()
@@ -189,6 +216,14 @@ module SyMath
     
     def is_zero?()
       return false
+    end
+
+    def conjugate()
+      if self == :i
+        return -:i
+      else
+        return self
+      end
     end
 
     def is_unit_quaternion?()

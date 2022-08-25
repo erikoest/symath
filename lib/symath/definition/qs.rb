@@ -4,6 +4,8 @@ module SyMath
   class Definition::QS < Definition::QLogicGate
     @@product_reductions = {}
 
+    @@matrix_form = nil
+
     def self.initialize()
       @@product_reductions = {
         :q0.to_m('vector')     => :q0.to_m('vector'),
@@ -14,6 +16,13 @@ module SyMath
         :qright.to_m('vector') => :qminus.to_m('vector'),
         :qS.to_m('linop')      => :qZ.to_m('linop'),
       }
+
+      @@matrix_form = [[1,  0],
+                       [0, :i]].to_m
+    end
+
+    def to_matrix
+      return @@matrix_form
     end
 
     def reduce_power_modulo_sign(e)

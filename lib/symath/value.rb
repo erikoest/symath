@@ -265,6 +265,16 @@ module SyMath
       return self
     end
 
+    # Replace vectors, differential forms and linear operators with coordinate
+    # matrices representing them in their vector room.
+    def to_matrix()
+      return self
+    end
+
+    def conjugate()
+      return self
+    end
+
     # Simple reduction rules, allows sign to change. Returns
     # (reduced exp, sign, changed). Defaults to no change
     def reduce_modulo_sign

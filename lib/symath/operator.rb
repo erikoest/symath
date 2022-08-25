@@ -48,6 +48,18 @@ module SyMath
       @args = @args.map { |a| a.mul_mx }
     end
 
+    def to_matrix()
+      # FIXME: Create a new operator object instead of replacing argument
+      # list in the old one?
+      @args = @args.map { |a| a.to_matrix }
+      return self
+    end
+
+    def conjugate()
+      @args = @args.map { |a| a.conjugate }
+      return self
+    end
+
     def evaluate()
       # Hack: Don't evaluate arguments if the operator is the integral.
       # this is taken care of inside the definition.

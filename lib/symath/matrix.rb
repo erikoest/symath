@@ -57,13 +57,17 @@ module SyMath
       return @ncols == @nrows
     end
 
+    def apply_on_elements(fn, *args)
+      data = (0..@nrows - 1).map do |r|
+        (0..@ncols - 1).map { |c| self[r, c].send(fn, *args) }
+      end
+
+      return SyMath::Matrix.new(data)
+    end
+
     def matrix_mul(other)
       if !other.is_a?(SyMath::Matrix)
-        data = (0..@nrows - 1).map do |r|
-          (0..@ncols - 1).map { |c| self[r, c]*other }
-        end
-
-        return SyMath::Matrix.new(data)
+        return apply_on_elements(:*, other)
       end
       
       raise 'Invalid dimensions' if @ncols != other.nrows
@@ -82,11 +86,7 @@ module SyMath
     def matrix_div(other)
       raise 'Cannot divide matrix by matrix' if other.is_a?(SyMath::Matrix)
 
-      data = (0..@nrows - 1).map do |r|
-        (0..@ncols - 1).map { |c| self[r, c]/other }
-      end
-
-      return SyMath::Matrix.new(data)
+      return apply_on_elements(:/, other)
     end
 
     def /(other)
@@ -130,13 +130,7 @@ module SyMath
     end
 
     def matrix_neg()
-      data = @elements.map do |r|
-        r.map do |e|
-          - e
-        end
-      end
-
-      return SyMath::Matrix.new(data)
+      return apply_on_elements(:-@)
     end
 
     def -@()
@@ -145,6 +139,10 @@ module SyMath
 
     def transpose()
       return SyMath::Matrix.new(@elements.transpose)
+    end
+
+    def conjugate_transpose()
+      return apply_on_elements(:conjugate).transpose
     end
 
     def inverse()

@@ -4,6 +4,8 @@ module SyMath
   class Definition::QX < Definition::QLogicGate
     @@product_reductions = {}
 
+    @@matrix_form = nil
+
     def self.initialize()
       @@product_reductions = {
         :q0.to_m('vector')     => :q1.to_m('vector'),
@@ -16,6 +18,13 @@ module SyMath
         :qY.to_m('linop')      => :i*:qZ.to_m('linop'),
         :qZ.to_m('linop')      => -:i*:qY.to_m('linop'),
       }
+
+      @@matrix_form = [[0, 1],
+                       [1, 0]].to_m
+    end
+
+    def to_matrix
+      return @@matrix_form
     end
 
     def product_reductions()

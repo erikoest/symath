@@ -42,6 +42,13 @@ module SyMath
       return (!argument.is_positive? and !argument.is_zero?)
     end
 
+    def conjugate()
+      # Small reduction rule in order to make the conjugate look slightly
+      # better without full normalization
+      ret = argument.conjugate
+      return - ret
+    end
+
     def is_negative_number?()
       return argument.is_number?
     end
