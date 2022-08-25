@@ -1,3 +1,4 @@
+# coding: utf-8
 # SyMath expression parser
 
 ## TOODO
@@ -31,7 +32,7 @@ rule
       | prod '*' factor { return val[0].mul(val[2]) }
       | prod '^' factor { return val[0].wedge(val[2]) }
       | prod '×' factor { return val[0].outer(val[2]) }
-      | prod factor     { return val[0].mul(val[1]) }
+      | prod factor     { return product_node(val[0], val[1]) }
       | factor          { return val[0] }
 
   factor: factor '**' factor      { return val[0].power(val[2]) }
@@ -54,7 +55,7 @@ rule
   args: args ',' exp { return val[0].push(val[2]) }
       | exp          { return [val[0]] }
 
-  braket: bra blist '>' { return val[0].mul(vector_node(val[1])) }
+  braket: bra blist '>' { return product_node(val[0], vector_node(val[1])) }
         | bra           { return val[0] }
         | ket           { return val[0] }
 
@@ -223,6 +224,36 @@ end
     return norm_bsymbols(list).map { |a|
       a.to_sym.to_m('vector')
     }.inject(:outer)
+  end
+
+  def product_node(a, b)
+    # * Outer product between vectors and between covectors
+    # * Normal product between vectors and covectors and between
+    #   (co)vectors and linear operators
+    # * Outer products has higher precedence than normal product
+    if b.type.is_vector?
+      if a.is_a?(SyMath::Product) and a.factor2.type.is_vector?
+        return a.factor1.mul(a.factor2.outer(b))
+      end
+
+      if a.type.is_vector?
+        return a.outer(b)
+      end
+    end
+
+    if a.type.is_covector?
+      if b.is_a?(SyMath::Product) and b.factor1.type.is_covector?
+        return a.outer(b.factor1).mul(b.factor2)
+      end
+
+      if b.type.is_covector?
+        return a.outer(b)
+      end
+    end
+
+    # What about A<covector|, |vector>A, and |vector><covector| ?
+
+    return a.mul(b)
   end
 
   def parse(str)

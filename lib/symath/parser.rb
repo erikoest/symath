@@ -101,7 +101,7 @@ end
 
 class Parser < Racc::Parser
 
-module_eval(<<'...end parser.y/module_eval...', 'parser.y', 164)
+module_eval(<<'...end parser.y/module_eval...', 'parser.y', 165)
   attr_reader :exp
 
   def function(name, subnodes)
@@ -164,6 +164,36 @@ module_eval(<<'...end parser.y/module_eval...', 'parser.y', 164)
     return norm_bsymbols(list).map { |a|
       a.to_sym.to_m('vector')
     }.inject(:outer)
+  end
+
+  def product_node(a, b)
+    # * Outer product between vectors and between covectors
+    # * Normal product between vectors and covectors and between
+    #   (co)vectors and linear operators
+    # * Outer products has higher precedence than normal product
+    if b.type.is_vector?
+      if a.is_a?(SyMath::Product) and a.factor2.type.is_vector?
+        return a.factor1.mul(a.factor2.outer(b))
+      end
+
+      if a.type.is_vector?
+        return a.outer(b)
+      end
+    end
+
+    if a.type.is_covector?
+      if b.is_a?(SyMath::Product) and b.factor1.type.is_covector?
+        return a.outer(b.factor1).mul(b.factor2)
+      end
+
+      if b.type.is_covector?
+        return a.outer(b)
+      end
+    end
+
+    # What about A<covector|, |vector>A, and |vector><covector| ?
+
+    return a.mul(b)
   end
 
   def parse(str)
@@ -465,133 +495,133 @@ Racc_debug_parser = false
 
 # reduce 1 omitted
 
-module_eval(<<'.,.,', 'parser.y', 21)
+module_eval(<<'.,.,', 'parser.y', 22)
   def _reduce_2(val, _values, result)
      return nil
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'parser.y', 22)
+module_eval(<<'.,.,', 'parser.y', 23)
   def _reduce_3(val, _values, result)
      return val[1].send(val[0])
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'parser.y', 23)
+module_eval(<<'.,.,', 'parser.y', 24)
   def _reduce_4(val, _values, result)
      return eq(val[0], val[2])
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'parser.y', 24)
+module_eval(<<'.,.,', 'parser.y', 25)
   def _reduce_5(val, _values, result)
      return val[0].add(val[2])
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'parser.y', 25)
+module_eval(<<'.,.,', 'parser.y', 26)
   def _reduce_6(val, _values, result)
      return val[0].sub(val[2])
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'parser.y', 26)
+module_eval(<<'.,.,', 'parser.y', 27)
   def _reduce_7(val, _values, result)
      return val[0]
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'parser.y', 27)
+module_eval(<<'.,.,', 'parser.y', 28)
   def _reduce_8(val, _values, result)
      return val[1].neg
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'parser.y', 29)
+module_eval(<<'.,.,', 'parser.y', 30)
   def _reduce_9(val, _values, result)
      return val[0].div(val[2])
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'parser.y', 30)
+module_eval(<<'.,.,', 'parser.y', 31)
   def _reduce_10(val, _values, result)
      return val[0].mul(val[2])
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'parser.y', 31)
+module_eval(<<'.,.,', 'parser.y', 32)
   def _reduce_11(val, _values, result)
      return val[0].wedge(val[2])
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'parser.y', 32)
+module_eval(<<'.,.,', 'parser.y', 33)
   def _reduce_12(val, _values, result)
      return val[0].outer(val[2])
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'parser.y', 33)
+module_eval(<<'.,.,', 'parser.y', 34)
   def _reduce_13(val, _values, result)
-     return val[0].mul(val[1])
+     return product_node(val[0], val[1])
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'parser.y', 34)
+module_eval(<<'.,.,', 'parser.y', 35)
   def _reduce_14(val, _values, result)
      return val[0]
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'parser.y', 36)
+module_eval(<<'.,.,', 'parser.y', 37)
   def _reduce_15(val, _values, result)
      return val[0].power(val[2])
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'parser.y', 37)
+module_eval(<<'.,.,', 'parser.y', 38)
   def _reduce_16(val, _values, result)
      return val[0].power(val[3].neg)
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'parser.y', 38)
+module_eval(<<'.,.,', 'parser.y', 39)
   def _reduce_17(val, _values, result)
      return function('fact', [val[1]])
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'parser.y', 39)
+module_eval(<<'.,.,', 'parser.y', 40)
   def _reduce_18(val, _values, result)
      return val[1]
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'parser.y', 40)
+module_eval(<<'.,.,', 'parser.y', 41)
   def _reduce_19(val, _values, result)
      return function('abs', [val[1]])
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'parser.y', 41)
+module_eval(<<'.,.,', 'parser.y', 42)
   def _reduce_20(val, _values, result)
      return function(val[0], val[3])
     result
@@ -600,119 +630,119 @@ module_eval(<<'.,.,', 'parser.y', 41)
 
 # reduce 21 omitted
 
-module_eval(<<'.,.,', 'parser.y', 44)
+module_eval(<<'.,.,', 'parser.y', 45)
   def _reduce_22(val, _values, result)
      return function(val[0], val[2])
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'parser.y', 45)
+module_eval(<<'.,.,', 'parser.y', 46)
   def _reduce_23(val, _values, result)
      return function('sharp', [val[2]])
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'parser.y', 46)
+module_eval(<<'.,.,', 'parser.y', 47)
   def _reduce_24(val, _values, result)
      return function('sharp', [val[1]])
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'parser.y', 47)
+module_eval(<<'.,.,', 'parser.y', 48)
   def _reduce_25(val, _values, result)
      return val[0].to_i.to_m
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'parser.y', 48)
+module_eval(<<'.,.,', 'parser.y', 49)
   def _reduce_26(val, _values, result)
      return function('fact', [val[0].to_i.to_m])
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'parser.y', 49)
+module_eval(<<'.,.,', 'parser.y', 50)
   def _reduce_27(val, _values, result)
      return named_node(val[0])
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'parser.y', 50)
+module_eval(<<'.,.,', 'parser.y', 51)
   def _reduce_28(val, _values, result)
      return function('fact', [named_node(val[0])])
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'parser.y', 51)
+module_eval(<<'.,.,', 'parser.y', 52)
   def _reduce_29(val, _values, result)
      return val[0]
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'parser.y', 53)
+module_eval(<<'.,.,', 'parser.y', 54)
   def _reduce_30(val, _values, result)
      return val[0].push(val[2])
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'parser.y', 54)
+module_eval(<<'.,.,', 'parser.y', 55)
   def _reduce_31(val, _values, result)
      return [val[0]]
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'parser.y', 56)
+module_eval(<<'.,.,', 'parser.y', 57)
   def _reduce_32(val, _values, result)
-     return val[0].mul(vector_node(val[1]))
+     return product_node(val[0], vector_node(val[1]))
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'parser.y', 57)
+module_eval(<<'.,.,', 'parser.y', 58)
   def _reduce_33(val, _values, result)
      return val[0]
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'parser.y', 58)
+module_eval(<<'.,.,', 'parser.y', 59)
   def _reduce_34(val, _values, result)
      return val[0]
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'parser.y', 60)
+module_eval(<<'.,.,', 'parser.y', 61)
   def _reduce_35(val, _values, result)
      return covector_node(val[1])
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'parser.y', 62)
+module_eval(<<'.,.,', 'parser.y', 63)
   def _reduce_36(val, _values, result)
      return vector_node(val[1])
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'parser.y', 64)
+module_eval(<<'.,.,', 'parser.y', 65)
   def _reduce_37(val, _values, result)
      return [ val[0] ] + val[2]
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'parser.y', 65)
+module_eval(<<'.,.,', 'parser.y', 66)
   def _reduce_38(val, _values, result)
      return [ val[0] ]
     result

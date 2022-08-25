@@ -160,6 +160,19 @@ module SyMath
       return SyMath::Matrix.new(data)
     end
 
+    def kroenecker(o)
+      data = (0..@nrows - 1).map do |r1|
+        (0..o.nrows - 1).map do |r2|
+          (0..@ncols - 1).map do |c1|
+            (0..o.ncols - 1).map do |c2|
+              self[r1, c1]*o[r2, c2]
+            end
+          end.inject(:+)
+        end
+      end.inject(:+)
+      return SyMath::Matrix.new(data)
+    end
+
     def determinant()
       raise 'Matrix is not square' if !is_square?
       

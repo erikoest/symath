@@ -28,6 +28,27 @@ module SyMath
       end
     end
 
+    def is_prod_exp?()
+      return false
+    end
+
+    def factors()
+      # Override from product. Don't enumerate factors
+      return [self].to_enum
+    end
+
+    def calc_mx
+      # We represent the outer product of matrices as the kroenecker product.
+      f1 = factor1.calc_mx
+      f2 = factor2.calc_mx
+
+      if f1.type.is_matrix? and f2.type.is_matrix?
+        return f1.kroenecker(f2)
+      else
+        return f1.outer(f2)
+      end
+    end
+
     def mul_symbol
       return ' × '
     end

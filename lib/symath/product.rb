@@ -16,6 +16,8 @@ module SyMath
         return self.simplify_inf(a, b)
       end
 
+      return 0.to_m if a == 0 or b == 0
+
       # First try some simple reductions
       # a*1 => a
       return a if b == 1
