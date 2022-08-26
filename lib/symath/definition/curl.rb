@@ -13,7 +13,7 @@ module SyMath
     end
 
     def evaluate_call(c)
-      if SyMath.get_variable(:basis.to_m).row(0).length != 3
+      if SyMath.get_vector_space.dimension != 3
         raise 'Curl is only defined for 3 dimensions'
       end
 

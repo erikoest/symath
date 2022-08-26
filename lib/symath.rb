@@ -74,72 +74,9 @@ module SyMath
   def self.settings()
     return @@global_settings
   end
-  
-  @@special_variables = {
-    :basis.to_m => 1,
-    :g.to_m => 1,
-  }
-
-  @@variable_assignments = {
-    # Some variables with special meanings
-
-    # Row matrix of variable names used as the coordinates in differential
-    # geometry analyses. These define the dimension of the manifold, and
-    # also as the default names of the basis vectors and co-vectors of the
-    # tangent space.
-    :basis.to_m => [:x1, :x2, :x3].to_m,
-
-    # Metric tensor, relative to the chosen basis (subscript indexes)
-    :g.to_m => [[1, 0, 0],
-                [0, 1, 0],
-                [0, 0, 1]].to_m,
-  }
 
   def self.define_equation(exp1, exp2)
     return SyMath::Equation.new(exp1, exp2)
-  end
-
-  def self.get_variables()
-    return @@variable_assignments
-  end
-
-  def self.get_variable(var)
-    return @@variable_assignments[var.to_m]
-  end
-
-  def self.assign_variable(var, value)
-    var = var.to_m
-    value = value.to_m
-    
-    # Check that name is a variable
-    if !var.is_a?(SyMath::Definition::Variable)
-      raise "#{var} is not a variable"
-    end
-
-    if !value.is_a?(SyMath::Value)
-      raise "#{value} is not a SyMath::Value"
-    end
-    
-    @@variable_assignments[var] = value
-
-    # Re-calculate basis vectors if the basis or the metric tensor
-    # changes
-    if var.name.to_sym == :g or var.name.to_sym == :basis
-      SyMath::Definition::Variable.recalc_basis_vectors
-    end
-  end
-
-  def self.set_metric(g, basis = nil)
-    @@variable_assignments[:g.to_m] = g
-    if !basis.nil?
-      @@variable_assignments[:basis.to_m] = basis
-    end
-
-    SyMath::Definition::Variable.recalc_basis_vectors
-  end
-
-  def self.clear_variable(var)
-    @@variable_assignments.delete(var.to_m)
   end
 
   @@parser = SyMath::Parser.new
@@ -148,15 +85,46 @@ module SyMath
     return @@parser.parse(str)
   end
 
+  @@vector_spaces = {}
+  @@default_vector_space = nil
+
+  def self.list_vector_spaces()
+    return @@vector_spaces.keys
+  end
+
+  def self.register_vector_space(vs)
+    if @@vector_spaces.has_key?(vs.name)
+      raise "Vector space #{vs.name} already exists"
+    end
+
+    @@vector_spaces[vs.name] = vs
+  end
+
+  def self.set_default_vector_space(vs)
+    if !vs.is_a?(SyMath::VectorSpace)
+      vs = self.get_vector_space(vs)
+    end
+
+    @@default_vector_space = vs
+  end
+
+  def self.get_vector_space(name = nil)
+    if name.nil?
+      return @@default_vector_space
+    else
+      return @@vector_spaces[name]
+    end
+  end
+
   # Initialize various static data used by the operation
   # modules.
   SyMath::Definition.init_builtin
+  SyMath::VectorSpace.initialize
   SyMath::Definition::Constant.initialize
   SyMath::Definition::Trig.initialize
   SyMath::Definition::QLogicGate.initialize
   SyMath::Operation::Differential.initialize
   SyMath::Operation::Integration.initialize
-
-  # Calculate basis vectors on startup
-  SyMath::Definition::Variable.recalc_basis_vectors
 end
+
+require 'symath/vectorspace'

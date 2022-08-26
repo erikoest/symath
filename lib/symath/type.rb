@@ -252,7 +252,8 @@ module SyMath
         return false
       end
 
-      return degree == SyMath.get_variable(:basis).ncols - 1
+      # FIXME: This does not depend on the default vector space
+      return degree == SyMath.get_vector_space.basis.ncols - 1
     end
 
     # True if type is a pseudoscalar. We use the notion of a pseudoscalar
@@ -263,7 +264,7 @@ module SyMath
         return false
       end
 
-      return degree == SyMath.get_variable(:basis).ncols
+      return degree == SyMath.get_vector_space.basis.ncols
     end
     
     # True if type is the dual of an nvector

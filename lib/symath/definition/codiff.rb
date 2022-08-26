@@ -16,7 +16,7 @@ module SyMath
     end
 
     def evaluate_call(c)
-      vars = SyMath.get_variable(:basis.to_m).row(0)
+      vars = SyMath.get_vector_space.basis.row(0)
       n = vars.length
       k = c.args[0].type.degree
       sign = ((-1)**(n*k + 1)).to_m

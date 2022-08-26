@@ -11,7 +11,7 @@ module SyMath::Operation::Exterior
 
     if res.is_a?(SyMath::Definition::Variable)
       if res.type.is_subtype?('vector')
-        return res.lower_vector
+        return res.vector_space.lower_vector(res)
       end
     end
     
@@ -24,7 +24,7 @@ module SyMath::Operation::Exterior
 
     if res.is_a?(SyMath::Definition::Variable)
       if res.type.is_subtype?('dform')
-        return res.raise_dform
+        return res.vector_space.raise_dform(res)
       end
     end
 
@@ -47,12 +47,12 @@ module SyMath::Operation::Exterior
       return factor1*factor2.hodge
     else
       if !self.type.is_subtype?('nform')
-        return self*SyMath::Definition::Variable.hodge_dual(1.to_m)
+        return self*SyMath.get_vector_space.hodge_dual(1.to_m)
       end
 
       # FIXME: If expression is a product of sums, expand the product first
       # (distributive law), then hodge op on the new sum.
-      return SyMath::Definition::Variable.hodge_dual(self)
+      return SyMath.get_vector_space.hodge_dual(self)
     end
   end
 end

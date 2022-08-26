@@ -40,13 +40,12 @@ module SyMath
     end
 
     it 'raises error on other dimensions than 3' do
-      SyMath.set_metric([[1, 0], [0, 1]].to_m, [:x1, :x2].to_m)
+      SyMath.set_default_vector_space('minkowski_4d')
 
       expect { curl(-x2*x1v).evaluate }.to raise_error(RuntimeError,
         'Curl is only defined for 3 dimensions')
 
-      SyMath.set_metric([[1, 0, 0], [0, 1, 0], [0, 0, 1]].to_m,
-        [:x1, :x2, :x3].to_m)
+      SyMath.set_default_vector_space('euclidean_3d')
     end
   end
 
@@ -62,13 +61,12 @@ module SyMath
     end
 
     it 'raises error on other dimensions than 3' do
-      SyMath.set_metric([[1, 0], [0, 1]].to_m, [:x1, :x2].to_m)
+      SyMath.set_default_vector_space('minkowski_4d')
 
       expect { div(-x2*x1v).evaluate }.to raise_error(RuntimeError,
         'Div is only defined for 3 dimensions')
 
-      SyMath.set_metric([[1, 0, 0], [0, 1, 0], [0, 0, 1]].to_m,
-        [:x1, :x2, :x3].to_m)
+      SyMath.set_default_vector_space('euclidean_3d')
     end
   end
 
