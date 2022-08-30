@@ -353,6 +353,40 @@ The basic quaternions, i, j, k are also available as constants. The
 quaternion i is identical to the complex imaginary unit. Some simple
 reduction rules are available for the quaternions as well.
 
+### Vectors, covectors and linear operators
+
+Variables can be defined as vectors, covectors, d-forms and
+other vector-like objects by specifying a type when created. Vector-like
+objects are associated with a vector space. The vector space may be
+defined with a set of basis vectors and a metric. A set of built-in
+vector spaces are created at startup, and a default space, the euclidean_3d,
+is chosen. Vector-like objects in an expression can be put on matrix
+representation by the method to_matrix (only objects which has an obvious
+representation, like basis vectors and other known objects, are converted).
+
+<pre>
+  > # Create vector objects within the default vector space
+  > a1 = :a1.to_m('vector')
+  > a2 = :a2.to_m('dform')
+  > # Create objects within a given vector space
+  > b = :b.to_m('vector', 'minkowski_4d')
+  > c = :c.to_m('covector', 'minkowski_4d')
+  > m4 = SyMath.get_vector_space('minkowski_4d')
+  > d = m4.vector(:d)
+  > e = m4.covector(:e)
+  > # Set the default vector space
+  > SyMath.list_vector_spaces
+  => ["euclidean_3d", "minkowski_4d", "quantum_logic"]
+  > SyMath.set_default_vector_space('minkowski_4d')
+  => minkowski_4d ([x0, x1, x2, x3])
+  > # Create a new vector space, and create a vector in it
+  > myspace = SyMath::VectorSpace.new('myspace', dimension: 5,
+        basis: [:v, :w, :x, :y, :z].to_m)
+  > SyMath.list_vector_spaces
+  => ["euclidean_3d", "minkowski_4d", "quantum_logic", "myspace"]
+  > v1 = myspace.vector(:v1)
+</pre>
+
 ### Exterior algebra
 
 Caveat: Exterior algebra and differential forms are not well
@@ -360,7 +394,8 @@ understood by the author of this code. The following has not been
 reviewed by any others who understand the subject better than me, and
 it may very well contain a lot of errors and misunderstandings.
 
-D-forms can be defined in several ways. The following are equal:
+D-forms can be defined in several ways. The following are equal. All
+of them will create a d-form in the default vector space:
 
 <pre>
   > # Using the to_d method on a scalar variable
@@ -385,26 +420,9 @@ must be used, e.g. when adding):
   => 0
 </pre>
 
-A vector variable can be defined using the to_m method, and specifying
-the vector type.
-
-<pre>
-  > :v.to_m('vector')
-  => v'
-</pre>
-
 The exterior derivative and related operators all work in a local
-coordinate system defined by set of basic vectors of names :x1, :x2,
-x3. The names can be changed by setting the built-in variable 'basis':
-
-<pre>
-  > SyMath.get_variable('basis')
-  => [x1, x2, x3]
-  > SyMath.assign_variable('basis', [:x, :y, :z])
-  => {dx=>x', dy=>y', dz=>z'}
-  > SyMath.get_variable('basis')
-  => [x, y, z]
-</pre>
+coordinate system defined by the basic vectors of the current
+vector space.
 
 The rest of this section assumes that the following scalars, vectors
 and d-forms are defined:
@@ -440,14 +458,8 @@ The musical isomorphisms are available as the flat and sharp operators:
 </pre>
 
 The flat and sharp operators use the metric tensor in their
-calculations. This is available a the built-in 'g' variable:
-
-<pre>
-  > SyMath.get_variable(:g)
-  => [1, 0, 0; 0, 1, 0; 0, 0, 1]
-</pre>
-
-It can be changed using the SyMath.assign_variable(:g, [value]) method.
+calculations and thus require that the current vector space
+has a metric.
 
 The hodge star operator is available as well:
 
@@ -474,11 +486,11 @@ from the above operators in the usual way:
   => 2*x1*dx3
 </pre>
 
-### Vectors and matrices
+### Matrices
 
-Vectors can be defined in the coordinate array form by converting an
-array to a math object, using the to_m method. Matrices can be created
-the same way from two dimensional arrays:
+Row matrices can be defined in the coordinate array form by converting an
+array to a math object, using the to_m method. Column matrices and two
+dimensional matrices can be created the same way from two dimensional arrays:
 
 <pre>
   > m = [[1, 2, 3], [4, 5, 6]].to_m

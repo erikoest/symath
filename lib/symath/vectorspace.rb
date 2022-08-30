@@ -3,26 +3,30 @@ module SyMath
     attr_reader :name, :basis, :g, :dimension
 
     def self.initialize()
+      # Initialize built-in vector spaces
       e3 = self.new('euclidean_3d', dimension: 3,
                     basis: [:x1, :x2, :x3].to_m,
                     metric: [[1, 0, 0],
                              [0, 1, 0],
                              [0, 0, 1]].to_m)
-      m4 = self.new('minkowski_4d', dimension: 4,
+
+      self.new('minkowski_4d', dimension: 4,
                     basis: [:x0, :x1, :x2, :x3].to_m,
                     metric: [[-1, 0, 0, 0],
                              [ 0, 1, 0, 0],
                              [ 0, 0, 1, 0],
                              [ 0, 0, 0, 1]].to_m)
-      ql = self.new('quantum_logic', dimension: 2, basis: [:q0, :q1].to_m,
-                    normalized: true)
 
       SyMath.set_default_vector_space(e3)
+
+      # Initialize the built-in quantum logic vector space
+      SyMath::VectorSpace::QuantumLogic.initialize
     end
     
     # TODO:
-    # * Is normalized the right term? Is it even correct to define the space itself as
-    #   normalized, or should each element/vector be specified as normalized?
+    # * Is normalized the right term? Is it even correct to define the space
+    #   itself as normalized, or should each element/vector be specified as
+    #   normalized?
 
     def initialize(name, dimension: 3, basis: nil, constants: {}, metric: nil,
                    normalized: false)
@@ -38,7 +42,16 @@ module SyMath
           raise "Number of basis vectors #{basis.ncols} does not match dimension #{dimension}"
         end
       end
-      
+
+      # Hash up the order of the basis vectors
+      @basis_order = {}
+
+      (0..dimension - 1).each do |i|
+        b = @basis.row(0)[i].name
+        @basis_order[b.to_sym] = i
+        @basis_order["d#{b}".to_sym] = i
+      end
+
       if !metric.nil?
         recalc_basis_vectors
       end
@@ -93,14 +106,6 @@ module SyMath
 
       vmap = brow.map do |bb|
         SyMath::Definition::Variable.new(bb.name.to_sym, 'vector'.to_t, self)
-      end
-
-      # Hash up the order of the basis vectors
-      @basis_order = {}
-
-      (0..dim - 1).each do |i|
-        @basis_order[brow[i].name.to_sym] = i
-        @basis_order["d#{brow[i].name}".to_sym] = i
       end
 
       # Calculate all possible permutations of all possible combinations of
@@ -162,13 +167,29 @@ module SyMath
         return nil
       end
     end
-    
+
     def hodge_dual(exp)
       if !@hodge_map.key?(exp)
         raise 'No hodge dual for ' + exp.to_s
       end
 
       return @hodge_map[exp]
+    end
+
+    def vector(name)
+      return name.to_m('vector', self)
+    end
+
+    def covector(name)
+      return name.to_m('covector', self)
+    end
+
+    def dform(name)
+      return name.to_m('dform', self)
+    end
+
+    def linop(name)
+      return name.to_m('linop', self)
     end
 
     def raise_dform(d)
@@ -198,7 +219,7 @@ module SyMath
     def metric?()
       return !@g.nil?
     end
-    
+
     def normalized?()
       return @normalized
     end
@@ -208,5 +229,57 @@ module SyMath
 
       recalc_basis_vectors
     end
+
+    def ==(other)
+      return @name == other.name
+    end
+
+    def hash()
+      return @name.hash
+    end
+
+    alias eql? ==
+
+    def product_reductions_by_variable(var)
+      return
+    end
+
+    def variable_to_matrix(var)
+      order = basis_order(var)
+      puts @basis_order.to_s
+      if order
+        m = [*0..@dimension - 1].map do |i|
+          i == order ? 1 : 0
+        end.to_m.transpose
+
+        if var.type.is_covector?
+          return m.conjugate_transpose
+        else
+          return m
+        end
+      end
+
+      # Cannot convert to matrix
+      return var
+    end
+
+    def inspect()
+      if SyMath.setting(:inspect_to_s)
+        return self.to_s
+      else
+        return super.inspect
+      end
+    end
+
+    def to_s
+      ret = "#{@name}"
+      if @basis
+        ret += " (#{@basis})"
+      end
+
+      return ret
+    end
   end
 end
+
+require 'symath/vectorspace/quantumlogic'

@@ -263,7 +263,7 @@ module SyMath::Operation::Normalization
         if !ex.is_a?(SyMath::Product)
           next
         end
-        
+
         sign2, changed = ex.compare_factors_and_swap
         done = false if changed
         sign *= sign2
@@ -409,24 +409,6 @@ module SyMath::Operation::Normalization
       # Scalars always go before non-scalar linops
       swap_factors
       return 1, true
-    end
-
-    if (f1.type.is_vector? or f1.type.is_dform?) and
-      (f2.type.is_vector? or f2.type.is_dform?)
-      # Only order simple vectors. Don't order vector
-      # expressions
-      # FIXME: We could do that. If so, we must get the dimension
-      # of the variable and swap sign only if dim(f1)*dim(f2) is
-      # odd.
-      if f1.is_a?(SyMath::Definition::Variable) and f2.is_a?(SyMath::Definition::Variable)
-        # Order vector factors
-        if f2 < f1
-          swap_factors
-          return -1, true
-        else
-          return 1, false
-        end
-      end
     end
 
     if f1.type.is_scalar? and f2.type.is_scalar?

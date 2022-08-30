@@ -7,16 +7,18 @@ module SyMath
     @@matrix_form = nil
 
     def self.initialize()
+      ql = SyMath.get_vector_space('quantum_logic')
+
       @@product_reductions = {
-        :q0.to_m('vector')     => :q1.to_m('vector'),
-        :q1.to_m('vector')     => :q0.to_m('vector'),
-        :qminus.to_m('vector') => :qplus.to_m('vector'),
-        :qplus.to_m('vector')  => :qminus.to_m('vector'),
-        :qleft.to_m('vector')  => :qleft.to_m('vector'),
-        :qright.to_m('vector') => :qright.to_m('vector'),
-        :qX.to_m('linop')      => 1.to_m,
-        :qY.to_m('linop')      => :i*:qZ.to_m('linop'),
-        :qZ.to_m('linop')      => -:i*:qY.to_m('linop'),
+        ql.vector(:q0)     => ql.vector(:q1),
+        ql.vector(:q1)     => ql.vector(:q0),
+        ql.vector(:qminus) => ql.vector(:qplus),
+        ql.vector(:qplus)  => ql.vector(:qminus),
+        ql.vector(:qleft)  => ql.vector(:qleft),
+        ql.vector(:qright) => ql.vector(:qright),
+        ql.linop(:qX)      => 1.to_m,
+        ql.linop(:qY)      => :i*ql.linop(:qZ),
+        ql.linop(:qZ)      => -:i*ql.linop(:qY),
       }
 
       @@matrix_form = [[0, 1],

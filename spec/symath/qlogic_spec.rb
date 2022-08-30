@@ -5,6 +5,7 @@ module SyMath
   describe SyMath::Operation::Normalization, ', reduce exp (real)' do
     before do
       SyMath.setting(:braket_syntax, true)
+      SyMath.set_default_vector_space('quantum_logic')
     end
 
     exp = {
@@ -43,12 +44,26 @@ module SyMath
 
     exp.each do |from, to|
       it "reduces '#{from}' to '#{to}'" do
-        expect(from.to_m.normalize).to be_equal_to to
+        expect(from.to_m.normalize).to be_equal_to to.to_m
+      end
+    end
+
+    # Calculate expressions by converting them to matrices
+    exp_mx = {
+      'qX qY qZ'    => [[:i, 0], [0, :i]],
+      'qS qS qS qS' => [[1, 0], [0, 1]],
+      'qX|0>'       => [[0], [1]],
+    }
+
+    exp_mx.each do |from, to|
+      it "calculates '#{from}' to '#{to}'" do
+        expect(from.to_m.to_matrix.calc_mx.normalize).to be_equal_to to.to_m
       end
     end
     
     after do
       SyMath.setting(:braket_syntax, false)
+      SyMath.set_default_vector_space('euclidean_3d')
     end
   end
 end

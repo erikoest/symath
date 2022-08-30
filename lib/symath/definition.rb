@@ -7,9 +7,9 @@
 # with no name but a number of arguments, and an expression. 
 
 module SyMath
-  # Empty submodule in which to define methods for function, operator and constant
-  # definitions. The submodule can be extended/included into the code of the user
-  # code in order to make the math expressions simpler.
+  # Empty submodule in which to define methods for function, operator and
+  # constant definitions. The submodule can be extended/included into the
+  # code of the user code in order to make the math expressions simpler.
   module Definitions
   end
 

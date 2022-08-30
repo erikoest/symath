@@ -7,22 +7,26 @@ module SyMath
     @@matrix_form = nil
 
     def self.initialize()
+      ql = SyMath.get_vector_space('quantum_logic')
+      q0     = ql.vector(:q0)
+      q1     = ql.vector(:q1)
+      qplus  = ql.vector(:qplus)
+      qminus = ql.vector(:qminus)
+
       @@product_reductions = {
-        '|0,0>' => '|0,0>',
-        '|0,1>' => '|0,1>',
-        '|1,0>' => '|1,1>',
-        '|1,1>' => '|1,0>',
-        '|0,->' => '|0,->',
-        '|0,+>' => '|0,+>',
-        '|1,->' => '-|1,->',
-        '|1,+>' => '|1,+>',
-        '|-,->' => '|+,->',
-        '|-,+>' => '|-,+>',
-        '|+,->' => '|-,->',
-        '|+,+>' => '|+,+>',
-      }.map do |from, to|
-        [ from.to_m, to.to_m ]
-      end.to_h
+        q0.outer(q0)         => q0.outer(q0),
+        q0.outer(q1)         => q0.outer(q1),
+        q1.outer(q0)         => q1.outer(q1),
+        q1.outer(q1)         => q1.outer(q0),
+        q0.outer(qminus)     => q0.outer(qminus),
+        q0.outer(qplus)      => q0.outer(qplus),
+        q1.outer(qminus)     => -q1.outer(qminus),
+        q1.outer(qplus)      => q1.outer(qplus),
+        qminus.outer(qminus) => qplus.outer(qminus),
+        qminus.outer(qplus)  => qminus.outer(qplus),
+        qplus.outer(qminus)  => qminus.outer(qminus),
+        qplus.outer(qplus)   => qplus.outer(qplus),
+      }
 
       @@matrix_form = [[1, 0, 0, 0],
                        [0, 1, 0, 0],

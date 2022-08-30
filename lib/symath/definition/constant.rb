@@ -20,12 +20,6 @@ module SyMath
       :i   => 'imaginary unit, first basic quaternion',
       :j   => 'second basic quaternion',
       :k   => 'third basic quaternion',
-      :q0  => 'qubit value |0>',
-      :q1  => 'qubit value |1>',
-      :qminus => 'qubit value |->',
-      :qplus  => 'qubit value |+>',
-      :qright => 'qubit value |right>',
-      :qleft  => 'qubit value |left>',
     }
 
     @@unit_quaternions = [:i, :j, :k].to_set
@@ -39,15 +33,7 @@ module SyMath
       :i   => 'imaginary',
       :j   => 'quaternion',
       :k   => 'quaternion',
-      :q0  => 'vector',
-      :q1  => 'vector',
-      :qminus => 'vector',
-      :qplus  => 'vector',
-      :qright => 'vector',
-      :qleft  => 'vector',
     }
-
-    @@matrix_form = nil;
 
     def self.default_type_for_constant(c)
       return @@builtin_constants[c]
@@ -58,13 +44,6 @@ module SyMath
       @@builtin_constants.each do |k, v|
         self.new(k, v)
       end
-
-      self.new(:q0, 'covector')
-      self.new(:q1, 'covector')
-      self.new(:qminus, 'covector')
-      self.new(:qplus,  'covector')
-      self.new(:qright, 'covector')
-      self.new(:qleft,  'covector')
     end
 
     def self.constants()
@@ -93,93 +72,6 @@ module SyMath
           :j.to_m => -:i.to_m,
           :k.to_m => -1.to_m,
         },
-        # Quantum logic vectors, covectors and operators
-        :q0.to_m('covector') => {
-          :q1.to_m('vector')     => 0.to_m,
-          :qminus.to_m('vector') => 1.to_m/fn(:sqrt, 2),
-          :qplus.to_m('vector')  => 1.to_m/fn(:sqrt, 2),
-          :qleft.to_m('vector')  => 1.to_m/fn(:sqrt, 2),
-          :qright.to_m('vector') => 1.to_m/fn(:sqrt, 2),
-          :qX.to_m('linop')      => :q1.to_m('vector'),
-          :qY.to_m('linop')      => -:i*:q1.to_m('covector'),
-          :qZ.to_m('linop')      => :q0.to_m('covector'),
-          :qH.to_m('linop')      => :qplus.to_m('covector'),
-          :qS.to_m('linop')      => :q0.to_m('covector'),
-        },
-        :q1.to_m('covector') => {
-          :q0.to_m('vector')     => 0.to_m,
-          :qminus.to_m('vector') => -1.to_m/fn(:sqrt, 2),
-          :qplus.to_m('vector')  => 1.to_m/fn(:sqrt, 2),
-          :qleft.to_m('vector')  => -:i.to_m/fn(:sqrt, 2),
-          :qright.to_m('vector') => :i.to_m/fn(:sqrt, 2),
-          :qX.to_m('linop')      => :q0.to_m('covector'),
-          :qY.to_m('linop')      => :i*:q0.to_m('covector'),
-          :qZ.to_m('linop')      => -:q1.to_m('covector'),
-          :qH.to_m('linop')      => :qminus.to_m('covector'),
-          :qS.to_m('linop')      => :i*:q1.to_m('covector'),
-        },
-        :qminus.to_m('covector') => {
-          :q0.to_m('vector')     => 1.to_m/fn(:sqrt, 2),
-          :q1.to_m('vector')     => -1.to_m/fn(:sqrt, 2),
-          :qplus.to_m('vector')  => 0.to_m,
-          :qleft.to_m('vector')  => (1.to_m + :i)/2,
-          :qright.to_m('vector') => (1.to_m - :i)/2,
-          :qX.to_m('linop')      => -:qminus.to_m('covector'),
-          :qY.to_m('linop')      => -:i*:qplus.to_m('covector'),
-          :qZ.to_m('linop')      => :qplus.to_m('covector'),
-          :qH.to_m('linop')      => :q1.to_m('covector'),
-          :qS.to_m('linop')      => :qright.to_m('covector'),
-        },
-        :qplus.to_m('covector')  => {
-          :q0.to_m('vector')     => 1.to_m/fn(:sqrt, 2),
-          :q1.to_m('vector')     => 1.to_m/fn(:sqrt, 2),
-          :qminus.to_m('vector') => 0.to_m,
-          :qleft.to_m('vector')  => (1.to_m - :i)/2,
-          :qright.to_m('vector') => (1.to_m + :i)/2,
-          :qX.to_m('linop')      => :qplus.to_m('covector'),
-          :qY.to_m('linop')      => :i*:qminus.to_m('covector'),
-          :qZ.to_m('linop')      => :qminus.to_m('covector'),
-          :qH.to_m('linop')      => :q0.to_m('covector'),
-          :qS.to_m('linop')      => :qleft.to_m('covector'),
-        },
-        :qleft.to_m('covector')  => {
-          :q0.to_m('vector')     => 1.to_m/fn(:sqrt, 2),
-          :q1.to_m('vector')     => :i.to_m/fn(:sqrt, 2),
-          :qminus.to_m('vector') => (1.to_m - :i)/2,
-          :qplus.to_m('vector')  => (1.to_m + :i)/2,
-          :qright.to_m('vector') => 0.to_m,
-          :qX.to_m('linop')      => :qplus.to_m('covector'),
-          :qY.to_m('linop')      => :i*:qminus.to_m('covector'),
-          :qZ.to_m('linop')      => :qminus.to_m('covector'),
-          :qH.to_m('linop')      => :q0.to_m('covector'),
-          :qS.to_m('linop')      => :qminus.to_m('covector'),
-        },
-        :qright.to_m('covector')  => {
-          :q0.to_m('vector')     => 1.to_m/fn(:sqrt, 2),
-          :q1.to_m('vector')     => -:i.to_m/fn(:sqrt, 2),
-          :qminus.to_m('vector') => (1.to_m + :i)/2,
-          :qplus.to_m('vector')  => (1.to_m - :i)/2,
-          :qleft.to_m('vector')  => 0.to_m,
-          :qX.to_m('linop')      => :qplus.to_m('covector'),
-          :qY.to_m('linop')      => :i*:qminus.to_m('covector'),
-          :qZ.to_m('linop')      => :qminus.to_m('covector'),
-          :qH.to_m('linop')      => :q0.to_m('covector'),
-          :qS.to_m('linop')      => :qplus.to_m('covector'),
-        },
-      }
-
-      # FIXME: Move these definitions down to the vector room where they
-      # belong when we have defined the 'vector room' object.
-      @@matrix_form = {
-        :x1     => [1, 0, 0].to_m.transpose,
-        :x2     => [0, 1, 0].to_m.transpose,
-        :x3     => [0, 0, 1].to_m.transpose,
-        :q0     => [1, 0].to_m.transpose,
-        :q1     => [0, 1].to_m.transpose,
-        :qplus  => 1/fn(:sqrt, 2)*[1, 1].to_m.transpose,
-        :qminus => 1/fn(:sqrt, 2)*[1, -1].to_m.transpose,
-        :qright => 1/fn(:sqrt, 2)*[1, :i].to_m.transpose,
-        :qleft  => 1/fn(:sqrt, 2)*[1, -:i].to_m.transpose,
       }
     end
 
@@ -189,17 +81,6 @@ module SyMath
 
     def description()
       return "#{@name} - #{@@descriptions[@name]}"
-    end
-
-    def to_matrix()
-      if self.type.is_vector? and @@matrix_form.has_key?(self.name)
-        return @@matrix_form[self.name]
-      end
-
-      if self.type.is_covector? or self.type.is_nform and
-        @@matrix_form.has_key?(self.name)
-        return @@matrix_form[self.name].conjugate_transpose
-      end
     end
 
     def is_nan?()
@@ -274,19 +155,6 @@ module SyMath
       end
 
       return self, 0, false
-    end
-
-    def reduce_product_modulo_sign(o)
-      if self.type.is_covector? and o.type.is_vector?
-        # <a|a> = 1
-        # FIXME: This is true only for unit vectors and covectors
-        # We need a vector property: is_unitary?
-        if self.name == o.name
-          return 1.to_m, 1, true
-        end
-      end
-
-      return super(o)
     end
 
     def to_latex()

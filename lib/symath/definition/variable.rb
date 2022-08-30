@@ -114,17 +114,32 @@ module SyMath
       end
     end
 
+    def product_reductions()
+      if self.vector_space
+        return vector_space.product_reductions_by_variable(self)
+      else
+        return
+      end
+    end
+
     def reduce_product_modulo_sign(o)
       if self.type.is_covector? and o.type.is_vector?
         # <a|a> = 1
-        # FIXME: This is true only for unit vectors and covectors
-        # We need a vector property: is_unitary?
-        if self.name == o.name
+        if self.vector_space == o.vector_space and
+          self.vector_space.normalized? and self.name == o.name
           return 1.to_m, 1, true
         end
       end
 
       return super(o)
+    end
+
+    def to_matrix()
+      if vector_space
+        return vector_space.variable_to_matrix(self)
+      else
+        return self
+      end
     end
 
     def to_latex()
@@ -155,7 +170,7 @@ module SyMath
 end
 
 class Symbol
-  def to_m(type = nil, vectorspace = nil)
+  def to_m(type = nil, vector_space = nil)
     begin
       # Look up the already defined symbol
       # (we might want to check that it is a constant or variable)
@@ -166,7 +181,7 @@ class Symbol
         type = 'real'
       end
 
-      return SyMath::Definition::Variable.new(self, type, vectorspace)
+      return SyMath::Definition::Variable.new(self, type, vector_space)
     end
   end
 end
