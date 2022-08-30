@@ -233,7 +233,9 @@ module SyMath
         elsif (left[-1] == '|' and right[0] == '<') or
               (left[-1] == '>' and right[0] == '|')
           return "#{left[0..-2]},#{right[1..-1]}"
-        elsif left == '>' and right == '<'
+        elsif (left[-1] == '>' and right[0] == '<') or
+             left[-1] == '|' or
+             right[0] == '|'
           return "#{left}#{right}"
         else
           return "#{left} #{right}"

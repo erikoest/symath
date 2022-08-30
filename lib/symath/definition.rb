@@ -242,13 +242,13 @@ module SyMath
       if @type.is_dform?
         return SyMath.setting(:d_symbol) + undiff.to_s
       elsif @type.is_vector?
-        if SyMath.setting(:braket_syntax)
+        if vector_space.normalized? and SyMath.setting(:braket_syntax)
           return "|#{qubit_name}>"
         else
           return @name.to_s + SyMath.setting(:vector_symbol)
         end
       elsif @type.is_covector?
-        if SyMath.setting(:braket_syntax)
+        if vector_space.normalized? and SyMath.setting(:braket_syntax)
           return "<#{qubit_name}|"
         else
           return @name.to_s + SyMath.setting(:covector_symbol)

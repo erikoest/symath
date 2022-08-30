@@ -22,32 +22,32 @@ module SyMath
     end
 
     it 'adding' do
-      expect((e1 + e3).normalize.to_s).to be == '3*x + 3 = 6'
-      expect((e1 + 3).normalize.to_s).to be == 'y + 2*x + 6 = 7'
-      expect((3 + e1).normalize.to_s).to be == 'y + 2*x + 6 = 7'
+      expect((e1 + e3).normalize.to_s).to be == '3 x + 3 = 6'
+      expect((e1 + 3).normalize.to_s).to be == 'y + 2 x + 6 = 7'
+      expect((3 + e1).normalize.to_s).to be == 'y + 2 x + 6 = 7'
     end
 
     it 'subtracting' do
       expect((e1 - e2).normalize.to_s).to be == '- y + 2 = 2'
-      expect((e1 - 3).normalize.to_s).to be == 'y + 2*x = 1'
-      expect((3 - e1).normalize.to_s).to be == '- y - 2*x = - 1'
+      expect((e1 - 3).normalize.to_s).to be == 'y + 2 x = 1'
+      expect((3 - e1).normalize.to_s).to be == '- y - 2 x = - 1'
       expect((-e3).normalize.to_s).to be == 'y - x = - 2'
     end
 
     it 'multiplication' do
       expect { e1 * e2 }.to raise_error 'Cannot multiply two equations'
-      expect((e1*2).normalize.to_s).to be == '2*(y + 2*x + 3) = 8'
-      expect((z*e2).normalize.to_s).to be == 'z*(2*y + 2*x + 1) = 2*z'
+      expect((e1*2).normalize.to_s).to be == '2 (y + 2 x + 3) = 8'
+      expect((z*e2).normalize.to_s).to be == 'z (2 y + 2 x + 1) = 2 z'
     end
 
     it 'division' do
       expect { e1 / e2 }.to raise_error 'Cannot divide by equation'
-      expect((e1/3).normalize.to_s).to be == '(y + 2*x + 3)/3 = 4/3'
+      expect((e1/3).normalize.to_s).to be == '(y + 2 x + 3)/3 = 4/3'
     end
 
     it 'power' do
       expect { e1**e2 }.to raise_error 'Cannot use equation as exponent'
-      expect((e1**2).normalize.to_s).to be == '(y + 2*x + 3)**2 = 16'
+      expect((e1**2).normalize.to_s).to be == '(y + 2 x + 3)**2 = 16'
     end
   end
 end

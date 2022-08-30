@@ -29,7 +29,7 @@ module SyMath
     :covector_symbol => '.',
 
     # Use (dirac) braket syntax for vectors and covectors
-    :braket_syntax => false,
+    :braket_syntax => true,
     # Show all parantheses on +, *, / and ^ operators.
     :expl_parentheses => false,
     # Represent square roots with the root symbol or as a fraction exponent

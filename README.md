@@ -355,14 +355,30 @@ reduction rules are available for the quaternions as well.
 
 ### Vectors, covectors and linear operators
 
-Variables can be defined as vectors, covectors, d-forms and
-other vector-like objects by specifying a type when created. Vector-like
-objects are associated with a vector space. The vector space may be
-defined with a set of basis vectors and a metric. A set of built-in
-vector spaces are created at startup, and a default space, the euclidean_3d,
-is chosen. Vector-like objects in an expression can be put on matrix
-representation by the method to_matrix (only objects which has an obvious
-representation, like basis vectors and other known objects, are converted).
+Variables can be defined as vectors, covectors, d-forms and other
+vector-like objects by specifying a type when created. Vector-like
+objects are associated with a vector space. The 'vector space' is
+matematically speaking an abuse of the term since vectors, covectors
+and linear operators live in separate vector spaces (typically denoted
+as V, V^V and VxVx...xV). They are, however, closely related, and
+share many properties. So we let all these vector-like object share
+their vector space. This may be changed in the future.
+
+The vector space may be defined with a set of basis vectors and a
+metric. This is optional, but a requirement if the vectors are to be
+used with the exteriar algebra operations (see next section).
+
+A set of built-in vector spaces are created at startup, and a default
+space, the euclidean_3d, is chosen. Vector-like objects in an
+expression can be put on matrix representation by the method to_matrix
+(only objects which has an obvious representation, like basis vectors
+and other known objects, are converted).
+
+Vector-vector and covector-covector multiplications are automatically
+composed into outer products. Covector-vector products are, on the
+other hand, composed into inner products. Vectors and covectors
+multiplied with a linear operator are composed into a normal product,
+which is interpreted as an operator composition operation.
 
 <pre>
   > # Create vector objects within the default vector space
@@ -385,6 +401,47 @@ representation, like basis vectors and other known objects, are converted).
   > SyMath.list_vector_spaces
   => ["euclidean_3d", "minkowski_4d", "quantum_logic", "myspace"]
   > v1 = myspace.vector(:v1)
+</pre>
+
+### Normalized vector spaces, Bra-ket notation and the quantum logic space
+
+A vector space can be defined as 'normalized'. In this case, all
+vectors, co-vectors and linear operators are assumed to be
+unitary. Vectors in normalized vector spaces are stringified in
+bra-ket/dirac notation form since such vector spaces are often used in
+quantum mechanical formula. The bra-ket notation is available for all
+vectors in the String.to_m parser.
+
+<pre>
+  > norm = SyMath::VectorSpace.new('norm', dimension: 3,
+        basis: [:a, :b, :c].to_m, normalized: true )
+  > SyMath.set_default_vector_space('norm')
+  => norm ([a, b, c])
+  > 'A B|c>'.to_m
+  => A B|c>
+  > '<a|a>'.to_m.normalize
+  => 1
+  > '|a>|b>'.to_m
+  => |a,b>
+  </pre>
+
+A built-in normalized vector space, 'quantum_logic', is available. It
+has the basis vectors '|0>' and '|1>', and various linear operators
+corresponding to quantum logical gates like, qX, qY, qZ, qH,
+qS. Simple reduction rules exist between these objects. They can also
+be converted to matrix form for further calculations.
+
+<pre>
+  > SyMath.set_default_vector_space('quantum_logic')
+  => quantum_logic ([q0, q1])
+  > 'qX|0>'.to_m
+  => qX|0>
+  > 'qX|0>'.to_m.normalize
+  => |1>
+  > '<1|qX|0>'.to_m.normalize
+  => 1
+  > 'qH|0>'.to_m.normalize
+  => |+>
 </pre>
 
 ### Exterior algebra

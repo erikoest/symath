@@ -7,15 +7,16 @@ module SyMath
     attr_reader :vector_space
 
     def initialize(name, t = 'real', vector_space = nil)
-      super(name, define_symbol: false, type: t)
-
-      if type.is_subtype?('tensor')
+      t = t.to_t
+      if t.is_subtype?('tensor')
         if !vector_space.is_a?(SyMath::VectorSpace)
           @vector_space = SyMath.get_vector_space(vector_space)
         else
           @vector_space = vector_space
         end
       end
+
+      super(name, define_symbol: false, type: t)
     end
 
     def description()
@@ -146,14 +147,14 @@ module SyMath
       if type.is_dform?
         return '\mathrm{d}' + undiff.to_latex
       elsif @type.is_vector?
-        if SyMath.setting(:braket_syntax)
+        if vector_space.normalized? and SyMath.setting(:braket_syntax)
           return "\\ket{#{qubit_name}}"
         else
           return "\\vec{#{@name}}"
         end
       elsif @type.is_covector?
         # What is the best way to denote a covector without using indexes?
-        if SyMath.setting(:braket_syntax)
+        if vector_space.normalized? and SyMath.setting(:braket_syntax)
           return "\\bra{#{qubit_name}}"
         else
           return "\\vec{#{@name}}"
