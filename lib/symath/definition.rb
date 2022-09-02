@@ -222,6 +222,10 @@ module SyMath
       return true
     end
 
+    def is_bounded?()
+      return type.is_subtype?('linop')
+    end
+
     def qubit_name()
       if @name == :qplus
         return '+'

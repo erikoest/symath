@@ -246,7 +246,6 @@ module SyMath
 
     def variable_to_matrix(var)
       order = basis_order(var)
-      puts @basis_order.to_s
       if order
         m = [*0..@dimension - 1].map do |i|
           i == order ? 1 : 0

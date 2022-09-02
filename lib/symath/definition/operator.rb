@@ -19,6 +19,9 @@ module SyMath
       SyMath::Definition::Laplacian.new
       SyMath::Definition::CoDiff.new
 
+      # Hermitian adjoint
+      SyMath::Definition::Herm.new
+
       # QLogic gate operators
       SyMath::Definition::QX.new
       SyMath::Definition::QY.new
@@ -77,6 +80,10 @@ module SyMath
     end
 
     def is_involutory?()
+      return false
+    end
+
+    def is_unitary?()
       return false
     end
 
@@ -256,4 +263,5 @@ require 'symath/definition/curl'
 require 'symath/definition/div'
 require 'symath/definition/laplacian'
 require 'symath/definition/codiff'
+require 'symath/definition/herm'
 require 'symath/definition/qlogicgate'

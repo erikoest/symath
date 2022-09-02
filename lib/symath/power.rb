@@ -123,6 +123,10 @@ module SyMath
       return base.reduce_power_modulo_sign(exponent)
     end
 
+    def type()
+      return base.type.product(base.type)
+    end
+
     def to_s()
       if base.is_sum_exp? or base.is_prod_exp? or base.is_a?(SyMath::Power)
         base_str = '(' + base.to_s + ')'

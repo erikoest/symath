@@ -138,6 +138,10 @@ module SyMath
       return true
     end
 
+    def is_bounded?()
+      return (factor1.is_bounded? and factor2.is_bounded?)
+    end
+
     def is_prod_exp?()
       return true
     end

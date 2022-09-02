@@ -116,6 +116,10 @@ module SyMath
       return
     end
 
+    def is_bounded?()
+      return false
+    end
+
     def is_divisor_factor?()
       return false
     end

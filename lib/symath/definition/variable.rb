@@ -75,6 +75,14 @@ module SyMath
       return !(vars.member?(self))
     end
 
+    def is_unitary?
+      if type.is_subtype?('tensor') and vector_space.normalized?
+        return true
+      end
+
+      return false
+    end
+
     # Returns true if variable is a differential form
     def is_d?()
       return @type.is_dform?

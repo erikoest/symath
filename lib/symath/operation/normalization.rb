@@ -206,7 +206,7 @@ module SyMath::Operation::Normalization
 
     return ret.empty? ? 1.to_m : ret.inject(:*)
   end
-  
+
   # Order the factors first by type, then, for commutative and anti-
   # commutative factors, by content using bubble sort:
   #   sign * constant numbers * scalar factors * other factors
@@ -380,6 +380,12 @@ module SyMath::Operation::Normalization
       if base1 == base2
         return replace_combined_factors(base1**(exp1 + exp2)), 1, true
       end
+    end
+
+    # For non-scalars reduce X * X**-1 to 1.
+    if base1 == base2 and ((exp1 == 1 and exp2 == -1) or
+                           (exp1 == -1 and exp2 == 1))
+      return replace_combined_factors(1.to_m), 1, true
     end
     
     return self, 1, false

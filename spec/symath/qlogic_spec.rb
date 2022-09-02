@@ -40,6 +40,12 @@ module SyMath
       'qCNOT|1>|+>' => '|1,+>',
       'qCNOT|1>|->' => '-|1,->',
       '|1>|0>'      => '|1,0>',
+      'Herm(|x>)'        => '<x|',
+      'Herm(|x,y>)'      => '<y,x|',
+      'Herm(Herm(a))'    => 'a',
+      'Herm(qX)'         => 'qX**-1',
+      'Herm(qX|a>)'      => '<a|qX**-1',
+      'Herm(qX|a>)qX|a>' => '1',
     }
 
     exp.each do |from, to|

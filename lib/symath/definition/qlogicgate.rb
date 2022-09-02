@@ -10,6 +10,10 @@ module SyMath
       SyMath::Definition::QS.initialize
       SyMath::Definition::QCNOT.initialize
     end
+
+    def is_unitary?()
+      return true
+    end
   end
 end
 
