@@ -134,6 +134,13 @@ module SyMath
       end
     end
 
+    # Symbol is allowed as a standalone lead node (as opposed to some
+    # functions and operators which can only be used as an operator
+    # call with arguments.
+    def allow_standalone?()
+      return true
+    end
+
     def product_reductions()
       return nil
     end

@@ -8,17 +8,18 @@ module SyMath
       super(:Herm, args: [:o], description: 'Hermitian adjoint, Herm(o)')
     end
 
-    # FIXME: raise error if operator is used as a leaf node (that is,
-    # without arguments).
+    def allow_standalone?()
+      return false
+    end
 
     def reduce_call(c)
       arg = c.args[0]
       if arg.is_a?(SyMath::Matrix)
-        # FIXME: Reduction rules for hermitian conjugate on matrices...
+        return arg.conjugate_transpose
         return self
       end
 
-      # H(H(a)) -> a
+      # Herm(Herm(a)) -> a
       # FIXME: Use the is_involutory? property
       if arg.is_a?(SyMath::Operator) and
         arg.definition.is_a?(SyMath::Definition::Herm)

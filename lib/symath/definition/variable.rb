@@ -180,17 +180,25 @@ end
 
 class Symbol
   def to_m(type = nil, vector_space = nil)
+    ret = nil
+
     begin
       # Look up the already defined symbol
       # (we might want to check that it is a constant or variable)
-      return SyMath::Definition.get(self, type)
+      ret = SyMath::Definition.get(self, type)
     rescue
       # Not defined. Define it now.
       if type.nil?
         type = 'real'
       end
 
-      return SyMath::Definition::Variable.new(self, type, vector_space)
+      ret = SyMath::Definition::Variable.new(self, type, vector_space)
     end
+
+    if !ret.allow_standalone?
+      raise "Symbol #{self} cannot be used without arguments."
+    end
+
+    return ret
   end
 end
