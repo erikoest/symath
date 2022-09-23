@@ -20,6 +20,16 @@ module SyMath
         return b*a
       end
 
+      # dx^dx**-1 = 1
+      if a.is_a?(SyMath::Power) and a.exponent == -1 and  a.base == b
+        return 1
+      end
+
+      # dx**-1^dx = 1
+      if b.is_a?(SyMath::Power) and b.exponent == -1 and  b.base == a
+        return 1.to_m
+      end
+
       # Treat minus expression
       if a.is_a?(SyMath::Minus)
         return -(a.argument^b)

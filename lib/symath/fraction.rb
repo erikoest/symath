@@ -25,6 +25,11 @@ module SyMath
         end
       end
 
+      # a/a = 1
+      if a == b
+        return 1.to_m
+      end
+
       if a.is_a?(SyMath::Fraction)
         if b.is_a?(SyMath::Fraction)
           return self.new(a.dividend*b.divisor, a.divisor*b.dividend)
