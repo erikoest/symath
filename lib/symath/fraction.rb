@@ -30,17 +30,34 @@ module SyMath
         return 1.to_m
       end
 
-      if a.is_a?(SyMath::Fraction)
-        if b.is_a?(SyMath::Fraction)
-          return self.new(a.dividend*b.divisor, a.divisor*b.dividend)
-        else
-          return self.new(a.dividend, a.divisor*b)
-        end
-      elsif b.is_a?(SyMath::Fraction)
-        return self.new(a*b.divisor, b.dividend)
+      # Move minuses out of fraction.
+      sign = 1.to_m
+      if a.is_a?(SyMath::Minus)
+        a = a.argument
+        sign = - sign
       end
 
-      return self.new(a, b)
+      if b.is_a?(SyMath::Minus)
+        b = b.argument
+        sign = - sign
+      end
+
+      # a/i = -a*i
+      if b == :i
+        return - sign * a * b
+      end
+
+      if a.is_a?(SyMath::Fraction)
+        if b.is_a?(SyMath::Fraction)
+          return sign * self.new(a.dividend*b.divisor, a.divisor*b.dividend)
+        else
+          return sign * self.new(a.dividend, a.divisor*b)
+        end
+      elsif b.is_a?(SyMath::Fraction)
+        return sign * self.new(a*b.divisor, b.dividend)
+      end
+
+      return sign * self.new(a, b)
     end
 
     # Divide infinite values

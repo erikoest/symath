@@ -173,6 +173,10 @@ module SyMath::Operation::Normalization
   end
 
   def product_on_fraction_form
+    if self.is_a?(SyMath::Minus)
+      return - argument.product_on_fraction_form
+    end
+
     ret = []
     fact = 1.to_m
     divf = 1.to_m

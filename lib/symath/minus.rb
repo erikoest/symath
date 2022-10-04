@@ -12,6 +12,8 @@ module SyMath
       if a.is_a?(SyMath::Minus)
         # - - a => a
         return a.argument
+      elsif a.is_sum_exp?
+        return a.terms.map { |t| - t }.inject(:+)
       else
         return self.new(a)
       end

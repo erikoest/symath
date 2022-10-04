@@ -47,7 +47,7 @@ module SyMath
       SyMath::setting(:expl_parentheses, false)
     end
     it 'minus of sum to s' do
-      expect((-(a + b)).to_s).to be == '- (a + b)'
+      expect(((a + b).neg).to_s).to be == '- (a + b)'
     end
     it 'product to s' do
       expect((2 * a * b).to_s).to be == '2*a*b'

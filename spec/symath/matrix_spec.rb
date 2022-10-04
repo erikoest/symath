@@ -51,7 +51,7 @@ module SyMath
     end
 
     it 'matrix inverse' do
-      expect(s2.inverse.normalize.to_s).to be == '[1/7, (- 1)/7; 1/7, 3/28]'
+      expect(s2.inverse.normalize.to_s).to be == '[1/7, - 1/7; 1/7, 3/28]'
       expect((s2.inverse*s2).calc_mx.normalize.to_s).to be ==
         '[1, 0; 0, 1]'
       expect((s3.inverse*s3).calc_mx.normalize.to_s).to be ==
