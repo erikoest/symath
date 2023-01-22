@@ -6,10 +6,9 @@ module SyMath
 
     a = :a.to_m
     b = :b.to_m
-    da = :da.to_m('dform')
+    da = :da.to_m('form')
     xv = :x.to_m('vector')
     yv = :y.to_m('vector')
-    xc = :x.to_m('covector')
     t = :t.to_m(SyMath::Type.new('tensor', indexes: ['u', 'l']))
     m = :m.to_m(SyMath::Type.new('matrix', dimm: 2, dimn: 3))
     mx = [[1, 2, 3], [4, 5, 6]].to_m
@@ -22,8 +21,7 @@ module SyMath
     # Types
     it '1234 to s' do expect(1234.to_m.to_s).to be == '1234' end
     it 'vector to s' do expect(xv.to_s).to be == 'x\'' end
-    it 'covector to s' do expect(xc.to_s).to be == 'x.' end
-    it 'dform to s' do expect(da.to_s).to be == 'da' end
+    it 'form to s' do expect(da.to_s).to be == 'da' end
     it 'tensor to s' do expect(t.to_s).to be == 't[\'.]' end
     it 'simple type to s' do expect(a.type.to_s).to be == 'real' end
     it 'matrix type to s' do expect(m.type.to_s).to be == 'matrix[2x3]' end

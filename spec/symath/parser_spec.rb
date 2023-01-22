@@ -5,9 +5,9 @@ module SyMath
   x = :x
   y = :y
   z = :z
-  dx = :dx.to_m('dform')
-  dy = :dy.to_m('dform')
-  dz = :dz.to_m('dform')
+  dx = :dx.to_m('form')
+  dy = :dy.to_m('form')
+  dz = :dz.to_m('form')
   xv = :xv.to_m('vector')
   yv = :yv.to_m('vector')
   zv = :zv.to_m('vector')

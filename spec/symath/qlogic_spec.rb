@@ -43,8 +43,8 @@ module SyMath
       'Herm(|x>)'        => '<x|',
       'Herm(|x,y>)'      => '<y,x|',
       'Herm(Herm(a))'    => 'a',
-      'Herm(qX)'         => 'qX**-1',
-      'Herm(qX|a>)'      => '<a|qX**-1',
+      'Herm(qX)'         => 'qX',
+      'Herm(qX|a>)'      => '<a|qX',
       'Herm(qX|a>)qX|a>' => '1',
     }
 

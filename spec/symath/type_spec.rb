@@ -8,9 +8,9 @@ module SyMath
     vx = :x.to_m('vector')
     vy = :y.to_m('vector')
     vz = :z.to_m('vector')
-    dx = :tx.to_m('dform')
-    dy = :ty.to_m('dform')
-    dz = :tz.to_m('dform')
+    dx = :tx.to_m('form')
+    dy = :ty.to_m('form')
+    dz = :tz.to_m('form')
     m53 = :m.to_m(SyMath::Type.new('matrix', dimn: 3, dimm: 5))
     m32 = :m.to_m(SyMath::Type.new('matrix', dimn: 2, dimm: 3))
 
@@ -26,8 +26,8 @@ module SyMath
       expect(rat.common_parent(im).name).to be == :complex
     end
 
-    it 'wedge product of mixed vector and dform' do
-      w = :a.to_m('vector').wedge(:db.to_m('dform'))
+    it 'wedge product of mixed vector and oneform' do
+      w = :a.to_m('vector').wedge(:db.to_m('form'))
       expect(w.type).to be == 'tensor'.to_t(indexes: ['u', 'l'])
     end
 
@@ -36,13 +36,13 @@ module SyMath
       expect(w.type).to be == 'vector'.to_t
     end
 
-    it 'wedge product of mixed scalar and dform' do
-      w = :da.to_m('dform').wedge(:b.to_m)
-      expect(w.type).to be == 'dform'.to_t
+    it 'wedge product of mixed scalar and form' do
+      w = :da.to_m('form').wedge(:b.to_m)
+      expect(w.type).to be == 'form'.to_t
     end
 
-    it 'vector and dform has no common parent' do
-      expect { vx.type.common_parent(dx.type) }.to raise_error 'No common type for vector[u] and dform[l]'
+    it 'vector and form has no common parent' do
+      expect { vx.type.common_parent(dx.type) }.to raise_error 'No common type for vector[u] and form[l]'
     end
 
     it 'matrix and scalar types cannot be summed' do
@@ -57,20 +57,16 @@ module SyMath
       expect { m32.type.product(m53.type) }.to raise_error 'Types matrix[3x2] and matrix[5x3] cannot be multiplied'
     end
 
-    it 'degree of vector/dform product' do
+    it 'degree of vector/form product' do
       expect((vx^vy^dx^dy).type.degree).to be == 4
     end
 
-    it 'product of dforms is nform' do
-      expect((dx^dy).type.is_nform?).to be == true
+    it 'product of oneforms is a form' do
+      expect((dx^dy).type.is_form?).to be == true
     end
 
-    it 'product of vector and dform is not nform' do
-      expect((vx^dx).type.is_nform?).to be == false
-    end
-
-    it 'dform is not a covector' do
-      expect(dx.type.is_covector?).to be == false
+    it 'product of vector and oneform is not a form' do
+      expect((vx^dx).type.is_form?).to be == false
     end
 
     it '2-form is a pseudovector in a 3d basis' do
@@ -81,7 +77,7 @@ module SyMath
       expect((vx^vy).type.is_pseudovector?).to be == true
     end
 
-    it 'dform is not a pseudovector in a 3d basis' do
+    it 'oneform is not a pseudovector in a 3d basis' do
       expect(dx.type.is_pseudovector?).to be == false
     end
 
@@ -101,7 +97,7 @@ module SyMath
       expect((vx^vy^vz).type.is_pseudoscalar?).to be == true
     end
 
-    it 'dform is not a pseudoscalar' do
+    it 'oneform is not a pseudoscalar' do
       expect(dx.type.is_pseudoscalar?).to be == false
     end
 

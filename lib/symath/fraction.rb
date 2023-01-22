@@ -149,7 +149,7 @@ module SyMath
       # Evaluate df/dx expression.
       if dividend.is_a?(SyMath::Operator) and
         dividend.definition.is_a?(SyMath::Definition::D)
-        # Evaluate if the divisor is a simple dform. The composed form
+        # Evaluate if the divisor is a simple oneform. The composed form
         # d(x) is accepted as well as the simple dx variable.
         if divisor.is_a?(SyMath::Definition::Variable) and divisor.is_d?
           v = divisor.undiff
@@ -183,7 +183,7 @@ module SyMath
         return dividend.type
       end
     end
-    
+
     def to_s()
       dividend_str = dividend.is_sum_exp? ? '(' + dividend.to_s + ')' : dividend.to_s
       divisor_str = (divisor.is_sum_exp? or divisor.is_prod_exp?) ?

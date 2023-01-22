@@ -79,10 +79,6 @@ module SyMath
       return
     end
 
-    def is_involutory?()
-      return false
-    end
-
     def is_unitary?()
       return false
     end

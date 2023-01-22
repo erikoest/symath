@@ -9,11 +9,11 @@ module SyMath
   x2v = :x2.to_m('vector')
   x3v = :x3.to_m('vector')
 
-  dx1 = :dx1.to_m('dform')
-  dx2 = :dx2.to_m('dform')
-  dx3 = :dx3.to_m('dform')
+  dx1 = :dx1.to_m('form')
+  dx2 = :dx2.to_m('form')
+  dx3 = :dx3.to_m('form')
 
-  da = :da.to_m('dform')
+  da = :da.to_m('form')
   av = :a.to_m('vector')
 
   describe SyMath::Definition::Grad do
@@ -142,7 +142,7 @@ module SyMath
     end
 
     it 'flat error' do
-      expect { op(:flat, av).evaluate }.to raise_error 'No dform dual for a\''
+      expect { op(:flat, av).evaluate }.to raise_error 'No oneform dual for a\''
     end
   end
 end

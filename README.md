@@ -13,8 +13,8 @@ Supported features:
   * Complex numbers and quaternions
   * Exterior algebra and exterior derivative (limited and possibly faulty)
   * Operator composition algebra (limited)
-  * Vectors and covectors
-  * Braket notation for vectors, covectors and linear operators
+  * Vectors and linear forms
+  * Braket notation for vectors, forms and linear operators
   * Matrices
 
 # Installation
@@ -353,16 +353,16 @@ The basic quaternions, i, j, k are also available as constants. The
 quaternion i is identical to the complex imaginary unit. Some simple
 reduction rules are available for the quaternions as well.
 
-### Vectors, covectors and linear operators
+### Vectors, oneforms and linear operators
 
-Variables can be defined as vectors, covectors, d-forms and other
-vector-like objects by specifying a type when created. Vector-like
+Variables can be defined as vectors, oneforms, multilinear forms and
+other vector-like objects by specifying a type when created. Vector-like
 objects are associated with a vector space. The 'vector space' is
-matematically speaking an abuse of the term since vectors, covectors
-and linear operators live in separate vector spaces (typically denoted
-as V, V^V and VxVx...xV). They are, however, closely related, and
-share many properties. So we let all these vector-like object share
-their vector space. This may be changed in the future.
+matematically speaking an abuse of the term since vectors, n-forms
+and other linear operators live in separate vector spaces (typically
+denoted as V, V^V and VxVx...xV). They are, however, closely related,
+and share many properties. So we let all these vector-like object
+share their vector space. This may be changed in the future.
 
 The vector space may be defined with a set of basis vectors and a
 metric. This is optional, but a requirement if the vectors are to be
@@ -374,22 +374,22 @@ expression can be put on matrix representation by the method to_matrix
 (only objects which has an obvious representation, like basis vectors
 and other known objects, are converted).
 
-Vector-vector and covector-covector multiplications are automatically
-composed into outer products. Covector-vector products are, on the
-other hand, composed into inner products. Vectors and covectors
+Vector-vector and oneform-oneform multiplications are automatically
+composed into outer products. Oneform-vector products are, on the
+other hand, composed into inner products. Vectors and oneforms
 multiplied with a linear operator are composed into a normal product,
 which is interpreted as an operator composition operation.
 
 <pre>
   > # Create vector objects within the default vector space
   > a1 = :a1.to_m('vector')
-  > a2 = :a2.to_m('dform')
+  > a2 = :a2.to_m('form')
   > # Create objects within a given vector space
   > b = :b.to_m('vector', 'minkowski_4d')
-  > c = :c.to_m('covector', 'minkowski_4d')
+  > c = :c.to_m('form', 'minkowski_4d')
   > m4 = SyMath.get_vector_space('minkowski_4d')
   > d = m4.vector(:d)
-  > e = m4.covector(:e)
+  > e = m4.oneform(:e)
   > # Set the default vector space
   > SyMath.list_vector_spaces
   => ["euclidean_3d", "minkowski_4d", "quantum_logic"]
@@ -451,8 +451,8 @@ understood by the author of this code. The following has not been
 reviewed by any others who understand the subject better than me, and
 it may very well contain a lot of errors and misunderstandings.
 
-D-forms can be defined in several ways. The following are equal. All
-of them will create a d-form in the default vector space:
+Forms can be defined in several ways. The following are equal. All
+of them will create a oneform in the default vector space:
 
 <pre>
   > # Using the to_d method on a scalar variable
@@ -461,12 +461,12 @@ of them will create a d-form in the default vector space:
   > # Differentiating a scalar variable
   > d(:x)
   => dx
-  > # Creating a variable, and specifying the dform type
-  > :dx.to_m('dform')
+  > # Creating a variable, and specifying the form type
+  > :dx.to_m('form')
   => dx
 </pre>
 
-D-forms can be wedged together, forming n-forms (note that the ^
+Forms can be wedged together, forming n-forms (note that the ^
 operator has lower preceedence in Ruby than in math, so parantheses
 must be used, e.g. when adding):
 
@@ -493,9 +493,9 @@ and d-forms are defined:
   > x1v = :x1.to_m('vector')
   > x2v = :x2.to_m('vector')
   > x3v = :x3.to_m('vector')
-  > dx1 = :dx1.to_m('dform')
-  > dx2 = :dx2.to_m('dform')
-  > dx3 = :dx3.to_m('dform')
+  > dx1 = :dx1.to_m('form')
+  > dx2 = :dx2.to_m('form')
+  > dx3 = :dx3.to_m('form')
 </pre>
 
 The exterior derivative is available as the xd-operator:
@@ -656,12 +656,8 @@ The library has some global settings which change the behaviour of the system:
   > # List all settings
   > SyMath.settings
   => {
-      # Symbol used when a d-form is created
-      :d_symbol                 => "d",
       # Symbol used when a vector is stringified
       :vector_symbol            => "'",
-      # Co-vector symbol used in a tensor type signature
-      :covector_symbol          => ".",
       # Show all parentheses when stringifying an expression
       :expl_parentheses         => false,
       # Put square roots on exponent form

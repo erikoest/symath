@@ -20,15 +20,10 @@ require 'symath/poly/galois'
 
 module SyMath
   @@global_settings = {
-    # Symbol used to represent the differential operator
-    # on variables
-    :d_symbol => 'd',
     # Symbol used to represent vector variables
     :vector_symbol => '\'',
-    # Symbol used to represent covector variables
-    :covector_symbol => '.',
 
-    # Use (dirac) braket syntax for vectors and covectors
+    # Use (dirac) braket syntax for vectors and oneform
     :braket_syntax => true,
     # Show all parantheses on +, *, / and ^ operators.
     :expl_parentheses => false,

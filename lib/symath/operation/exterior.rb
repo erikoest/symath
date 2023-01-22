@@ -23,8 +23,8 @@ module SyMath::Operation::Exterior
     res = recurse('sharp', nil)
 
     if res.is_a?(SyMath::Definition::Variable)
-      if res.type.is_subtype?('dform')
-        return res.vector_space.raise_dform(res)
+      if res.type.is_subtype?('form')
+        return res.vector_space.raise_oneform(res)
       end
     end
 
@@ -46,7 +46,7 @@ module SyMath::Operation::Exterior
       # Assume that the wedge expression is always on the right hand side
       return factor1*factor2.hodge
     else
-      if !self.type.is_subtype?('nform')
+      if !self.type.is_subtype?('form')
         return self*SyMath.get_vector_space.hodge_dual(1.to_m)
       end
 

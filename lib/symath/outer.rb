@@ -17,7 +17,7 @@ module SyMath
         if (indexes - ['u']).empty?
           type = 'vector'
         elsif (indexes - ['l']).empty?
-          type = 'covector'
+          type = 'form'
         else
           type = 'tensor'
         end

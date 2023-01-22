@@ -66,12 +66,16 @@ module SyMath
       end
 
       if !a.is_a?(SyMath::Wedge) and !b.is_a?(SyMath::Wedge)
-        if a == b
+        if a == b and a.type.degree.odd?
           return 0.to_m
         end
 
         if a > b
-          return -1.to_m*(b.wedge(a))
+          if (a.type.degree*b.type.degree).odd?
+            return -1.to_m*(b.wedge(a))
+          else
+            return b.wedge(a)
+          end
         end
 
         return a.wedge(b)
@@ -111,9 +115,10 @@ module SyMath
 
     # Compose ordered wedge of self and w together with a sign if w is
     # shifted an even number of times. We assume self is already
-    # ordered and flattened. Return 0 if w already exists in self.
+    # ordered and flattened. Return 0 if w is an odd dimensional form
+    # and w already exists in self.
     def wedge_ordered(w)
-      if w == factor2
+      if w == factor2 and w.type.degree.odd?
         return 0.to_m
       end
 
@@ -130,10 +135,15 @@ module SyMath
 
         return -f1^factor2
       else
-        if w == factor1
+        if w == factor1 and w.type.degree.odd?
           return 0.to_m
         elsif w > factor1
-          return -((factor1.wedge(w)).wedge(factor2))
+          ret = (factor1.wedge(w)).wedge(factor2)
+          if (w.type.degree*factor1.type.degree).odd?
+            return -ret
+          else
+            return ret
+          end
         else
           return (w.wedge(factor1)).wedge(factor2)
         end

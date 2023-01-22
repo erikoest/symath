@@ -28,10 +28,7 @@ module SyMath
             :nvector => {
               :vector => 1,
             },
-            :nform => {
-              :dform => 1,
-            },
-            :covector => 1,
+            :form => 1,
           },
           # Scalar types
           :quaternion => {
@@ -95,8 +92,7 @@ module SyMath
       :imaginary  => SyMath::Type.new(:imaginary),
       :quaternion => SyMath::Type.new(:quaternion),
       :vector     => SyMath::Type.new(:vector, indexes: ['u']),
-      :covector   => SyMath::Type.new(:covector, indexes: ['l']),
-      :dform      => SyMath::Type.new(:dform, indexes: ['l']),
+      :form       => SyMath::Type.new(:form, indexes: ['l']),
     }
 
     # Check if a type is a subtype of another
@@ -160,21 +156,17 @@ module SyMath
         return other
       elsif oscalar
         return self
-      elsif is_covector? and other.is_covector?
-        # Outer product of covectors
-        # FIXME: Should the result be an n-covector (multilinear form)?
-        return 'covector'.to_t
-      elsif is_nform? and other.is_nform?
+      elsif is_form? and other.is_form?
         indexes = self.indexes + other.indexes
-        return 'nform'.to_t(indexes: indexes)
+        return 'form'.to_t(indexes: indexes)
       elsif is_vector? and other.is_vector?
         # Outer product of vectors
-        return 'nvector'.to_t
-      elsif is_covector? and other.is_vector?
-        # Inner product of covector and vector
+        return 'nvector'.to_t(indexes: ['u', 'u'])
+      elsif is_oneform? and other.is_vector?
+        # Inner product of oneform and vector
         return 'scalar'.to_t
-      elsif is_vector? and other.is_covector?
-        # Outer product of vector and covector
+      elsif is_vector? and other.is_oneform?
+        # Outer product of vector and oneform
         return 'linop'
       elsif is_subtype?('matrix') and other.is_subtype?('matrix')
         if dimn != other.dimm
@@ -182,8 +174,8 @@ module SyMath
         end
 
         return 'matrix'.to_t(dimm: dimm, dimn: other.dimn)
-      elsif is_covector? and other.is_subtype?('linop')
-        return 'covector'.to_t
+      elsif is_oneform? and other.is_subtype?('linop')
+        return 'form'.to_t
       elsif is_subtype?('linop') and other.is_vector?
         return 'vector'.to_t
       elsif is_subtype?('linop') and other.is_subtype?('linop')
@@ -202,7 +194,7 @@ module SyMath
         if (ix - ['u']).empty?
           ret = 'nvector'
         elsif (ix - ['l']).empty?
-          ret = 'nform'
+          ret = 'form'
         else
           ret = 'tensor'
         end
@@ -248,7 +240,7 @@ module SyMath
     # both for N-1 dimensional nvectors and nforms (N being the dimensionality
     # of the default vector space)
     def is_pseudovector?()
-      if !is_subtype?('nvector') and !is_subtype?('nform')
+      if !is_subtype?('nvector') and !is_subtype?('form')
         return false
       end
 
@@ -260,26 +252,21 @@ module SyMath
     # both for N dimensional nvectors and nforms (N being the dimensionality
     # of the default vector space)
     def is_pseudoscalar?()
-      if !is_subtype?('nvector') and !is_subtype?('nform')
+      if !is_subtype?('nvector') and !is_subtype?('form')
         return false
       end
 
       return degree == SyMath.get_vector_space.basis.ncols
     end
-    
-    # True if type is the dual of an nvector
-    def is_nform?()
-      return is_subtype?('nform')
+
+    def is_form?()
+      return is_subtype?('form')
     end
 
-    def is_covector?()
-      return is_subtype?('covector')
+    def is_oneform?()
+      return (is_subtype?('form') and degree == 1)
     end
 
-    def is_dform?()
-      return is_subtype?('dform')
-    end
-    
     # Return index list as a string coded with upper indices as ' and lower
     # indices as .
     def index_str()

@@ -59,7 +59,7 @@ rule
         | bra           { return val[0] }
         | ket           { return val[0] }
 
-  bra: '<' blist '|' { return covector_node(val[1]) }
+  bra: '<' blist '|' { return oneform_node(val[1]) }
 
   ket: '|' blist '>' { return vector_node(val[1]) }
 
@@ -186,7 +186,7 @@ end
   # Create a variable or constant
   def named_node(name)
     if name.length >= 2 and name.match(/^d/)
-      return name.to_sym.to_m('dform')
+      return name.to_sym.to_m('form')
     end
 
     if name.match(/\'$/)
@@ -214,9 +214,9 @@ end
     end
   end
 
-  def covector_node(list)
+  def oneform_node(list)
     return norm_bsymbols(list).map { |a|
-      a.to_sym.to_m('covector')
+      a.to_sym.to_m('form')
     }.inject(:outer)
   end
 
@@ -227,8 +227,8 @@ end
   end
 
   def product_node(a, b)
-    # * Outer product between vectors and between covectors
-    # * Normal product between vectors and covectors and between
+    # * Outer product between vectors and between oneforms
+    # * Normal product between vectors and oneforms and between
     #   (co)vectors and linear operators
     # * Outer products has higher precedence than normal product
     if b.type.is_vector?
@@ -241,17 +241,17 @@ end
       end
     end
 
-    if a.type.is_covector?
-      if b.is_a?(SyMath::Product) and b.factor1.type.is_covector?
+    if a.type.is_oneform?
+      if b.is_a?(SyMath::Product) and b.factor1.type.is_oneform?
         return a.outer(b.factor1).mul(b.factor2)
       end
 
-      if b.type.is_covector?
+      if b.type.is_oneform?
         return a.outer(b)
       end
     end
 
-    # What about A<covector|, |vector>A, and |vector><covector| ?
+    # What about A<form|, |vector>A, and |vector><form| ?
 
     return a.mul(b)
   end

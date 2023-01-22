@@ -101,7 +101,7 @@ module SyMath
       dim = brow.length
 
       dmap = brow.map do |bb|
-        SyMath::Definition::Variable.new("d#{bb.name}".to_sym, 'dform'.to_t, self)
+        SyMath::Definition::Variable.new("d#{bb.name}".to_sym, 'form'.to_t, self)
       end
 
       vmap = brow.map do |bb|
@@ -121,17 +121,17 @@ module SyMath
           end
 
           # Hash them to the normalized expression (including the sign).
-          # Do this both for vectors and dforms.      
+          # Do this both for vectors and oneforms.
           norm = p.sort
           sign = self.class.permutation_parity(p)
 
-          dform = p.map { |i| dmap[i] }.inject(:^)
+          form = p.map { |i| dmap[i] }.inject(:^)
           vect = p.map { |i| vmap[i] }.inject(:^)
 
           dnorm = sign*(norm.map { |i| dmap[i] }.inject(:^))
           vnorm = sign*(norm.map { |i| vmap[i] }.inject(:^))
 
-          @norm_map[dform] = dnorm
+          @norm_map[form] = dnorm
           @norm_map[vect] = vnorm
 
           # Hash them to their hodge dual
@@ -146,7 +146,7 @@ module SyMath
             hdv = sign*dsign*(dual.map { |i| vmap[i] }.inject(:^))
           end
 
-          @hodge_map[dform] = hdd
+          @hodge_map[form] = hdd
           @hodge_map[vect] = hdv
         end
       end
@@ -180,19 +180,16 @@ module SyMath
       return name.to_m('vector', self)
     end
 
-    def covector(name)
-      return name.to_m('covector', self)
-    end
-
-    def dform(name)
-      return name.to_m('dform', self)
+    def oneform(name)
+      return name.to_m('form', self)
     end
 
     def linop(name)
       return name.to_m('linop', self)
     end
 
-    def raise_dform(d)
+    # FIXME: Define these for n-forms and n-vectors
+    def raise_oneform(d)
       if @sharp_map.nil?
         raise "Not a metric space"
       end
@@ -210,7 +207,7 @@ module SyMath
       end
 
       if !@flat_map.key?(v)
-        raise "No dform dual for #{v}"
+        raise "No oneform dual for #{v}"
       end
 
       return @flat_map[v]
@@ -251,7 +248,7 @@ module SyMath
           i == order ? 1 : 0
         end.to_m.transpose
 
-        if var.type.is_covector?
+        if var.type.is_oneform?
           return m.conjugate_transpose
         else
           return m

@@ -26,12 +26,12 @@ module SyMath
         return arg.args[0]
       end
 
-      # c is unitary: H(c) -> c**-1
+      # c is unitary: Herm(c) -> c**-1
       if arg.is_a?(SyMath::Definition::Variable) and arg.is_unitary?
         if arg.type.is_vector?
           # Ket -> bra
-          return arg.name.to_sym.to_m(:covector, arg.vector_space)
-        elsif arg.type.is_covector?
+          return arg.name.to_sym.to_m(:form, arg.vector_space)
+        elsif arg.type.is_oneform?
           # Bra -> ket
           return arg.name.to_sym.to_m(:vector, arg.vector_space)
         end
@@ -55,7 +55,7 @@ module SyMath
         return arg.class.new(op(:Herm, arg.factor2), op(:Herm, arg.factor1))
       end
 
-      # FIXME: a is self adjoint: H(a) -> a
+      # FIXME: a is self adjoint: Herm(a) -> a
       return c
     end
 

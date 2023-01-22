@@ -34,7 +34,7 @@ module SyMath
     end
 
     def initialize()
-      super(:qX, type: 'linop')
+      super(:qX, type: 'linop'.to_t(indexes: ['u', 'l']))
     end
 
     def is_involutory?

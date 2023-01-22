@@ -250,19 +250,17 @@ module SyMath
     end
 
     def to_s()
-      if @type.is_dform?
-        return SyMath.setting(:d_symbol) + undiff.to_s
-      elsif @type.is_vector?
-        if vector_space.normalized? and SyMath.setting(:braket_syntax)
+      if @type.is_vector?
+        if !vector_space.nil? and vector_space.normalized? and SyMath.setting(:braket_syntax)
           return "|#{qubit_name}>"
         else
           return @name.to_s + SyMath.setting(:vector_symbol)
         end
-      elsif @type.is_covector?
-        if vector_space.normalized? and SyMath.setting(:braket_syntax)
+      elsif @type.is_form?
+        if !vector_space.nil? and vector_space.normalized? and SyMath.setting(:braket_syntax)
           return "<#{qubit_name}|"
         else
-          return @name.to_s + SyMath.setting(:covector_symbol)
+          return @name.to_s
         end
       elsif @type.is_subtype?('tensor')
         return @name.to_s + '['.to_s + @type.index_str + ']'.to_s

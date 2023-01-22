@@ -244,6 +244,16 @@ module SyMath
 
     alias eql? ==
 
+    def to_vector()
+      # Find default vectorspace (or get vectorspace from input)
+      # If matrix is row with same dimension as vectorspace,
+      #   convert to oneform
+      # If matrix is column with same dimension as vectorspace,
+      #   convert to vector
+      # TODO: Do square matrices represent anything meaningful?
+      # Throw error is dimension is not matching.
+    end
+
     def to_s()
       # This will in many cases look rather messy, but we don't have the option
       # to format the matrix over multiple lines.

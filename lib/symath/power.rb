@@ -19,7 +19,12 @@ module SyMath
       if b == 1
         return a
       end
-      
+
+      # involutory value is its own inverse
+      if b == -1 and a.is_involutory?
+        return a
+      end
+
       if a.is_a?(SyMath::Power)
         return a.base**(a.exponent*b)
       end
@@ -113,8 +118,8 @@ module SyMath
         return 1.to_m, 1, true
       end
 
-      # Reduce positive integer power of vectors and dforms to zero
-      if (base.type.is_dform? or base.type.is_vector?) and
+      # Reduce positive integer power of odd dimensional forms to zero
+      if base.type.is_oneform? and base.type.dimension.odd? and
         exponent.is_number?
         return 0.to_m, 1, true
       end

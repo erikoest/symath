@@ -41,8 +41,8 @@ module SyMath
       if type.name != other.type.name
         return type.name <=> other.type.name
       end
-      # Order basis vectors and basis dforms by basis order
-      if type.is_subtype?('vector') or type.is_subtype?('dform')
+      # Order basis vectors and basis forms by basis order
+      if type.is_subtype?('vector') or type.is_subtype?('form')
         # First, order by vector space
         if self.vector_space.name != other.vector_space.name
           return self.vector_space.name <=> other.vector_space.name
@@ -83,12 +83,14 @@ module SyMath
       return false
     end
 
-    # Returns true if variable is a differential form
+    # Returns true if variable is a differential form.
+    # By convention, we treat all forms beginning with the character 'd' as
+    # differential forms.
     def is_d?()
-      return @type.is_dform?
+      return (@type.is_oneform? and @name != 'd' and @name[0] == 'd')
     end
 
-    # Returns variable which differential is based on
+    # Returns variable which a differential form is based on
     def undiff()
       n = "#{@name}"
       if n[0] == 'd'
@@ -97,9 +99,10 @@ module SyMath
 
       n.to_sym.to_m(:real)
     end
-    
+
+    # Create a differential form based on a variable
     def to_d()
-      return "d#{@name}".to_sym.to_m(:dform)
+      return "d#{@name}".to_sym.to_m(:form)
     end
 
     def variables()
@@ -132,7 +135,7 @@ module SyMath
     end
 
     def reduce_product_modulo_sign(o)
-      if self.type.is_covector? and o.type.is_vector?
+      if (self.type.is_oneform? and o.type.is_vector?)
         # <a|a> = 1
         if self.vector_space == o.vector_space and
           self.vector_space.normalized? and self.name == o.name
@@ -152,20 +155,18 @@ module SyMath
     end
 
     def to_latex()
-      if type.is_dform?
-        return '\mathrm{d}' + undiff.to_latex
-      elsif @type.is_vector?
+      if @type.is_vector?
         if vector_space.normalized? and SyMath.setting(:braket_syntax)
           return "\\ket{#{qubit_name}}"
         else
           return "\\vec{#{@name}}"
         end
-      elsif @type.is_covector?
-        # What is the best way to denote a covector without using indexes?
+      elsif @type.is_form?
+        # What is the best way to denote a oneform without using indexes?
         if vector_space.normalized? and SyMath.setting(:braket_syntax)
           return "\\bra{#{qubit_name}}"
         else
-          return "\\vec{#{@name}}"
+          return "#{@name}"
         end
       elsif @type.is_subtype?('tensor')
         return "#{@name}[#{@type.index_str}]"

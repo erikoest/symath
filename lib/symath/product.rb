@@ -39,7 +39,12 @@ module SyMath
 
       # Tensor-like objects
       if a.type.is_subtype?(:tensor) and b.type.is_subtype?(:tensor)
-        if a.type.is_subtype?(:nform) and b.type.is_subtype?(:nform)
+        if (a.type.is_oneform? and b.type.is_oneform?) or
+          (a.type.is_vector? and b.type.is_vector?)
+          return a.outer(b)
+        end
+
+        if a.type.is_subtype?(:form) and b.type.is_subtype?(:form)
           # Expand expression if any of the parts are sum
           if b.is_sum_exp?
             return b.terms.map { |f| a.*(f) }.inject(:+)
@@ -50,11 +55,6 @@ module SyMath
           end
 
           return a.wedge(b)
-        end
-
-        if (a.type.is_subtype?(:covector) and b.type.is_subtype?(:covector)) or
-          (a.type.is_subtype?(:vector) and b.type.is_subtype?(:vector))
-          return a.outer(b)
         end
       end
 
