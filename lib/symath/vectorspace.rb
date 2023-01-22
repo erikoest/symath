@@ -213,6 +213,14 @@ module SyMath
       return @flat_map[v]
     end
 
+    def basis_vectors()
+      return @basis.row(0).map { |b| b.name.to_m('vector') }
+    end
+
+    def basis_forms()
+      return @basis.row(0).map { |b| "d#{b.name}".to_sym.to_m('form') }
+    end
+
     def metric?()
       return !@g.nil?
     end

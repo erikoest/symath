@@ -451,8 +451,8 @@ understood by the author of this code. The following has not been
 reviewed by any others who understand the subject better than me, and
 it may very well contain a lot of errors and misunderstandings.
 
-Forms can be defined in several ways. The following are equal. All
-of them will create a oneform in the default vector space:
+Forms can be defined in several ways. The following are equal. All of
+them will create a oneform in the default vector space:
 
 <pre>
   > # Using the to_d method on a scalar variable
@@ -464,6 +464,12 @@ of them will create a oneform in the default vector space:
   > # Creating a variable, and specifying the form type
   > :dx.to_m('form')
   => dx
+</pre>
+
+N-forms can be created by specifying the type explicitly:
+
+<pre>
+  > :da.to_m('form'.to_t(indexes: 'll'))
 </pre>
 
 Forms can be wedged together, forming n-forms (note that the ^
@@ -545,21 +551,50 @@ from the above operators in the usual way:
 
 ### Matrices
 
-Row matrices can be defined in the coordinate array form by converting an
-array to a math object, using the to_m method. Column matrices and two
-dimensional matrices can be created the same way from two dimensional arrays:
+Row matrices can be defined by converting an array to a math object, using
+the to_m method. Column matrices and two dimensional matrices can similarily
+be created from two dimensional arrays:
 
 <pre>
-  > m = [[1, 2, 3], [4, 5, 6]].to_m
-  > v = [-3, 4, 1].to_m
-  > m*v.transpose
-  => [1, 2, 3; 4, 5, 6]*[- 3; 4; 1]
-  > (m*v.transpose).evaluate
-  => [8; 14]
+  > a = [[1, 2, 3], [4, 5, 6]].to_m
+  > b = [-3, 4, 1].to_m
+</pre>
+
+Various operations are available on matrices such as:
+
+<pre>
+  > m = [1, 2, 3].to_m
+  > m.transpose
+  => [1; 2; 3]
+  > n = [[4], [5], [5]].to_m
+  > m.kroenecker(n)
+  => [4, 2 4, 3 4; 5, 2 5, 3 5; 5, 2 5, 3 5]
+  > m.kroenecker(n).normalize
+  => [4, 8, 12; 5, 10, 15; 5, 10, 15]
+  > s = [[4, 7], [2, 6]].to_m
+  > s.determinant
+  => 10
+  > s.inverse
+  => [6/10, - 7/10; - 2/10, 4/10]
+  > s.trace
+  => 10
+  > s.adjugate
+  => [6, - 7; - 2, 4]
 </pre>
 
 The vector and matrix cells can of course contain symbolic expressions
 instead of just numbers.
+
+Row- and column vectors can be translated into sums of basis forms and
+basis vectors, respectively, as long as the length of the row or column
+is equal to the vector space.
+
+<pre>
+  > m.to_vector
+  => dx1 + 2 dx2 + 3 dx3
+  > n.to_vector
+  => 4 x1' + 5 x2' + 5 x3'
+</pre>
 
 ### Methods for manipulating expressions
 

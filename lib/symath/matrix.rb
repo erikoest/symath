@@ -244,14 +244,37 @@ module SyMath
 
     alias eql? ==
 
-    def to_vector()
+    def to_vector(vs = nil)
       # Find default vectorspace (or get vectorspace from input)
-      # If matrix is row with same dimension as vectorspace,
-      #   convert to oneform
-      # If matrix is column with same dimension as vectorspace,
-      #   convert to vector
-      # TODO: Do square matrices represent anything meaningful?
-      # Throw error is dimension is not matching.
+      if (vs.nil?)
+        vs = SyMath.get_vector_space
+      end
+
+      if (nrows == 1 and ncols == vs.dimension)
+        # Matrix is row with same dimension as vectorspace.
+        # convert to oneform
+        r = row(0)
+        ret = 0.to_m
+        vs.basis_forms.each_with_index do |b, i|
+          ret += r[i]*b
+        end
+
+        return ret
+      end
+
+      if (nrows == vs.dimension and ncols == 1)
+        # If matrix is column with same dimension as vectorspace.
+        # convert to vector
+        r = col(0)
+        ret = 0.to_m
+        vs.basis_vectors.each_with_index do |b, i|
+          ret += r[i]*b
+        end
+
+        return ret
+      end
+
+      raise 'Cannot convert matrix of dim #{ncols},#{nrows} to vector expression'
     end
 
     def to_s()
