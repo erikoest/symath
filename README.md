@@ -353,7 +353,7 @@ The basic quaternions, i, j, k are also available as constants. The
 quaternion i is identical to the complex imaginary unit. Some simple
 reduction rules are available for the quaternions as well.
 
-### Vectors, oneforms and linear operators
+### Vectors, forms and other linear operators
 
 Variables can be defined as vectors, oneforms, multilinear forms and
 other vector-like objects by specifying a type when created. Vector-like
@@ -488,7 +488,7 @@ coordinate system defined by the basic vectors of the current
 vector space.
 
 The rest of this section assumes that the following scalars, vectors
-and d-forms are defined:
+and forms are defined:
 
 <pre>
   > SyMath.assign_variable('basis', [:x1, :x2, :x3])

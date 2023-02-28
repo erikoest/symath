@@ -215,7 +215,7 @@ module SyMath
 
     # Return tensor degree (rank)
     def degree()
-      return @indexes.length
+      return @indexes.nil? ? 0 : @indexes.length
     end
 
     # True if type is a scalar value 
