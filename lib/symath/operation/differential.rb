@@ -94,6 +94,7 @@ module SyMath::Operation::Differential
       return d_power(vars)
     end
 
+    puts self
     # Derivative of function
     return d_function(vars)
   end
@@ -102,12 +103,12 @@ module SyMath::Operation::Differential
     raise DifferentialError, 'Cannot calculate differential of expression ' + to_s
   end
 
-  # Leibniz product rule for forms. For simplicity, just use wedge
-  # products all the time. They will be normalized to scalar products
-  # afterwards.
+  # Leibniz product rule for forms.
   def d_product(vars)
     s = factor1.type.degree.even? ? 1 : -1
 
+    # For simplicity, just use wedge products all the time. They will be
+    # normalized to scalar products afterwards.
     return ((factor1.d(vars)^factor2) +
             s*(factor1^factor2.d(vars)))
   end

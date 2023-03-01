@@ -9,12 +9,28 @@ module SyMath
   x2v = :x2.to_m('vector')
   x3v = :x3.to_m('vector')
 
-  dx1 = :dx1.to_m('form')
-  dx2 = :dx2.to_m('form')
-  dx3 = :dx3.to_m('form')
+  dx1 = d(:x1)
+  dx2 = d(:x2)
+  dx3 = d(:x3)
 
-  da = :da.to_m('form')
+  a = :a.to_m(:form.to_t(indexes: ['l']))
+  da = a.to_d
+  b = :b.to_m(:form.to_t(indexes: ['l', 'l']))
+  db = b.to_d
+
   av = :a.to_m('vector')
+
+  describe SyMath::Definition::Xd do
+    xd = {
+      xd(a^b) => b.wedge(da) - a.wedge(db)
+    }
+
+    xd.each do |from, to|
+      it "evaluates '#{from.to_s}' into '#{to.to_s}'" do
+        expect(from.evaluate.normalize).to be_equal_to to
+      end
+    end
+  end
 
   describe SyMath::Definition::Grad do
     g = {
@@ -108,7 +124,7 @@ module SyMath
     end
 
     it 'hodge error' do
-      expect { hodge(da).evaluate }.to raise_error 'No hodge dual for da'
+      expect { hodge(a).evaluate }.to raise_error 'No hodge dual for a'
     end
   end
 
@@ -125,7 +141,7 @@ module SyMath
     end
 
     it 'sharp error' do
-      expect { sharp(da).evaluate }.to raise_error 'No vector dual for da'
+      expect { sharp(a).evaluate }.to raise_error 'No vector dual for a'
     end
   end
 

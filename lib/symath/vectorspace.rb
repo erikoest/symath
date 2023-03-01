@@ -101,11 +101,11 @@ module SyMath
       dim = brow.length
 
       dmap = brow.map do |bb|
-        SyMath::Definition::Variable.new("d#{bb.name}".to_sym, 'form'.to_t, self)
+        SyMath::Definition::Variable.new("d#{bb.name}".to_sym, 'form'.to_t, v: self, exact: true)
       end
 
       vmap = brow.map do |bb|
-        SyMath::Definition::Variable.new(bb.name.to_sym, 'vector'.to_t, self)
+        SyMath::Definition::Variable.new(bb.name.to_sym, 'vector'.to_t, v: self)
       end
 
       # Calculate all possible permutations of all possible combinations of
@@ -177,15 +177,15 @@ module SyMath
     end
 
     def vector(name)
-      return name.to_m('vector', self)
+      return name.to_m('vector', v: self)
     end
 
     def oneform(name)
-      return name.to_m('form', self)
+      return name.to_m('form', v: self)
     end
 
     def linop(name)
-      return name.to_m('linop', self)
+      return name.to_m('linop', v: self)
     end
 
     # FIXME: Define these for n-forms and n-vectors

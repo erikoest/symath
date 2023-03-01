@@ -8,7 +8,7 @@ Supported features:
   * Composing formulas from +, -, *, / and other standard algebraic operations
   * Reduction rules
   * Derivation
-  * Simple heuristic integration (not cad-level)
+  * Simple heuristic integration (not cas level)
   * Simple polynomial factorization with one variable
   * Complex numbers and quaternions
   * Exterior algebra and exterior derivative (limited and possibly faulty)
@@ -448,8 +448,8 @@ be converted to matrix form for further calculations.
 
 Caveat: Exterior algebra and differential forms are not well
 understood by the author of this code. The following has not been
-reviewed by any others who understand the subject better than me, and
-it may very well contain a lot of errors and misunderstandings.
+reviewed by anyone who understand the subject well. It may very well
+contain a lot of errors and misunderstandings.
 
 Forms can be defined in several ways. The following are equal. All of
 them will create a oneform in the default vector space:

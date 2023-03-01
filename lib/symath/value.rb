@@ -120,6 +120,10 @@ module SyMath
       return false
     end
 
+    def is_exact?()
+      return false
+    end
+
     def is_involutory?()
       return false
     end

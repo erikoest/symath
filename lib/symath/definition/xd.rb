@@ -12,8 +12,8 @@ module SyMath
     end
 
     def evaluate_call(c)
-      vars = SyMath.get_vector_space.basis.row(0)
-
+      # Differentiate over all free variables
+      vars = c.args[0].variables;
       return c.args[0].evaluate.d(vars)
     end
 

@@ -5,18 +5,25 @@ require 'symath/vectorspace'
 module SyMath
   class Definition::Variable < Definition
     attr_reader :vector_space
+    attr_reader :exact
 
-    def initialize(name, t = 'real', vector_space = nil)
+    def initialize(name, t = 'real', v: nil, exact: false)
       t = t.to_t
       if t.is_subtype?('tensor')
-        if !vector_space.is_a?(SyMath::VectorSpace)
-          @vector_space = SyMath.get_vector_space(vector_space)
+        if !v.is_a?(SyMath::VectorSpace)
+          @vector_space = SyMath.get_vector_space(v)
         else
-          @vector_space = vector_space
+          @vector_space = v
         end
+
+        @exact = exact
       end
 
       super(name, define_symbol: false, type: t)
+    end
+
+    def is_exact?
+      return @exact
     end
 
     def description()
@@ -102,11 +109,14 @@ module SyMath
 
     # Create a differential form based on a variable
     def to_d()
-      return "d#{@name}".to_sym.to_m(:form)
+      # d^2 = 0
+      return 0.to_m if is_exact?
+
+      return "d#{@name}".to_sym.to_m(:form, exact: true)
     end
 
     def variables()
-      return [@name]
+      return [self]
     end
 
     def replace(map)
@@ -180,7 +190,7 @@ module SyMath
 end
 
 class Symbol
-  def to_m(type = nil, vector_space = nil)
+  def to_m(type = nil, v: nil, exact: false)
     ret = nil
 
     begin
@@ -193,7 +203,7 @@ class Symbol
         type = 'real'
       end
 
-      ret = SyMath::Definition::Variable.new(self, type, vector_space)
+      ret = SyMath::Definition::Variable.new(self, type, v: v, exact: exact)
     end
 
     if !ret.allow_standalone?

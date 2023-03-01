@@ -30,10 +30,10 @@ module SyMath
       if arg.is_a?(SyMath::Definition::Variable) and arg.is_unitary?
         if arg.type.is_vector?
           # Ket -> bra
-          return arg.name.to_sym.to_m(:form, arg.vector_space)
+          return arg.name.to_sym.to_m(:form, v: arg.vector_space)
         elsif arg.type.is_oneform?
           # Bra -> ket
-          return arg.name.to_sym.to_m(:vector, arg.vector_space)
+          return arg.name.to_sym.to_m(:vector, v: arg.vector_space)
         end
       end
 
