@@ -155,19 +155,21 @@ module SyMath
       if SyMath.setting(:expl_parentheses)
         return '('.to_s + term1.to_s + ' + ' + term2.to_s + ')'.to_s
       else
-        if term2.is_a?(SyMath::Minus)
-          return term1.to_s + " " + term2.to_s
+        t2 = term2.to_s
+        if t2[0] == '-'
+          return term1.to_s + " " + t2
         else
-          return term1.to_s + " + " + term2.to_s
+          return term1.to_s + " + " + t2
         end
       end
     end
 
     def to_latex()
-      if term2.is_a?(SyMath::Minus)
-        return term1.to_latex + ' ' + term2.to_latex
+      t2 = term2.to_latex
+      if t2[0] == '-'
+        return term1.to_latex + ' ' + t2
       else
-        return term1.to_latex + ' + ' + term2.to_latex
+        return term1.to_latex + ' + ' + t2
       end
     end
   end

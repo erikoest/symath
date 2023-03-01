@@ -499,9 +499,9 @@ and forms are defined:
   > x1v = :x1.to_m('vector')
   > x2v = :x2.to_m('vector')
   > x3v = :x3.to_m('vector')
-  > dx1 = :dx1.to_m('form')
-  > dx2 = :dx2.to_m('form')
-  > dx3 = :dx3.to_m('form')
+  > dx1 = x1.to_d
+  > dx2 = x2.to_d
+  > dx3 = x3.to_d
 </pre>
 
 The exterior derivative is available as the xd-operator:
